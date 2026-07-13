@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  phone         String?
+  location      String?
+  role          String    @default("USER") // USER, ADMIN
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  progress      UserProgress[]
+  bookmarks     Bookmark[]
+  consultations Consultation[]
+  transactions  Transaction[]
+  readingHistory ReadingHistory[]
+
+  @@index([role])
+}
+
+model UserProgress {
+  id          String   @id @default(uuid())
+  userId      String
+  courseId    String
+  moduleId    String
+  lessonId    String
+  status      String   @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED
+  progressPct Float    @default(0.0)
+  lastAccessed DateTime @default(now())
+  quizScore   Float?
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, lessonId])
+  @@index([userId])
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String   // ARTICLE, JUDGMENT, GUIDE, LESSON
+  contentId String   // ID of the content being bookmarked
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, type, contentId])
+  @@index([userId])
+  @@index([type])
+}
+
+model Consultation {
+  id               String   @id @default(uuid())
+  userId           String
+  name             String
+  mobile           String
+  language         String
+  time             String
+  category         String
+  summary          String?
+  status           String   @default("PENDING_PAYMENT") // PENDING_PAYMENT, PENDING_VERIFICATION, APPROVED, REJECTED
+  
+  upiId            String?
+  utr              String?
+  screenshotUrl    String?
+  adminRemarks     String?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions     Transaction[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Transaction {
+  id             String   @id @default(uuid())
+  userId         String
+  consultationId String?
+  amount         Float
+  utr            String?
+  screenshotUrl  String?
+  status         String   @default("PENDING") // PENDING, APPROVED, REJECTED, REFUNDED
+  paymentMethod  String   @default("UPI")
+  remarks        String?
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  approvedAt     DateTime?
+  approvedBy     String?  // Admin User ID
+  
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  consultation   Consultation? @relation(fields: [consultationId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model ReadingHistory {
+  id          String   @id @default(uuid())
+  userId      String
+  title       String
+  path        String
+  timeSpent   Int      @default(0) // seconds
+  lastAccessed DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

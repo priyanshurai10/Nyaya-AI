@@ -1,0 +1,104 @@
+{
+  "property": {
+    "title": "Property Law & Real Estate Guide",
+    "start_court": "Sub-Registrar Office / Civil Court",
+    "first_instance": "Local Civil Judge",
+    "timeline": "6 months - 3 years",
+    "documents": [
+      "Original Title Deeds & Sale Deed",
+      "Encumbrance Certificate",
+      "Property Tax Receipts",
+      "Khata / Mutation Extract",
+      "Approved Building Plan",
+      "Identity Proof (Aadhaar/PAN)"
+    ],
+    "hierarchy": [
+      { "step": 1, "name": "Registration & Registry", "desc": "Property transactions require mandatory registration at the Sub-Registrar's office under the Registration Act to ensure legal validity." },
+      { "step": 2, "name": "Sale Deed & Gift Deed", "desc": "Drafting and executing valid transfer documents. A Sale Deed transfers ownership for a price, while a Gift Deed transfers it out of love and affection." },
+      { "step": 3, "name": "Mutation & Land Records", "desc": "Updating revenue records (Khata/Patta) after property transfer to ensure property tax is assessed in the new owner's name." },
+      { "step": 4, "name": "Partition", "desc": "Dividing ancestral or jointly owned property among co-owners through a deed of partition or a partition suit in a civil court." },
+      { "step": 5, "name": "Illegal Possession & Encroachment", "desc": "Legal remedies under the Specific Relief Act and criminal complaints to reclaim property from squatters or encroachers." },
+      { "step": 6, "name": "Common Disputes", "desc": "Resolving boundary disputes, contested titles, inheritance conflicts, and builder-buyer issues under RERA." }
+    ]
+  },
+  "labour": {
+    "title": "Employment & Labour Law Guide",
+    "start_court": "Labour Commissioner / Labour Court",
+    "first_instance": "Assistant Labour Commissioner",
+    "timeline": "6 months - 2 years",
+    "documents": [
+      "Employment Contract / Offer Letter",
+      "Salary Slips & Bank Statements",
+      "Termination / Relieving Letter",
+      "PF / ESI Account Statements",
+      "Official Email Correspondences",
+      "Notice / Show Cause documents"
+    ],
+    "hierarchy": [
+      { "step": 1, "name": "Contracts & Labour Rights", "desc": "Understanding the terms of employment, non-compete clauses, working hours, and fundamental rights under the Industrial Disputes Act." },
+      { "step": 2, "name": "Salary Issues & Notice Period", "desc": "Addressing unpaid wages, unauthorized deductions, and enforcing notice period clauses for both employer and employee." },
+      { "step": 3, "name": "PF & ESI", "desc": "Ensuring employer compliance with Provident Fund (PF) and Employee State Insurance (ESI) contributions, and resolving withdrawal issues." },
+      { "step": 4, "name": "Workplace Harassment", "desc": "Filing complaints under the POSH Act with the Internal Complaints Committee (ICC) for safe working conditions." },
+      { "step": 5, "name": "Wrongful Termination", "desc": "Legal recourse against illegal retrenchment, dismissal without adequate cause, or forced resignation (constructive dismissal)." }
+    ]
+  },
+  "family": {
+    "title": "Family Law & Domestic Relations",
+    "start_court": "Family Court",
+    "first_instance": "Principal Judge, Family Court",
+    "timeline": "1 - 3 years",
+    "documents": [
+      "Marriage Certificate & Photographs",
+      "Identity & Address Proofs",
+      "Income Proof & Tax Returns",
+      "Birth Certificates of Children",
+      "Police Complaints (if any)"
+    ],
+    "hierarchy": [
+      { "step": 1, "name": "Marriage", "desc": "Requirements for a valid marriage under personal laws or the Special Marriage Act, and mandatory registration." },
+      { "step": 2, "name": "Divorce", "desc": "Grounds for contested divorce or mutual consent divorce, including mediation and the cooling-off period." },
+      { "step": 3, "name": "Maintenance", "desc": "Claiming financial support (alimony) for spouse, children, or parents under personal laws or Section 125 of the CrPC." },
+      { "step": 4, "name": "Domestic Violence", "desc": "Filing complaints under the Protection of Women from Domestic Violence Act (PWDVA) for protection, residence, and monetary orders." },
+      { "step": 5, "name": "Child Custody & Adoption", "desc": "Determining physical/legal custody based on child welfare, and the legal process for adoption under CARA guidelines." },
+      { "step": 6, "name": "Succession & Inheritance", "desc": "Rules for intestate succession (dying without a will), drafting a valid will, and obtaining a succession certificate." }
+    ]
+  },
+  "civil": {
+    "title": "Civil Dispute Pathway",
+    "start_court": "Civil Judge (Junior/Senior Division)",
+    "first_instance": "Munsif Court / Sub-Judge",
+    "timeline": "2 - 5 years",
+    "documents": [
+      "Plaint (Filing Petition)",
+      "Vakalatnama (Lawyer Authorization)",
+      "Affidavit of Evidence",
+      "Original Documents / Agreements",
+      "Court Fee Receipt"
+    ],
+    "hierarchy": [
+      { "step": 1, "name": "Institution of Suit", "desc": "Filing the plaint with appropriate court fees. First-instance institution of monetary, recovery, or property lawsuits." },
+      { "step": 2, "name": "District Court (First Appeal)", "desc": "Appellate review of decrees passed by sub-judges and trial of suits exceeding municipal valuation limits." },
+      { "step": 3, "name": "High Court (Second Appeal)", "desc": "Second appeals on substantial questions of law, writ petitions, and constitutional oversight." },
+      { "step": 4, "name": "Supreme Court", "desc": "Apex adjudication, federal arbitration, and final interpretation of the Constitution via Special Leave Petition (SLP)." }
+    ]
+  },
+  "criminal": {
+    "title": "Criminal Prosecution Flow",
+    "start_court": "Judicial Magistrate First Class (JMFC)",
+    "first_instance": "Police Station / Magistrate",
+    "timeline": "1 - 5 years",
+    "documents": [
+      "FIR (First Information Report)",
+      "Charge Sheet",
+      "Bail Application",
+      "Witness Statements (Sec 161/164 CrPC)",
+      "Medical/Forensic Reports"
+    ],
+    "hierarchy": [
+      { "step": 1, "name": "Magistrate Court", "desc": "Filing of charge-sheets, bail hearings, summary trials for minor offenses, and committing sessions-level crimes." },
+      { "step": 2, "name": "Sessions Court", "desc": "Trial of serious crimes (homicide, rape) and first appeal hearings from magistrate courts." },
+      { "step": 3, "name": "High Court", "desc": "Writ petitions for quashing FIRs, bail applications, and death sentence confirmations." },
+      { "step": 4, "name": "Supreme Court", "desc": "Apex judicial review, final sentencing appeals, and constitutional integrity verification." }
+    ]
+  }
+}

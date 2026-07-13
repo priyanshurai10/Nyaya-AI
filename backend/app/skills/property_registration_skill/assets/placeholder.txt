@@ -1,0 +1,5 @@
+Assets and templates for Property Registration & Stamp Duty
+Templates:
+- Standard Sale Deed draft template
+- Standard Gift Deed draft template
+- Will draft template

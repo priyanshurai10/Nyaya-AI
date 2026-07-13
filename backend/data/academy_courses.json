@@ -1,0 +1,88 @@
+{
+  "courses": [
+    {
+      "id": "COURSE-1000",
+      "title": "Constitution of India",
+      "description": "Master the supreme law of India, fundamental rights, and state policies.",
+      "level": "Beginner"
+    },
+    {
+      "id": "COURSE-1001",
+      "title": "Bharatiya Nyaya Sanhita (BNS)",
+      "description": "The new criminal code replacing IPC. Understand offenses and penalties.",
+      "level": "Intermediate"
+    },
+    {
+      "id": "COURSE-1002",
+      "title": "Bharatiya Nagarik Suraksha Sanhita (BNSS)",
+      "description": "Replaces CrPC. Learn criminal procedures and police powers.",
+      "level": "Intermediate"
+    },
+    {
+      "id": "COURSE-1003",
+      "title": "Bharatiya Sakshya Adhiniyam (BSA)",
+      "description": "The new Indian Evidence Act. Rules of evidence and admissibility.",
+      "level": "Advanced"
+    },
+    {
+      "id": "COURSE-1004",
+      "title": "Right to Information (RTI)",
+      "description": "Empowering citizens to seek information from public authorities.",
+      "level": "Beginner"
+    },
+    {
+      "id": "COURSE-1005",
+      "title": "Consumer Protection Act",
+      "description": "Protecting consumer rights against unfair trade practices.",
+      "level": "Beginner"
+    },
+    {
+      "id": "COURSE-1006",
+      "title": "Property Law (TPA)",
+      "description": "Transfer of property, real estate rules, and RERA.",
+      "level": "Advanced"
+    },
+    {
+      "id": "COURSE-1007",
+      "title": "Employment & Labour Law",
+      "description": "Rights of workers, labor codes, and employer compliance.",
+      "level": "Intermediate"
+    },
+    {
+      "id": "COURSE-1008",
+      "title": "Family Law",
+      "description": "Marriage, divorce, succession, and adoption under various personal laws.",
+      "level": "Intermediate"
+    },
+    {
+      "id": "COURSE-1009",
+      "title": "Cyber Law & IT Act",
+      "description": "Digital crimes, data protection, and intermediary liability.",
+      "level": "Intermediate"
+    },
+    {
+      "id": "COURSE-1010",
+      "title": "Motor Vehicles Act",
+      "description": "Traffic rules, challans, and accident claims tribunals.",
+      "level": "Beginner"
+    },
+    {
+      "id": "COURSE-1011",
+      "title": "POSH Act",
+      "description": "Prevention of Sexual Harassment at Workplace.",
+      "level": "Beginner"
+    },
+    {
+      "id": "COURSE-1012",
+      "title": "Digital Evidence & Forensics",
+      "description": "Admissibility of electronic records and cyber forensics.",
+      "level": "Advanced"
+    },
+    {
+      "id": "COURSE-1013",
+      "title": "Legal Drafting & Procedures",
+      "description": "How to draft notices, plaints, and petitions in India.",
+      "level": "Advanced"
+    }
+  ]
+}

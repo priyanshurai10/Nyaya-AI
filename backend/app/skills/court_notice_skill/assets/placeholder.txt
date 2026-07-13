@@ -1,0 +1,5 @@
+Assets and templates for Court Notice & Summons Reply
+Templates:
+- Written Statement template
+- Vakalatnama format
+- Adjournment petition format

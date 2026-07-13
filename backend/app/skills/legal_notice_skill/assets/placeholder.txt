@@ -1,0 +1,5 @@
+Assets and templates for Legal Notice Drafting & Reply
+Templates:
+- Standard Reply template
+- Cheque Bounce Reply template
+- Demand Notice template

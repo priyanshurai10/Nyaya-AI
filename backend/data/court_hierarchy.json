@@ -1,0 +1,42 @@
+[
+  {
+    "id": "sc",
+    "name": "Supreme Court of India",
+    "level": "Apex",
+    "description": "The highest judicial authority in India. Hears appeals from High Courts and original suits involving disputes between the Union and States or fundamental rights violations.",
+    "jurisdiction": "Appellate, Original, Advisory",
+    "location": "New Delhi"
+  },
+  {
+    "id": "hc",
+    "name": "High Courts",
+    "level": "State Level",
+    "description": "The principal civil courts of original jurisdiction in the state along with appellate jurisdiction over all subordinate courts.",
+    "jurisdiction": "Appellate, Original (in some states), Writ",
+    "location": "State Capitals (Mostly)"
+  },
+  {
+    "id": "dc",
+    "name": "District & Sessions Courts",
+    "level": "District Level",
+    "description": "District Courts handle civil matters, while Sessions Courts handle criminal matters. Appeals lie to the High Court.",
+    "jurisdiction": "Civil (District), Criminal (Sessions)",
+    "location": "Every District HQ"
+  },
+  {
+    "id": "sub",
+    "name": "Subordinate Courts (Civil Judge / Magistrate)",
+    "level": "Taluka/Block Level",
+    "description": "The lowest tier of the formal judiciary handling smaller civil disputes and lesser criminal offenses.",
+    "jurisdiction": "Original (Limited pecuniary/sentencing)",
+    "location": "Taluka Level"
+  },
+  {
+    "id": "special",
+    "name": "Specialized Tribunals",
+    "level": "Subject Specific",
+    "description": "Quasi-judicial bodies for specific areas like Consumer Disputes (NCDRC), Company Law (NCLT), Armed Forces (AFT), and Labour matters.",
+    "jurisdiction": "Statutory Subject Matter",
+    "location": "Varies"
+  }
+]
