@@ -30,16 +30,16 @@ export default function LitigationCalendarPage() {
       .finally(() => setIsLoading(false));
   }, []);
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220] p-6 lg:p-8">
+    <div className="min-h-screen bg-[var(--background)] p-6 lg:p-8">
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-[var(--text-primary)] flex items-center gap-3">
               <CalendarIcon className="w-8 h-8 text-[#FF9933]" />
               Agenda Calendar
             </h1>
-            <p className="text-slate-600 dark:text-slate-400 dark:text-slate-500 mt-2">
+            <p className="text-slate-600 dark:text-[var(--text-muted)] dark:text-[var(--text-muted)] mt-2">
               Keep track of court hearings, filing deadlines, RTI replies, and legal consultations.
             </p>
           </div>
@@ -55,24 +55,24 @@ export default function LitigationCalendarPage() {
         
         {/* Mini Calendar / Sidebar */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+          <div className="bg-[var(--card)] border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-slate-900 dark:text-white">November 2023</h3>
+              <h3 className="font-bold text-[var(--text-primary)]">November 2023</h3>
               <div className="flex gap-2">
-                <button className="p-1 hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-slate-800 rounded"><ChevronLeft className="w-5 h-5" /></button>
-                <button className="p-1 hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-slate-800 rounded"><ChevronRight className="w-5 h-5" /></button>
+                <button className="p-1 hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-[var(--card-elevated)] rounded"><ChevronLeft className="w-5 h-5" /></button>
+                <button className="p-1 hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-[var(--card-elevated)] rounded"><ChevronRight className="w-5 h-5" /></button>
               </div>
             </div>
             
             {/* Extremely simple calendar grid placeholder */}
-            <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium mb-2 text-slate-500 dark:text-slate-400">
+            <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium mb-2 text-[var(--text-muted)]">
               <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
             </div>
             <div className="grid grid-cols-7 gap-1 text-center text-sm">
               {[...Array(30)].map((_, i) => (
                 <div 
                   key={i} 
-                  className={`py-1.5 rounded-lg cursor-pointer ${ i === 10 ? "bg-[#FF9933] text-white font-bold" : (i === 11 || i === 14) ? "bg-slate-100 dark:bg-slate-800 text-[#FF9933]" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-[#0B1220] dark:hover:bg-slate-800" }`}
+                  className={`py-1.5 rounded-lg cursor-pointer ${ i === 10 ? "bg-[#FF9933] text-white font-bold" : (i === 11 || i === 14) ? "bg-slate-100 dark:bg-slate-800 text-[#FF9933]" : "text-slate-700 dark:text-slate-300 hover:bg-[var(--background)] dark:hover:bg-[var(--card-elevated)]" }`}
                 >
                   {i + 1}
                 </div>
@@ -86,7 +86,7 @@ export default function LitigationCalendarPage() {
             <p className="text-white/80 text-sm mb-4">
               Get notified 24 hours before your next court hearing directly on WhatsApp.
             </p>
-            <button className="px-4 py-2 bg-white dark:bg-slate-900 text-green-700 text-sm font-bold rounded-lg shadow-sm hover:bg-slate-50 dark:bg-[#0B1220] w-full">
+            <button className="px-4 py-2 bg-[var(--card)] text-green-700 text-sm font-bold rounded-lg shadow-sm hover:bg-[var(--background)] w-full">
               Enable Reminders
             </button>
           </div>
@@ -94,42 +94,42 @@ export default function LitigationCalendarPage() {
 
         {/* Agenda List */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex bg-white dark:bg-slate-900 rounded-xl p-1 border border-slate-200 dark:border-slate-800 w-fit mb-2">
+          <div className="flex bg-[var(--card)] rounded-xl p-1 border border-slate-200 dark:border-slate-800 w-fit mb-2">
             <button 
               onClick={() => setView('upcoming')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${view === 'upcoming' ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white dark:hover:text-white'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${view === 'upcoming' ? 'bg-slate-100 dark:bg-slate-800 text-[var(--text-primary)]' : 'text-slate-600 dark:text-[var(--text-muted)] hover:text-[var(--text-primary)] dark:hover:text-white'}`}
             >
               Upcoming
             </button>
             <button 
               onClick={() => setView('past')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${view === 'past' ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white dark:hover:text-white'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${view === 'past' ? 'bg-slate-100 dark:bg-slate-800 text-[var(--text-primary)]' : 'text-slate-600 dark:text-[var(--text-muted)] hover:text-[var(--text-primary)] dark:hover:text-white'}`}
             >
               Past Events
             </button>
           </div>
 
           {isLoading ? (
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400">
+            <div className="bg-[var(--card)] border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center text-[var(--text-muted)]">
               Loading calendar events...
             </div>
           ) : events.length === 0 ? (
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400">
+            <div className="bg-[var(--card)] border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center text-[var(--text-muted)]">
               No events found.
             </div>
           ) : events.map((event) => (
-            <div key={event.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:shadow-md transition-shadow flex gap-4">
+            <div key={event.id} className="bg-[var(--card)] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:shadow-md transition-shadow flex gap-4">
               
               {/* Date Box */}
               <div className="hidden sm:flex flex-col items-center justify-center w-20 shrink-0 border-r border-slate-100 dark:border-slate-800 pr-4">
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">NOV</span>
-                <span className="text-2xl font-black text-slate-900 dark:text-white">{event.date.includes("Tomorrow") ? "11" : event.date.split(" ")[0]}</span>
+                <span className="text-xs font-bold text-[var(--text-muted)] uppercase">NOV</span>
+                <span className="text-2xl font-black text-[var(--text-primary)]">{event.date.includes("Tomorrow") ? "11" : event.date.split(" ")[0]}</span>
               </div>
 
               {/* Event Details */}
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${ event.type === 'Hearing' ? 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400' : event.type === 'Meeting' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400' }`}>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${ event.type === 'Hearing' ? 'bg-red-50 dark:bg-[var(--danger-subtle)] text-red-600 dark:text-[var(--danger)]' : event.type === 'Meeting' ? 'bg-blue-50 bg-[var(--primary-subtle)] text-blue-600 dark:text-[var(--primary)]' : 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400' }`}>
                     {event.type}
                   </span>
                   {event.urgent && (
@@ -139,18 +139,18 @@ export default function LitigationCalendarPage() {
                   )}
                 </div>
                 
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{event.title}</h3>
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">{event.title}</h3>
                 
-                <div className="space-y-1.5 text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
+                <div className="space-y-1.5 text-sm text-slate-600 dark:text-[var(--text-muted)] dark:text-[var(--text-muted)]">
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-slate-400 dark:text-slate-500" /> {event.date}
+                    <Clock className="w-4 h-4 text-slate-400 dark:text-[var(--text-muted)]" /> {event.date}
                   </div>
                   <div className="flex items-center gap-2">
-                    {event.mode === 'Virtual' ? <Video className="w-4 h-4 text-slate-400 dark:text-slate-500" /> : <MapPin className="w-4 h-4 text-slate-400 dark:text-slate-500" />}
+                    {event.mode === 'Virtual' ? <Video className="w-4 h-4 text-slate-400 dark:text-[var(--text-muted)]" /> : <MapPin className="w-4 h-4 text-slate-400 dark:text-[var(--text-muted)]" />}
                     {event.location}
                   </div>
                   <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                    <User className="w-4 h-4 text-slate-400 dark:text-[var(--text-muted)]" />
                     {event.advocate}
                   </div>
                 </div>

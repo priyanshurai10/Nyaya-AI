@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -28,12 +28,12 @@ import {
   BookOpen,
   Bell,
   X,
+  ChevronDown,
   type LucideIcon,
 } from 'lucide-react';
 import { translations } from '@/lib/translations';
-
 import { useLanguage } from '@/context/LanguageContext';
-import { useEffect } from 'react';
+import Logo from '@/components/Logo';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -46,11 +46,13 @@ interface NavItem {
   path: string;
   label: string;
   icon: LucideIcon;
-  isDemo?: boolean;
+  badge?: string;
+  badgeType?: 'success' | 'primary' | 'warning';
 }
 
 interface NavGroup {
   title: string;
+  icon?: LucideIcon;
   items: NavItem[];
 }
 
@@ -67,6 +69,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const pathname = usePathname();
   const { selectedLang, t } = useLanguage();
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
   // Sync user session
   useEffect(() => {
@@ -89,7 +92,6 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     };
 
     window.addEventListener('nyaya_user_changed', handleUserChange);
-    // Also listen to storage changes
     window.addEventListener('storage', handleUserChange);
 
     return () => {
@@ -98,341 +100,338 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     };
   }, []);
 
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // ── Custom labels for certain routes ─────────────────────────────────────
+  // Prevent body scroll on mobile/tablet when sidebar is open overlay drawer style
+  useEffect(() => {
+    const handleResizeAndScroll = () => {
+      if (isOpen && window.innerWidth < 1024) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    };
 
-  const getCustomLabel = (path: string): string => {
-    if (path === '/journey') {
-      return selectedLang === 'hi'
-        ? 'अदालत पदानुक्रम'
-        : selectedLang === 'bn'
-          ? 'আদালতের শ্রেণিবিন্যাস'
-          : selectedLang === 'ta'
-            ? 'நீதிமன்ற படிநிலை'
-            : selectedLang === 'te'
-              ? 'కోర్టు సోపానక్రమం'
-              : 'Court Hierarchy';
-    }
+    handleResizeAndScroll();
+    window.addEventListener('resize', handleResizeAndScroll);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('resize', handleResizeAndScroll);
+    };
+  }, [isOpen]);
 
-    if (path === '/judges') {
-      return selectedLang === 'hi'
-        ? 'न्यायाधीश निर्देशिका'
-        : selectedLang === 'bn'
-          ? 'বিচারকদের তথ্য'
-          : selectedLang === 'ta'
-            ? 'நீதிபதி அடைவு'
-            : selectedLang === 'te'
-              ? 'న్యాయమూర్తుల డైరెక్టరీ'
-              : 'Judge Directory';
-    }
+  // Close sidebar on Escape key press (mobile/tablet only)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen && window.innerWidth < 1024) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, setIsOpen]);
 
-    if (path === '/nyaya-path') {
-      return selectedLang === 'hi'
-        ? 'न्याय पथ™ नेविगेटर'
-        : selectedLang === 'bn'
-          ? 'ন্যায় পথ™ নেভিগেটর'
-          : selectedLang === 'ta'
-            ? 'நியாயா பாதை™ நேவிகேட்டர்'
-            : selectedLang === 'te'
-              ? 'న్యాయ మార్గం™ నావిగేటర్'
-              : 'NYAYA PATH™ Navigator';
-    }
+  // Focus trap on mobile/tablet when open
+  useEffect(() => {
+    if (!isOpen || window.innerWidth >= 1024) return;
 
-    if (path === '/evidence-vault') {
-      return selectedLang === 'hi'
-        ? 'एआई साक्ष्य तिजोरी'
-        : selectedLang === 'bn'
-          ? 'এআই প্রমাণ ভল্ট'
-          : selectedLang === 'ta'
-            ? 'ஏஐ சான்று பெட்டகம்'
-            : selectedLang === 'te'
-              ? 'ఏఐ साक్ష్యాల వాల్ట్'
-              : 'AI Evidence Vault';
-    }
+    const focusableElements = sidebarRef.current?.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (!focusableElements || focusableElements.length === 0) return;
 
-    if (path === '/academy') {
-      return selectedLang === 'hi'
-        ? 'कानूनी शिक्षा अकादमी'
-        : selectedLang === 'bn'
-          ? 'আইনি শিক্ষা একাডেমি'
-          : selectedLang === 'ta'
-            ? 'சட்டக் கல்வி அகாடமி'
-            : selectedLang === 'te'
-              ? 'న్యాయ విద్యా అకాడమీ'
-              : 'Legal Learning Academy';
-    }
+    const firstElement = focusableElements[0] as HTMLElement;
+    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
 
-    if (path === '/admin') {
-      return 'Admin Control Panel';
-    }
+    // Focus the first element inside the drawer
+    firstElement.focus();
 
-    if (path === '/advocates') {
-      return selectedLang === 'hi'
-        ? 'वकील खोजें और बुक करें'
-        : selectedLang === 'bn'
-          ? 'উকিল খুঁজুন'
-          : selectedLang === 'ta'
-            ? 'வழக்கறிஞரைத் தேடுங்கள்'
-            : selectedLang === 'te'
-              ? 'న్యాయవాదిని కనుగొనండి'
-              : 'Find & Book Advocate';
-    }
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
 
-    if (path === '/cases') {
-      return selectedLang === 'hi'
-        ? 'केस फ़ोल्डर्स'
-        : selectedLang === 'bn'
-          ? 'কেস ফোল্ডার'
-          : selectedLang === 'ta'
-            ? 'வழக்கு கோப்புகள்'
-            : selectedLang === 'te'
-              ? 'కేసు ఫోల్డర్లు'
-              : 'Case Management';
-    }
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          lastElement.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          firstElement.focus();
+          e.preventDefault();
+        }
+      }
+    };
 
-    if (path === '/calendar') {
-      return selectedLang === 'hi'
-        ? 'एजेंडा कैलेंडर'
-        : selectedLang === 'bn'
-          ? 'এজেন্ডা ক্যালেন্ডার'
-          : selectedLang === 'ta'
-            ? 'அஜண்டா நாட்காட்டி'
-            : selectedLang === 'te'
-              ? 'ఎజెండా క్యాలెండర్'
-              : 'Agenda Calendar';
-    }
+    window.addEventListener('keydown', handleTabKey);
+    return () => window.removeEventListener('keydown', handleTabKey);
+  }, [isOpen]);
 
-    if (path === '/document-generator') {
-      return selectedLang === 'hi'
-        ? 'दस्तावेज जनरेटर'
-        : selectedLang === 'bn'
-          ? 'নথি জেনারেটর'
-          : selectedLang === 'ta'
-            ? 'ஆவண ஜெனரேட்டர்'
-            : selectedLang === 'te'
-              ? 'డాక్యుమెంట్ జనరేటర్'
-              : 'Document Drafting Hub';
-    }
 
-    if (path === '/trust-privacy') {
-      return selectedLang === 'hi'
-        ? 'गोपनीयता और विश्वास केंद्र'
-        : selectedLang === 'bn'
-          ? 'विश्वास ও গোপনীয়তা'
-          : selectedLang === 'ta'
-            ? 'நம்பிக்கை & தனியுரிமை'
-            : selectedLang === 'te'
-              ? 'ట్రస్ట్ & గోప్యత'
-              : 'Trust & Privacy';
-    }
-
-    if (path === '/marketplace') {
-      return selectedLang === 'hi'
-        ? 'कानूनी सेवा बाजार'
-        : selectedLang === 'bn'
-          ? 'আইনি পরিষেবা বাজার'
-          : selectedLang === 'ta'
-            ? 'சட்ட சேவைகள் சந்தை'
-            : selectedLang === 'te'
-              ? 'న్యాయ సేవల మార్కెట్'
-              : 'Services Marketplace';
-    }
-
-    if (path === '/admin/marketplace') {
-      return selectedLang === 'hi'
-        ? 'भुगतान और परामर्श प्रबंधन'
-        : selectedLang === 'bn'
-          ? 'পেমেন্ট ও পরামর্শ পরিচালক'
-          : selectedLang === 'ta'
-            ? 'கட்டணம் & ஆலோசனை மேலாளர்'
-            : selectedLang === 'te'
-              ? 'చెల్లింపులు & సంప్రదింపుల మేనేజర్'
-              : 'Payments & Consultations';
-    }
-
-    if (path === '/knowledge') {
-      return selectedLang === 'hi'
-        ? 'कानूनी ज्ञान केंद्र'
-        : selectedLang === 'bn'
-          ? 'আইন জ্ঞান কেন্দ্র'
-          : selectedLang === 'ta'
-            ? 'சட்ட அறிவு மையம்'
-            : selectedLang === 'te'
-              ? 'న్యాయ జ్ఞాన కేంద్రం'
-              : 'Knowledge Center';
-    }
-
-    if (path === '/judgments') {
-      return selectedLang === 'hi'
-        ? 'ऐतिहासिक फैसले'
-        : selectedLang === 'bn'
-          ? 'ঐতিহাসিক রায়'
-          : selectedLang === 'ta'
-            ? 'முக்கிய தீர்ப்புகள்'
-            : selectedLang === 'te'
-              ? 'చారిత్రక తీర్పులు'
-              : 'Landmark Judgments';
-    }
-
-    if (path === '/notifications') {
-      return selectedLang === 'hi'
-        ? 'सूचना केंद्र'
-        : selectedLang === 'bn'
-          ? 'বিজ্ঞপ্তি কেন্দ্র'
-          : selectedLang === 'ta'
-            ? 'அறிவிப்பு மையம்'
-            : selectedLang === 'te'
-              ? 'నోటిఫికేషన్ సెంటర్'
-              : 'Notification Center';
-    }
-
-    return '';
+  // ── Custom labels ─────────────────────────────────────────
+  const getLabel = (key: string): string => {
+    const labels: Record<string, Record<string, string>> = {
+      '/journey': { hi: 'अदालत पदानुक्रम', bn: 'আদালতের শ্রেণিবিন্যাস', ta: 'நீதிமன்ற படிநிலை', te: 'కోర్టు సోపానక్రమం', en: 'Court Hierarchy' },
+      '/judges': { hi: 'न्यायाधीश निर्देशिका', bn: 'বিচারকদের তথ্য', ta: 'நீதிபதி அடைவு', te: 'న్యాయమూర్తుల డైరెక్టరీ', en: 'Judge Directory' },
+      '/nyaya-path': { hi: 'न्याय पथ™ नेविगेटर', bn: 'ন্যায় পথ™', ta: 'நியாயா பாதை™', te: 'న్యాయ మార్గం™', en: 'NYAYA PATH™ Navigator' },
+      '/evidence-vault': { hi: 'एआई साक्ष्य तिजोरी', bn: 'এআই প্রমাণ ভল্ট', ta: 'ஏஐ சான்று பெட்டகம்', te: 'ఏఐ साक్ష్యాల వాల్ట్', en: 'AI Evidence Vault' },
+      '/academy': { hi: 'कानूनी शिक्षा अकादमी', bn: 'আইনি শিক্ষা একাডেমি', ta: 'சட்டக் கல்வி அகாடமி', te: 'న్యాయ విద్యా అకాడమీ', en: 'Legal Academy' },
+      '/advocates': { hi: 'वकील खोजें', bn: 'উকিল খুঁজুন', ta: 'வழக்கறிஞரை தேடுங்கள்', te: 'న్యాయవాది కనుగొనండి', en: 'Find Advocates' },
+      '/cases': { hi: 'केस फ़ोल्डर्स', bn: 'কেস ফোল্ডার', ta: 'வழக்கு கோப்புகள்', te: 'కేసు ఫోల్డర్లు', en: 'Case Management' },
+      '/calendar': { hi: 'एजेंडा कैलेंडर', bn: 'এজেন্ডা ক্যালেন্ডার', ta: 'அஜண்டா நாட்காட்டி', te: 'ఎజెండా క్యాలెండర్', en: 'Agenda Calendar' },
+      '/document-generator': { hi: 'दस्तावेज जनरेटर', bn: 'নথি জেনারেটর', ta: 'ஆவண ஜெனரேட்டர்', te: 'డాక్యుమెంట్ జనరేటర్', en: 'Document Drafting Hub' },
+      '/trust-privacy': { hi: 'गोपनीयता केंद्र', bn: 'গোপনীয়তা কেন্দ্র', ta: 'தனியுரிமை மையம்', te: 'గోప్యత కేంద్రం', en: 'Privacy & Trust' },
+      '/marketplace': { hi: 'सेवाएं बाज़ार', bn: 'পরিষেবা বাজার', ta: 'சேவைகள் சந்தை', te: 'సేవలు మార్కెట్', en: 'Services Marketplace' },
+      '/knowledge': { hi: 'ज्ञान केंद्र', bn: 'জ্ঞান কেন্দ্র', ta: 'அறிவு மையம்', te: 'జ్ఞాన కేంద్రం', en: 'Knowledge Center' },
+      '/judgments': { hi: 'ऐतिहासिक निर्णय', bn: 'ঐতিহাসিক রায়', ta: 'முக்கிய தீர்ப்புகள்', te: 'చారిత్రక తీర్పులు', en: 'Landmark Judgments' },
+      '/notifications': { hi: 'सूचना केंद्र', bn: 'বিজ্ঞপ্তি কেন্দ্র', ta: 'அறிவிப்பு மையம்', te: 'నోటిఫికేషన్ సెంటర్', en: 'Notifications' },
+    };
+    const lang = selectedLang || 'en';
+    return labels[key]?.[lang] || labels[key]?.['en'] || key;
   };
 
-  // ── Navigation groups ────────────────────────────────────────────────────
-
+  // ── Navigation groups ────────────────────────────────────
   const navGroups: NavGroup[] = [
     {
       title: 'Core Console',
       items: [
-        { path: '/', label: t('sidebarHome'), icon: House },
-        { path: '/chat', label: t('sidebarChat'), icon: MessageSquare },
-        { path: '/advocates', label: 'Verified Advocates', icon: Award, isDemo: true },
-        { path: '/nyaya-path', label: getCustomLabel('/nyaya-path'), icon: Route },
-        { path: '/documents', label: t('sidebarDoc'), icon: FileText },
-        { path: '/map', label: 'Verified Courts', icon: MapPin, isDemo: true },
-        { path: '/document-generator', label: getCustomLabel('/document-generator'), icon: FilePenLine },
-        { path: '/marketplace', label: getCustomLabel('/marketplace'), icon: ShoppingBag },
+        { path: '/', label: t('sidebarHome') || 'Home Dashboard', icon: House },
+        { path: '/chat', label: t('sidebarChat') || 'AI Legal Assistant', icon: MessageSquare, badge: 'AI', badgeType: 'primary' },
+        { path: '/advocates', label: getLabel('/advocates'), icon: Award },
+        { path: '/nyaya-path', label: getLabel('/nyaya-path'), icon: Route },
+        { path: '/documents', label: t('sidebarDoc') || 'Document Analyzer', icon: FileText },
+        { path: '/map', label: 'Verified Courts Map', icon: MapPin },
+        { path: '/document-generator', label: getLabel('/document-generator'), icon: FilePenLine },
+        { path: '/marketplace', label: getLabel('/marketplace'), icon: ShoppingBag },
       ],
     },
     {
       title: 'Legal Aid & Drafts',
       items: [
-        { path: '/knowledge', label: getCustomLabel('/knowledge'), icon: BookOpen },
-        { path: '/chat?mode=rights', label: t('sidebarRights'), icon: Shield },
-        { path: '/drafts?template=police_complaint', label: t('sidebarComplaintGen'), icon: FilePenLine },
-        { path: '/chat?mode=fir', label: t('sidebarFIR'), icon: Scale },
-        { path: '/drafts?template=legal_notice', label: t('sidebarNoticeGen'), icon: FileCode },
-        { path: '/drafts?template=rti', label: t('sidebarRTI'), icon: FolderOpen },
-        { path: '/emergency', label: 'Nearby Police', icon: ShieldAlert, isDemo: true },
-        { path: '/drafts?template=consumer_complaint', label: t('sidebarConsumer'), icon: ShoppingBag },
+        { path: '/knowledge', label: getLabel('/knowledge'), icon: BookOpen },
+        { path: '/chat?mode=rights', label: t('sidebarRights') || 'Legal Rights Guide', icon: Shield },
+        { path: '/drafts?template=police_complaint', label: t('sidebarComplaintGen') || 'Complaint Generator', icon: FilePenLine },
+        { path: '/chat?mode=fir', label: t('sidebarFIR') || 'FIR Assistant', icon: Scale },
+        { path: '/drafts?template=legal_notice', label: t('sidebarNoticeGen') || 'Legal Notice', icon: FileCode },
+        { path: '/drafts?template=rti', label: t('sidebarRTI') || 'RTI Assistant', icon: FolderOpen },
+        { path: '/emergency', label: 'Nearby Police & SOS', icon: ShieldAlert, badge: 'SOS', badgeType: 'warning' },
+        { path: '/drafts?template=consumer_complaint', label: t('sidebarConsumer') || 'Consumer Complaint', icon: ShoppingBag },
       ],
     },
     {
       title: 'Litigation Pathways',
       items: [
-        { path: '/journey', label: getCustomLabel('/journey'), icon: Scale },
-        { path: '/judges', label: getCustomLabel('/judges'), icon: Award },
-        { path: '/judgments', label: getCustomLabel('/judgments'), icon: Bookmark },
-        { path: '/journey?category=property', label: t('sidebarProperty'), icon: Building },
-        { path: '/journey?category=labour', label: t('sidebarLabour'), icon: Briefcase },
-        { path: '/journey?category=family', label: t('sidebarFamily'), icon: Heart },
+        { path: '/journey', label: getLabel('/journey'), icon: Scale },
+        { path: '/judges', label: getLabel('/judges'), icon: Award },
+        { path: '/judgments', label: getLabel('/judgments'), icon: Bookmark },
+        { path: '/journey?category=property', label: t('sidebarProperty') || 'Property Disputes', icon: Building },
+        { path: '/journey?category=labour', label: t('sidebarLabour') || 'Labour Rights', icon: Briefcase },
+        { path: '/journey?category=family', label: t('sidebarFamily') || 'Family Law', icon: Heart },
       ],
     },
     {
       title: 'Personal Workspace',
       items: [
-        { path: '/cases', label: getCustomLabel('/cases'), icon: FolderOpen },
-        { path: '/calendar', label: getCustomLabel('/calendar'), icon: Calendar },
-        { path: '/evidence-vault', label: getCustomLabel('/evidence-vault'), icon: Archive },
-        { path: '/notifications', label: getCustomLabel('/notifications'), icon: Bell },
-        { path: '/trust-privacy', label: getCustomLabel('/trust-privacy'), icon: ShieldCheck },
-        { path: '/academy', label: getCustomLabel('/academy'), icon: GraduationCap },
-        { path: '/map?bookmarks=true', label: t('sidebarBookmarks'), icon: Bookmark, isDemo: true },
+        { path: '/cases', label: getLabel('/cases'), icon: FolderOpen },
+        { path: '/calendar', label: getLabel('/calendar'), icon: Calendar },
+        { path: '/evidence-vault', label: getLabel('/evidence-vault'), icon: Archive },
+        { path: '/notifications', label: getLabel('/notifications'), icon: Bell },
+        { path: '/trust-privacy', label: getLabel('/trust-privacy'), icon: ShieldCheck },
+        { path: '/academy', label: getLabel('/academy'), icon: GraduationCap },
+        { path: '/map?bookmarks=true', label: t('sidebarBookmarks') || 'Saved Courts', icon: Bookmark },
       ],
     },
   ];
-
-  // ── Admin section (conditional) ──────────────────────────────────────────
 
   if (userData && (userData.is_admin || userData.email === 'admin@nyaya.ai')) {
     navGroups.push({
       title: 'Administration',
       items: [
-        { path: '/admin', label: getCustomLabel('/admin'), icon: ShieldCheck },
-        { path: '/admin/marketplace', label: getCustomLabel('/admin/marketplace'), icon: ShieldCheck },
+        { path: '/admin', label: 'Admin Control Panel', icon: ShieldCheck, badge: 'Admin', badgeType: 'warning' },
+        { path: '/admin/marketplace', label: 'Marketplace Admin', icon: ShoppingBag },
       ],
     });
   }
 
-  // ── Render ───────────────────────────────────────────────────────────────
+  const toggleGroup = (title: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(title)) next.delete(title);
+      else next.add(title);
+      return next;
+    });
+  };
+
+  const isActive = (path: string) =>
+    pathname === path || (path !== '/' && pathname.startsWith(path.split('?')[0]));
+
+  // ── Render ───────────────────────────────────────────────
 
   return (
     <>
-      {/* Mobile backdrop overlay */}
+      {/* Mobile backdrop */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="lg:hidden fixed inset-0 bg-slate-900/40 dark:bg-[#020813]/60 backdrop-blur-sm z-40 transition-opacity duration-300"
+          className="lg:hidden fixed inset-0 z-45 bg-black/50 backdrop-blur-sm transition-opacity"
+          aria-hidden="true"
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 bg-white dark:bg-slate-900 border-slate-200 dark:border-white/5 backdrop-blur-md flex flex-col transition-all duration-300 ease-in-out lg:static lg:h-screen overflow-hidden ${isOpen ? 'w-64 translate-x-0 border-r' : 'w-0 -translate-x-full lg:translate-x-0 border-r-0'}`}
+        ref={sidebarRef}
+        role="navigation"
+        aria-label="Sidebar Navigation"
+        className={`
+          fixed top-0 bottom-0 left-0 z-50 flex flex-col
+          bg-[var(--surface)] border-r transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden
+          lg:static lg:h-screen
+          ${isOpen
+            ? 'w-64 translate-x-0 opacity-100 border-[var(--border)]'
+            : 'w-0 -translate-x-full lg:w-0 lg:-translate-x-full opacity-0 pointer-events-none border-transparent'
+          }
+        `}
+        style={{ boxShadow: isOpen ? 'var(--shadow-xl)' : 'none' }}
       >
-        <div className="w-64 min-w-[16rem] h-full flex flex-col">
-          {/* Mobile header with close button */}
-          <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-white/5 lg:hidden">
-            <span className="font-extrabold bg-gradient-to-r from-[#FF9933] to-[#138808] bg-clip-text text-transparent text-sm">
-            ⚖️ MENU
-          </span>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="p-1 rounded-lg bg-slate-100 dark:bg-[#111827]/5 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
-          >
-            <X size={18} />
-          </button>
-        </div>
+        <div className="w-64 min-w-[16rem] h-full flex flex-col overflow-hidden">
 
-        {/* Scrollable nav area */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-white/5">
-          {navGroups.map(group => ({
-            ...group,
-            items: group.items.filter(item => !item.isDemo)
-          })).filter(group => group.items.length > 0).map((group, gIdx) => (
-            <div key={gIdx} className="space-y-2">
-              {/* Group title */}
-              <h4 className="px-3 text-[9px] uppercase font-extrabold text-slate-400 dark:text-slate-500 tracking-wider">
-                {group.title}
-              </h4>
-
-              {/* Nav items */}
-              <ul className="space-y-1">
-                {group.items.map((item, iIdx) => {
-                  const Icon = item.icon;
-                  const isActive =
-                    pathname === item.path ||
-                    (item.path !== '/' && pathname.startsWith(item.path));
-
-                  return (
-                    <li key={iIdx}>
-                      <Link
-                        href={item.path}
-                        onClick={() => setIsOpen(false)}
-                        className={`group px-3 py-2 rounded-xl text-xs flex items-center justify-between font-semibold transition-all duration-200 ${ isActive ? 'bg-indigo-50 dark:bg-indigo-900/15 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 shadow-sm' : 'text-slate-600 hover:text-slate-900 dark:text-white dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white dark:bg-[#111827]/[0.03] border-transparent' }`}
-                      >
-                        <div className="flex items-center gap-3 truncate">
-                          <Icon
-                            size={15}
-                            className={`transition-colors duration-200 ${ isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400' }`}
-                          />
-                          <span className="truncate">{item.label}</span>
-                        </div>
-
-                        {item.isDemo && (
-                          <span className="ml-2 shrink-0 px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-cyan-100 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-500/20">
-                            DEMO
-                          </span>
-                        )}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+          {/* ── Brand Header ────────────────────────────────────── */}
+          <div className="flex items-center justify-between px-4 py-4 border-b border-[var(--border)] shrink-0">
+            <div className="flex items-center gap-2.5">
+              <Logo size={34} animated={false} />
+              <div>
+                <p className="font-extrabold text-sm tracking-tight text-[var(--text-primary)] leading-none">
+                  Nyaya AI
+                </p>
+                <p className="text-[9px] text-[var(--text-muted)] mt-0.5 font-medium tracking-wider uppercase">
+                  Justice Made Simple
+                </p>
+              </div>
             </div>
-          ))}
-        </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="lg:hidden p-1.5 rounded-lg hover:bg-[var(--card-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+              aria-label="Close Sidebar"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* ── Navigation ──────────────────────────────────────── */}
+          <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-1 no-scrollbar">
+            {navGroups.map((group) => {
+              const collapsed = collapsedGroups.has(group.title);
+              return (
+                <div key={group.title} className="mb-2">
+                  {/* Group Header */}
+                  <button
+                    onClick={() => toggleGroup(group.title)}
+                    className="w-full flex items-center justify-between px-3 py-1.5 mb-1 group"
+                  >
+                    <span className="text-[9.5px] font-black uppercase tracking-widest text-[var(--text-muted)] group-hover:text-[var(--text-secondary)] transition-colors">
+                      {group.title}
+                    </span>
+                    <ChevronDown
+                      size={10}
+                      className={`text-[var(--text-muted)] transition-transform duration-200 ${collapsed ? '-rotate-90' : ''}`}
+                    />
+                  </button>
+
+                  {/* Group Items */}
+                  {!collapsed && (
+                    <ul className="space-y-0.5">
+                      {group.items.map((item) => {
+                        const Icon = item.icon;
+                        const active = isActive(item.path);
+
+                        return (
+                          <li key={item.path}>
+                            <Link
+                              href={item.path}
+                              onClick={() => {
+                                if (window.innerWidth < 1024) {
+                                  setIsOpen(false);
+                                }
+                              }}
+                              className={`
+                                flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-medium
+                                transition-all duration-150 relative group
+                                ${active
+                                  ? 'bg-[var(--primary-subtle)] text-[var(--primary)] font-semibold'
+                                  : 'text-[var(--text-secondary)] hover:bg-[var(--card-elevated)] hover:text-[var(--text-primary)]'
+                                }
+                              `}
+                            >
+                              {/* Active indicator bar */}
+                              {active && (
+                                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[var(--primary)] rounded-r-full" />
+                              )}
+
+                              <div className="flex items-center gap-2.5 truncate">
+                                <Icon
+                                  size={14}
+                                  className={`shrink-0 transition-colors ${
+                                    active
+                                      ? 'text-[var(--primary)]'
+                                      : 'text-[var(--text-muted)] group-hover:text-[var(--primary)]'
+                                  }`}
+                                />
+                                <span className="truncate">{item.label}</span>
+                              </div>
+
+                              {/* Badge */}
+                              {item.badge && (
+                                <span className={`
+                                  shrink-0 px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider
+                                  ${item.badgeType === 'primary' ? 'bg-[var(--primary-subtle)] text-[var(--primary)]' : ''}
+                                  ${item.badgeType === 'warning' ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400' : ''}
+                                  ${item.badgeType === 'success' ? 'bg-[var(--success-subtle)] text-[var(--success)]' : ''}
+                                `}>
+                                  {item.badge}
+                                </span>
+                              )}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
+
+          {/* ── Footer ──────────────────────────────────────────── */}
+          <div className="shrink-0 px-3 py-3 border-t border-[var(--border)]">
+            {userData ? (
+              <div className="flex items-center gap-2.5 px-2 py-2 rounded-xl bg-[var(--card-elevated)]">
+                <div className="w-7 h-7 rounded-lg bg-[var(--primary-subtle)] flex items-center justify-center text-[var(--primary)] font-black text-xs shrink-0">
+                  {(userData.name || 'U').charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-[var(--text-primary)] truncate leading-tight">
+                    {userData.name || 'Citizen'}
+                  </p>
+                  <p className="text-[9px] text-[var(--text-muted)] truncate mt-0.5">
+                    {userData.email || userData.mobile || ''}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href="/auth"
+                onClick={() => {
+                  if (window.innerWidth < 1024) {
+                    setIsOpen(false);
+                  }
+                }}
+                className="flex items-center justify-center gap-2 py-2 rounded-xl bg-[var(--primary)] text-white text-xs font-bold hover:bg-[var(--primary-hover)] transition-colors"
+              >
+                Login / Register
+              </Link>
+            )}
+          </div>
+
         </div>
       </aside>
     </>

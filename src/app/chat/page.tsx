@@ -54,7 +54,7 @@ function renderMarkdown(text: string) {
       return (
         <p
           key={i}
-          className="pl-4 py-0.5 text-slate-800 dark:text-gray-200"
+          className="pl-4 py-0.5 text-[var(--text-primary)]"
           dangerouslySetInnerHTML={{ __html: processed }}
         />
       );
@@ -63,7 +63,7 @@ function renderMarkdown(text: string) {
       return (
         <p
           key={i}
-          className="pl-4 py-0.5 text-slate-800 dark:text-gray-200"
+          className="pl-4 py-0.5 text-[var(--text-primary)]"
           dangerouslySetInnerHTML={{ __html: processed }}
         />
       );
@@ -72,7 +72,7 @@ function renderMarkdown(text: string) {
     return (
       <p
         key={i}
-        className="py-0.5 text-slate-800 dark:text-gray-200"
+        className="py-0.5 text-[var(--text-primary)] leading-relaxed"
         dangerouslySetInnerHTML={{ __html: processed }}
       />
     );
@@ -361,93 +361,106 @@ ${data.analysis.key_points.map((p: string) => `• ${p}`).join('\n')}
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 dark:bg-[#0B1220] transition-colors duration-200">
-      {/* Top action bar */}
-      <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900 px-4 py-3 shadow-sm relative z-15 select-none">
-        <Link href="/" className="flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:text-white/60 dark:hover:text-white transition-all text-xs font-bold">
-          <ArrowLeft size={16} />
+    <div className="flex flex-col h-full bg-[var(--background)] transition-colors duration-200">
+      {/* ── Top action bar ───────────────────────────────── */}
+      <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-4 py-3 shadow-sm relative z-10 select-none">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all text-xs font-semibold group"
+        >
+          <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
           <span>Exit Assistant</span>
         </Link>
 
         {/* Mother Mode toggle */}
         <button
           onClick={() => setMotherMode(!motherMode)}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-extrabold uppercase tracking-wider transition-all duration-300 shadow-sm ${ motherMode ? 'bg-rose-500/10 border-rose-500/30 text-rose-500 hover:bg-rose-500/20' : 'bg-white dark:bg-slate-900 hover:bg-slate-50 border-slate-200 text-slate-600 dark:bg-[#111827]/5 dark:hover:bg-slate-800 dark:border-white/10 dark:text-white/80' }`}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all duration-200 ${
+            motherMode
+              ? 'bg-rose-500/10 border-rose-500/30 text-rose-500'
+              : 'bg-[var(--card-elevated)] border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--card-hover)]'
+          }`}
         >
-          <Heart size={14} className={motherMode ? 'fill-rose-500' : ''} />
+          <Heart size={13} className={motherMode ? 'fill-rose-500 text-rose-500' : ''} />
           <span>Mother Mode™</span>
         </button>
       </div>
 
-      {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/5">
+      {/* ── Messages Area ────────────────────────────────── */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5 no-scrollbar">
         {messages.map((m) => (
           <div
             key={m.id}
-            className={`flex items-start gap-3.5 max-w-3xl ${ m.role === 'user' ? 'ml-auto flex-row-reverse' : '' }`}
+            className={`flex items-end gap-3 animate-slide-up ${
+              m.role === 'user' ? 'ml-auto flex-row-reverse max-w-[85%] sm:max-w-[70%]' : 'max-w-[92%] sm:max-w-[80%]'
+            }`}
           >
             {/* Avatar */}
             <div
-              className={`w-9 h-9 rounded-2xl flex items-center justify-center text-sm shadow-md shrink-0 select-none ${ m.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 text-[#FF9933]' }`}
+              className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                m.role === 'user'
+                  ? 'bg-[var(--primary)] text-white shadow-md'
+                  : 'bg-[var(--card-elevated)] border border-[var(--border)] text-[var(--accent)]'
+              }`}
             >
-              {m.role === 'user' ? <User size={16} /> : <Bot size={16} />}
+              {m.role === 'user' ? <User size={14} /> : <Bot size={14} />}
             </div>
 
-            {/* Message bubble */}
-            <div className="space-y-2">
+            {/* Bubble + extras */}
+            <div className={`flex flex-col gap-1.5 ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
+              {/* Bubble */}
               <div
-                className={`rounded-2xl p-4 shadow-sm border text-sm relative group ${ m.role === 'user' ? 'bg-indigo-600 border-indigo-500 text-white rounded-tr-none' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-white/5 text-slate-800 dark:text-slate-200 dark:text-slate-100 rounded-tl-none' }`}
+                className={`relative group px-4 py-3 text-sm leading-relaxed ${
+                  m.role === 'user'
+                    ? 'chat-bubble-user'
+                    : 'chat-bubble-ai'
+                }`}
               >
-                {/* Speech read-aloud button for AI responses */}
+                {/* AI: read-aloud button on hover */}
                 {m.role === 'ai' && (
                   <button
                     onClick={() => speakText(m.content, m.id)}
-                    className="absolute -right-9 top-1 opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#111827]/5 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-all"
+                    className="absolute -right-9 top-2 opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-[var(--card-elevated)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] transition-all"
                     title="Read Aloud"
                   >
-                    {currentlySpeakingId === m.id ? <VolumeX size={14} /> : <Volume2 size={14} />}
+                    {currentlySpeakingId === m.id ? <VolumeX size={13} /> : <Volume2 size={13} />}
                   </button>
                 )}
-
                 {renderMarkdown(m.content)}
               </div>
 
               {/* Timestamp */}
-              <div
-                className={`text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-widest ${ m.role === 'user' ? 'text-right' : '' }`}
-              >
+              <span className="text-[9px] text-[var(--text-muted)] font-medium tracking-wider uppercase">
                 {formatTime(m.timestamp)}
-              </div>
+              </span>
 
-              {/* Specialist actions */}
+              {/* Approve Draft button */}
               {m.role === 'ai' && m.requiresApproval && !m.approved && (
-                <div className="flex gap-2 animate-in fade-in duration-300">
-                  <button
-                    onClick={() => handleApproveDraft(m.id)}
-                    className="px-3.5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow"
-                  >
-                    <CheckCircle size={14} />
-                    Approve Draft
-                  </button>
-                </div>
+                <button
+                  onClick={() => handleApproveDraft(m.id)}
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-[var(--success)] text-white rounded-xl text-xs font-bold hover:opacity-90 transition-opacity shadow-sm animate-fade-in"
+                >
+                  <CheckCircle size={13} />
+                  Approve & Save Draft
+                </button>
               )}
 
-              {/* Bookmarked / Approved Success */}
+              {/* Approved state */}
               {m.role === 'ai' && m.approved && (
-                <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400 font-extrabold bg-green-50 dark:bg-green-500/10 p-3 rounded-xl border border-green-200 dark:border-green-500/20">
-                  <CheckCircle size={14} />
-                  Draft approved and saved to Case Folders!
+                <div className="flex items-center gap-1.5 text-xs text-[var(--success)] font-semibold bg-[var(--success-subtle)] px-3 py-2 rounded-xl border border-[var(--success-subtle)] animate-fade-in">
+                  <CheckCircle size={13} />
+                  Saved to Case Folders
                 </div>
               )}
 
-              {/* Suggested actions list */}
+              {/* Next step chips */}
               {m.role === 'ai' && m.nextSteps && m.nextSteps.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-1.5">
+                <div className="flex flex-wrap gap-2 pt-1">
                   {m.nextSteps.map((step, idx) => (
                     <button
                       key={idx}
                       onClick={() => sendMessage(step)}
-                      className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 border border-indigo-150 dark:border-blue-500/20 text-indigo-650 dark:text-blue-400 rounded-xl text-[10px] font-extrabold transition-all duration-200 uppercase tracking-wider"
+                      className="px-3 py-1.5 bg-[var(--primary-subtle)] border border-[var(--primary-subtle)] text-[var(--primary)] rounded-xl text-[10px] font-bold uppercase tracking-wider hover:bg-[var(--primary)] hover:text-white transition-all duration-200"
                     >
                       {step}
                     </button>
@@ -458,26 +471,35 @@ ${data.analysis.key_points.map((p: string) => `• ${p}`).join('\n')}
           </div>
         ))}
 
+        {/* Typing indicator */}
         {isTyping && (
-          <div className="flex items-center gap-2 max-w-sm text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-3 rounded-2xl animate-pulse">
-            <Loader2 className="w-4 h-4 animate-spin text-[#FF9933]" />
-            Thinking...
+          <div className="flex items-end gap-3 max-w-[80%]">
+            <div className="w-8 h-8 rounded-xl bg-[var(--card-elevated)] border border-[var(--border)] text-[var(--accent)] flex items-center justify-center shrink-0">
+              <Bot size={14} />
+            </div>
+            <div className="chat-bubble-ai px-4 py-3.5">
+              <div className="flex items-center gap-1.5">
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+              </div>
+            </div>
           </div>
         )}
         <div ref={bottomRef} />
       </div>
 
-      {/* Suggested prompts on new chat */}
+      {/* ── Suggested Prompts ─────────────────────────────── */}
       {showSuggestions && (
-        <div className="px-6 py-4 grid grid-cols-2 md:grid-cols-4 gap-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-white/5 relative z-10 select-none">
+        <div className="px-4 pb-3 grid grid-cols-2 md:grid-cols-4 gap-2.5 bg-[var(--background)] border-t border-[var(--border)] pt-3 select-none">
           {suggestedQuestions.map((q, idx) => (
             <button
               key={idx}
               onClick={() => sendMessage(q.text)}
-              className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/5 rounded-2xl text-left hover:scale-[1.02] hover:border-indigo-600 dark:hover:border-indigo-500 transition-all group"
+              className="p-3 bg-[var(--card)] border border-[var(--border)] rounded-xl text-left hover:border-[var(--primary)] hover:bg-[var(--primary-subtle)] transition-all group"
             >
-              <div className="text-xl mb-1.5 group-hover:scale-110 transition-transform duration-300">{q.emoji}</div>
-              <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug">
+              <div className="text-lg mb-1.5 group-hover:scale-110 transition-transform duration-200">{q.emoji}</div>
+              <p className="text-[10px] font-semibold text-[var(--text-secondary)] group-hover:text-[var(--primary)] leading-snug">
                 {q.text}
               </p>
             </button>
@@ -485,16 +507,16 @@ ${data.analysis.key_points.map((p: string) => `• ${p}`).join('\n')}
         </div>
       )}
 
-      {/* Input bar */}
-      <div className="border-t border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900 p-4 relative z-10 select-none">
-        <div className="max-w-4xl mx-auto flex items-center gap-3">
-          {/* File Upload Button */}
+      {/* ── Input Bar ────────────────────────────────────── */}
+      <div className="border-t border-[var(--border)] bg-[var(--surface)] px-4 py-3 select-none">
+        <div className="max-w-4xl mx-auto flex items-center gap-2.5">
+          {/* Attach */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-all shadow-sm border border-slate-200 dark:border-white/5"
+            className="p-2.5 rounded-xl bg-[var(--card-elevated)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] hover:bg-[var(--primary-subtle)] transition-all"
             title="Attach Document"
           >
-            <Paperclip size={18} />
+            <Paperclip size={17} />
           </button>
           <input
             type="file"
@@ -504,7 +526,7 @@ ${data.analysis.key_points.map((p: string) => `• ${p}`).join('\n')}
             className="hidden"
           />
 
-          {/* Text Input */}
+          {/* Text input */}
           <div className="flex-1 relative">
             <input
               type="text"
@@ -516,27 +538,31 @@ ${data.analysis.key_points.map((p: string) => `• ${p}`).join('\n')}
               }
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage(inputValue)}
-              className="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-white/5 rounded-2xl text-slate-900 dark:text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage(inputValue)}
+              className="w-full px-4 py-3 bg-[var(--card)] border-[1.5px] border-[var(--border)] rounded-xl text-[var(--text-primary)] text-sm font-medium placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary-subtle)] transition-all disabled:opacity-50"
             />
           </div>
 
-          {/* Voice Input Button */}
+          {/* Voice */}
           <button
             onClick={toggleSpeech}
-            className={`p-3 rounded-xl transition-all shadow-sm border ${ voiceActive ? 'bg-rose-600 text-white animate-pulse border-rose-500' : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/5' }`}
+            className={`p-2.5 rounded-xl border transition-all ${
+              voiceActive
+                ? 'bg-rose-500 border-rose-500 text-white shadow-md animate-pulse'
+                : 'bg-[var(--card-elevated)] border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)]'
+            }`}
             title="Voice Search"
           >
-            {voiceActive ? <MicOff size={18} /> : <Mic size={18} />}
+            {voiceActive ? <MicOff size={17} /> : <Mic size={17} />}
           </button>
 
-          {/* Send Button */}
+          {/* Send */}
           <button
             onClick={() => sendMessage(inputValue)}
             disabled={!inputValue.trim() || isTyping}
-            className="p-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white rounded-xl transition-all flex items-center justify-center shadow-md shadow-indigo-500/10"
+            className="p-2.5 bg-[var(--primary)] hover:bg-[var(--primary-hover)] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl transition-all shadow-sm hover:shadow-[var(--shadow-primary)] active:scale-95"
           >
-            <Send size={18} />
+            <Send size={17} />
           </button>
         </div>
       </div>

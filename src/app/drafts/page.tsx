@@ -68,9 +68,9 @@ function DraftsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220] p-6 lg:p-8 text-slate-900 dark:text-white">
+    <div className="min-h-screen bg-[var(--background)] p-6 lg:p-8 text-[var(--text-primary)]">
       <div className="max-w-5xl mx-auto">
-        <Link href="/document-generator" className="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:underline mb-6">
+        <Link href="/document-generator" className="inline-flex items-center text-sm text-blue-600 dark:text-[var(--primary)] hover:underline mb-6">
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to Templates
         </Link>
         
@@ -88,17 +88,17 @@ function DraftsContent() {
         </div>
 
         {isLoading ? (
-          <div className="text-center p-12 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+          <div className="text-center p-12 bg-[var(--card)] rounded-xl border border-slate-200 dark:border-slate-800">
             Loading drafts...
           </div>
         ) : drafts.length === 0 ? (
-          <div className="text-center p-12 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
+          <div className="text-center p-12 bg-[var(--card)] rounded-xl border border-slate-200 dark:border-slate-800 text-[var(--text-muted)]">
             No drafts found. Click &quot;New Draft&quot; to create one.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {drafts.map((d) => (
-              <div key={d.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl hover:border-[#FF9933] transition-colors relative group">
+              <div key={d.id} className="bg-[var(--card)] border border-slate-200 dark:border-slate-800 p-6 rounded-2xl hover:border-[#FF9933] transition-colors relative group">
                 <div className="flex justify-between items-start mb-4">
                   <span className="text-xs font-bold px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded uppercase">
                     {d.template_type.replace('_', ' ')}
@@ -108,13 +108,13 @@ function DraftsContent() {
                   </span>
                 </div>
                 <h3 className="font-bold text-lg mb-2 truncate" title={d.title}>{d.title}</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Last updated: {new Date(d.updated_at).toLocaleDateString()}</p>
+                <p className="text-sm text-[var(--text-muted)] mb-6">Last updated: {new Date(d.updated_at).toLocaleDateString()}</p>
                 
                 <div className="flex justify-between items-center">
-                  <button className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 text-sm font-medium">
+                  <button className="text-blue-600 dark:text-[var(--primary)] hover:underline flex items-center gap-1 text-sm font-medium">
                     <Edit className="w-4 h-4" /> Edit
                   </button>
-                  <button onClick={() => handleDelete(d.id)} className="text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                  <button onClick={() => handleDelete(d.id)} className="text-[var(--danger)] hover:bg-red-50 dark:hover:bg-[var(--danger-subtle)] p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -129,7 +129,7 @@ function DraftsContent() {
 
 export default function DraftsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50 dark:bg-[#0B1220] p-6 lg:p-8 flex items-center justify-center"><div className="text-slate-500 dark:text-slate-400">Loading drafts...</div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--background)] p-6 lg:p-8 flex items-center justify-center"><div className="text-[var(--text-muted)]">Loading drafts...</div></div>}>
       <DraftsContent />
     </Suspense>
   );

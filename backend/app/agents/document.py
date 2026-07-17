@@ -1,6 +1,6 @@
 import json
 import os
-import fitz  # PyMuPDF
+from pypdf import PdfReader
 from PIL import Image
 import google.generativeai as genai
 from pydantic import BaseModel, Field
@@ -21,10 +21,9 @@ class DocumentAnalysisAgent:
     def extract_text_from_pdf(self, file_path: str) -> str:
         text = ""
         try:
-            doc = fitz.open(file_path)
-            for page in doc:
-                text += page.get_text()
-            doc.close()
+            reader = PdfReader(file_path)
+            for page in reader.pages:
+                text += page.extract_text() or ""
         except Exception as e:
             text = f"Error extracting text from PDF: {str(e)}"
         return text

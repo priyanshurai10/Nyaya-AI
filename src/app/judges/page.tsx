@@ -210,16 +210,16 @@ export default function VerifiedJudgesPage() {
   }, [judgesData, searchQuery, courtFilter, stateFilter, alphabetFilter]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220] p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen bg-[var(--background)] p-4 md:p-6 lg:p-8">
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-[var(--text-primary)] flex items-center gap-3">
               <Scale className="w-8 h-8 text-[#FF9933]" />
               Judge Directory
             </h1>
-            <p className="text-slate-600 dark:text-slate-400 dark:text-slate-500 mt-2 max-w-2xl">
+            <p className="text-slate-600 dark:text-[var(--text-muted)] dark:text-[var(--text-muted)] mt-2 max-w-2xl">
               Access the verified directory of honorable judges across the Supreme Court, High Courts, and District Courts of India.
             </p>
           </div>
@@ -239,39 +239,39 @@ export default function VerifiedJudgesPage() {
       </div>
 
       {/* Filters Section */}
-      <div className="max-w-7xl mx-auto mb-8 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="max-w-7xl mx-auto mb-8 bg-[var(--card)] p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="flex flex-col md:flex-row gap-4 mb-5">
           <div className="flex-1">
-            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-1.5">Search Judges</label>
+            <label className="block text-xs font-medium text-[var(--text-muted)] dark:text-[var(--text-muted)] mb-1.5">Search Judges</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[var(--text-muted)]" />
               <input 
                 type="text" 
                 placeholder="Search by name or court..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2.5 w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-[#FF9933] outline-none dark:text-white transition-all"
+                className="pl-9 pr-4 py-2.5 w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-[#FF9933] outline-none dark:text-[var(--text-primary)] transition-all"
               />
             </div>
           </div>
           
           <div className="w-full md:w-48">
-            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-1.5">Court Level</label>
+            <label className="block text-xs font-medium text-[var(--text-muted)] dark:text-[var(--text-muted)] mb-1.5">Court Level</label>
             <select 
               value={courtFilter}
               onChange={(e) => setCourtFilter(e.target.value)}
-              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF9933] dark:text-white transition-all appearance-none cursor-pointer"
+              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF9933] dark:text-[var(--text-primary)] transition-all appearance-none cursor-pointer"
             >
               {allCourts.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
 
           <div className="w-full md:w-48">
-            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-1.5">State / Region</label>
+            <label className="block text-xs font-medium text-[var(--text-muted)] dark:text-[var(--text-muted)] mb-1.5">State / Region</label>
             <select 
               value={stateFilter}
               onChange={(e) => setStateFilter(e.target.value)}
-              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF9933] dark:text-white transition-all appearance-none cursor-pointer"
+              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF9933] dark:text-[var(--text-primary)] transition-all appearance-none cursor-pointer"
             >
               {allStates.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
@@ -279,13 +279,13 @@ export default function VerifiedJudgesPage() {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-2">Filter by Alphabet</label>
+          <label className="block text-xs font-medium text-[var(--text-muted)] dark:text-[var(--text-muted)] mb-2">Filter by Alphabet</label>
           <div className="flex flex-wrap gap-1.5">
             {alphabets.map(alpha => (
               <button
                 key={alpha}
                 onClick={() => setAlphabetFilter(alpha)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${ alphabetFilter === alpha ? 'bg-[#FF9933] text-white shadow-sm' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-slate-700 border border-transparent dark:border-slate-700/50' }`}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${ alphabetFilter === alpha ? 'bg-[#FF9933] text-white shadow-sm' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-[var(--text-muted)] dark:text-[var(--text-muted)] hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-slate-700 border border-transparent dark:border-slate-700/50' }`}
               >
                 {alpha}
               </button>
@@ -301,18 +301,18 @@ export default function VerifiedJudgesPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FF9933]"></div>
           </div>
         ) : filteredJudges.length === 0 ? (
-          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <div className="text-center py-20 bg-[var(--card)] rounded-2xl border border-slate-200 dark:border-slate-800">
             <Scale className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 dark:text-white">No judges found</h3>
-            <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">Try adjusting your search or filters.</p>
+            <h3 className="text-lg font-medium text-[var(--text-primary)]">No judges found</h3>
+            <p className="text-[var(--text-muted)] dark:text-[var(--text-muted)] mt-1">Try adjusting your search or filters.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredJudges.map(judge => (
-              <div key={judge.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 hover:shadow-lg transition-all flex flex-col h-full group">
+              <div key={judge.id} className="bg-[var(--card)] rounded-2xl border border-slate-200 dark:border-slate-800 p-6 hover:shadow-lg transition-all flex flex-col h-full group">
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-14 h-14 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 group-hover:scale-110 transition-transform duration-300">
-                    <Scale className="w-6 h-6 text-slate-400 dark:text-slate-500" />
+                    <Scale className="w-6 h-6 text-slate-400 dark:text-[var(--text-muted)]" />
                   </div>
                   {judge.verified && (
                     <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded-full uppercase tracking-wider">
@@ -322,7 +322,7 @@ export default function VerifiedJudgesPage() {
                   )}
                 </div>
                 
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 line-clamp-2">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1 line-clamp-2">
                   {judge.name}
                 </h3>
                 <p className="text-sm font-medium text-[#FF9933] mb-4">
@@ -330,11 +330,11 @@ export default function VerifiedJudgesPage() {
                 </p>
                 
                 <div className="space-y-2.5 mb-6 flex-grow">
-                  <div className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
+                  <div className="flex items-start gap-2 text-sm text-slate-600 dark:text-[var(--text-muted)] dark:text-[var(--text-muted)]">
                     <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span className="line-clamp-2">{judge.courtName}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
+                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-[var(--text-muted)] dark:text-[var(--text-muted)]">
                     <Calendar className="w-4 h-4 flex-shrink-0" />
                     {judge.experience} Experience
                   </div>
@@ -361,17 +361,17 @@ export default function VerifiedJudgesPage() {
           onClick={() => setSelectedJudge(null)}
         >
           <div 
-            className="bg-white dark:bg-slate-900 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-800 transform transition-all" 
+            className="bg-[var(--card)] rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-800 transform transition-all" 
             onClick={e => e.stopPropagation()}
           >
             <div className="p-6 md:p-8">
               <div className="flex justify-between items-start mb-8">
                 <div className="flex items-center gap-5">
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 flex-shrink-0">
-                    <Scale className="w-8 h-8 md:w-10 md:h-10 text-slate-400 dark:text-slate-500" />
+                    <Scale className="w-8 h-8 md:w-10 md:h-10 text-slate-400 dark:text-[var(--text-muted)]" />
                   </div>
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+                    <h2 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] flex items-center gap-2 flex-wrap">
                       {selectedJudge.name}
                       {selectedJudge.verified && (
                         <span title="Verified Profile" className="flex items-center">
@@ -384,7 +384,7 @@ export default function VerifiedJudgesPage() {
                 </div>
                 <button 
                   onClick={() => setSelectedJudge(null)} 
-                  className="p-2 hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500 dark:text-slate-400"
+                  className="p-2 hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-[var(--card-elevated)] rounded-full transition-colors text-[var(--text-muted)]"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -392,20 +392,20 @@ export default function VerifiedJudgesPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-wider">State / Region</div>
-                  <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                  <div className="text-xs font-medium text-[var(--text-muted)] dark:text-[var(--text-muted)] mb-1 uppercase tracking-wider">State / Region</div>
+                  <div className="font-semibold text-[var(--text-primary)] flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-[#FF9933]" /> {selectedJudge.state}
                   </div>
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Experience</div>
-                  <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                  <div className="text-xs font-medium text-[var(--text-muted)] dark:text-[var(--text-muted)] mb-1 uppercase tracking-wider">Experience</div>
+                  <div className="font-semibold text-[var(--text-primary)] flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-[#FF9933]" /> {selectedJudge.experience}
                   </div>
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Cases Disposed</div>
-                  <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                  <div className="text-xs font-medium text-[var(--text-muted)] dark:text-[var(--text-muted)] mb-1 uppercase tracking-wider">Cases Disposed</div>
+                  <div className="font-semibold text-[var(--text-primary)] flex items-center gap-2">
                     <Gavel className="w-4 h-4 text-[#FF9933]" /> {selectedJudge.cases}
                   </div>
                 </div>
@@ -413,7 +413,7 @@ export default function VerifiedJudgesPage() {
 
               <div className="space-y-8">
                 <section>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
                     <BookOpen className="w-5 h-5 text-[#FF9933]" /> 
                     Biography
                   </h3>
@@ -423,7 +423,7 @@ export default function VerifiedJudgesPage() {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
                     <Award className="w-5 h-5 text-[#FF9933]" /> 
                     Education & Qualifications
                   </h3>
@@ -433,7 +433,7 @@ export default function VerifiedJudgesPage() {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
                     <Scale className="w-5 h-5 text-[#FF9933]" /> 
                     Notable Judgments
                   </h3>
@@ -451,7 +451,7 @@ export default function VerifiedJudgesPage() {
               <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 flex justify-end">
                  <button 
                     onClick={() => setSelectedJudge(null)}
-                    className="px-6 py-2.5 bg-slate-900 dark:bg-[#111827] text-white dark:text-slate-900 dark:text-white font-medium rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 dark:bg-[#1F2937] transition-colors"
+                    className="px-6 py-2.5 bg-slate-900 dark:bg-[var(--card)] text-white dark:text-[var(--text-primary)] font-medium rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 dark:bg-[#1F2937] transition-colors"
                   >
                     Close Profile
                  </button>

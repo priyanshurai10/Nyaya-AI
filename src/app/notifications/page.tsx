@@ -49,14 +49,14 @@ export default function NotificationCenterPage() {
   const filtered = activeTab === "all" ? notifications : notifications.filter(n => n.category === activeTab);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220] p-6 lg:p-8">
+    <div className="min-h-screen bg-[var(--background)] p-6 lg:p-8">
       {/* Header */}
       <div className="max-w-4xl mx-auto mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+        <h1 className="text-3xl font-bold text-[var(--text-primary)] flex items-center gap-3">
           <Bell className="w-8 h-8 text-[#FF9933]" />
           Notification Center
         </h1>
-        <p className="text-slate-600 dark:text-slate-400 dark:text-slate-500 mt-2">
+        <p className="text-slate-600 dark:text-[var(--text-muted)] dark:text-[var(--text-muted)] mt-2">
           Stay updated with the latest laws, court hearings, and system alerts.
         </p>
       </div>
@@ -74,7 +74,7 @@ export default function NotificationCenterPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${ activeTab === tab.id ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm" : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800" }`}
+              className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${ activeTab === tab.id ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm" : "bg-[var(--card)] text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-[var(--card-elevated)] border border-slate-200 dark:border-slate-800" }`}
             >
               {tab.label}
             </button>
@@ -82,12 +82,12 @@ export default function NotificationCenterPage() {
         </div>
 
         {/* Notifications List */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+        <div className="bg-[var(--card)] rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
           <div className="divide-y divide-slate-100 dark:divide-slate-800/50">
             {isLoading ? (
-              <div className="p-12 text-center text-slate-500 dark:text-slate-400">Loading notifications...</div>
+              <div className="p-12 text-center text-[var(--text-muted)]">Loading notifications...</div>
             ) : filtered.length === 0 ? (
-              <div className="p-12 text-center text-slate-500 dark:text-slate-400">
+              <div className="p-12 text-center text-[var(--text-muted)]">
                 No notifications in this category.
               </div>
             ) : (
@@ -97,7 +97,7 @@ export default function NotificationCenterPage() {
                 
                 if (notification.category === "laws") {
                   Icon = FileText;
-                  colorClass = "text-blue-500 bg-blue-50 dark:bg-blue-500/10";
+                  colorClass = "text-blue-500 bg-blue-50 bg-[var(--primary-subtle)]";
                 } else if (notification.category === "cases") {
                   Icon = Calendar;
                   colorClass = "text-[#FF9933] bg-orange-50 dark:bg-orange-500/10";
@@ -107,25 +107,25 @@ export default function NotificationCenterPage() {
                 }
 
                 return (
-                  <div key={notification.id} className={`p-6 flex gap-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/30 ${!notification.read ? 'bg-slate-50/50 dark:bg-slate-800/10' : ''}`}>
+                  <div key={notification.id} className={`p-6 flex gap-4 transition-colors hover:bg-[var(--card-elevated)]/30 ${!notification.read ? 'bg-slate-50/50 dark:bg-slate-800/10' : ''}`}>
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${colorClass}`}>
                       <Icon className="w-6 h-6" />
                     </div>
                     <div className="flex-1">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
-                        <h3 className={`font-bold ${!notification.read ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>
+                        <h3 className={`font-bold ${!notification.read ? 'text-[var(--text-primary)]' : 'text-slate-700 dark:text-slate-300'}`}>
                           {notification.title}
                         </h3>
-                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">{notification.date}</span>
+                        <span className="text-xs font-medium text-[var(--text-muted)] whitespace-nowrap">{notification.date}</span>
                       </div>
-                      <p className="text-slate-600 dark:text-slate-400 dark:text-slate-500 text-sm leading-relaxed">
+                      <p className="text-slate-600 dark:text-[var(--text-muted)] dark:text-[var(--text-muted)] text-sm leading-relaxed">
                         {notification.desc}
                       </p>
                     </div>
                     {!notification.read ? (
                       <button onClick={() => toggleRead(notification.id, false)} className="w-2.5 h-2.5 bg-[#FF9933] rounded-full shrink-0 mt-2 hover:scale-125 transition-transform" title="Mark as Read"></button>
                     ) : (
-                      <button onClick={() => toggleRead(notification.id, true)} className="text-xs text-slate-400 hover:text-slate-500 dark:text-slate-400 dark:hover:text-slate-300 transition-colors h-fit mt-1">Undo</button>
+                      <button onClick={() => toggleRead(notification.id, true)} className="text-xs text-slate-400 hover:text-[var(--text-muted)] dark:hover:text-slate-300 transition-colors h-fit mt-1">Undo</button>
                     )}
                   </div>
                 );

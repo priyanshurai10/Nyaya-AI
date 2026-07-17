@@ -5,6 +5,7 @@ import { translations, LanguageCode } from '@/lib/translations';
 import { useLanguage } from '@/context/LanguageContext';
 import { MapPin, Search, Compass, ShieldAlert, Phone, Globe, Clock, User, Landmark, Route, ExternalLink } from 'lucide-react';
 import PincodeSearch from '@/components/PincodeSearch';
+import { apiClient } from '@/lib/api';
 
 interface MapMarker {
   id: string;
@@ -154,12 +155,7 @@ export default function LegalMapPage() {
     // Clear previous judge before query
     setDynamicJudge(null);
     
-    fetch('http://localhost:8000/api/v1/navigation/judges/search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ court_name: selectedMarker.name })
-    })
-      .then(res => res.json())
+    apiClient.post<any>('/navigation/judges/search', { court_name: selectedMarker.name })
       .then(data => {
         if (data && data.length > 0) {
           setDynamicJudge(data[0]);
@@ -171,7 +167,7 @@ export default function LegalMapPage() {
   // Seed DB first in case it is fresh
   const ensureSeeded = async () => {
     try {
-      await fetch('http://localhost:8000/api/v1/navigation/courts/seed', { method: 'POST' });
+      await apiClient.post('/navigation/courts/seed');
     } catch (e) {
       console.warn('Seeding failed / offline', e);
     }
@@ -185,17 +181,7 @@ export default function LegalMapPage() {
     try {
       let payload = { latitude: latVal, longitude: lonVal, ...manualPayload };
 
-      const res = await fetch('http://localhost:8000/api/v1/navigation/courts/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) {
-        throw new Error('Court proximity API failed.');
-      }
-
-      const data = await res.json();
+      const data = await apiClient.post<any>('/navigation/courts/search', payload);
       
       // Update coordinates to user center resolved by backend
       const centerLat = data.user_location.latitude;

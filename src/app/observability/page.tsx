@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { translations, LanguageCode } from '@/lib/translations';
 import Header from '@/components/Header';
+import { apiClient } from '@/lib/api';
 
 /* ─── Observability specific localization ─── */
 const obsTranslations = {
@@ -151,21 +152,15 @@ export default function ObservabilityPage() {
     setError(null);
     try {
       // 1. Fetch Stats
-      const statsRes = await fetch('http://localhost:8000/api/v1/observability/stats');
-      if (!statsRes.ok) throw new Error('Failed to load security statistics.');
-      const statsData = await statsRes.json();
+      const statsData = await apiClient.get<any>('/observability/stats');
       setStats(statsData);
 
       // 2. Fetch Evaluations
-      const evalsRes = await fetch('http://localhost:8000/api/v1/observability/evals');
-      if (!evalsRes.ok) throw new Error('Failed to load quality evaluations.');
-      const evalsData = await evalsRes.json();
+      const evalsData = await apiClient.get<any>('/observability/evals');
       setEvals(evalsData);
 
       // 3. Fetch Audit Logs
-      const auditRes = await fetch('http://localhost:8000/api/v1/observability/audit');
-      if (!auditRes.ok) throw new Error('Failed to load audit logs trail.');
-      const auditData = await auditRes.json();
+      const auditData = await apiClient.get<any>('/observability/audit');
       setAuditLogs(auditData);
     } catch (err: any) {
       console.error(err);

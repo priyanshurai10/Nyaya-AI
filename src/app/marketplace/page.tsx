@@ -64,16 +64,16 @@ export default function LegalMarketplacePage() {
   const filtered = services.filter(s => activeTab === "all" || s.category === activeTab);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220] p-6 lg:p-8">
+    <div className="min-h-screen bg-[var(--background)] p-6 lg:p-8">
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-[var(--text-primary)] flex items-center gap-3">
               <Store className="w-8 h-8 text-[#FF9933]" />
               Legal Services Marketplace
             </h1>
-            <p className="text-slate-600 dark:text-slate-400 dark:text-slate-500 mt-2">
+            <p className="text-slate-600 dark:text-[var(--text-muted)] dark:text-[var(--text-muted)] mt-2">
               Book consultations, order legal drafts, and get verified professional help at transparent prices.
             </p>
           </div>
@@ -102,16 +102,16 @@ export default function LegalMarketplacePage() {
                   <span className="flex items-center gap-1.5"><CheckCircle2 className="w-5 h-5 text-emerald-400" /> Secure Payment</span>
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl w-full md:w-80 shrink-0 shadow-lg text-center border border-slate-200 dark:border-slate-800">
-                <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 font-medium mb-1">Fixed Price</p>
-                <div className="text-4xl font-black text-slate-900 dark:text-white mb-6">₹200</div>
+              <div className="bg-[var(--card)] p-6 rounded-2xl w-full md:w-80 shrink-0 shadow-lg text-center border border-slate-200 dark:border-slate-800">
+                <p className="text-[var(--text-muted)] dark:text-[var(--text-muted)] font-medium mb-1">Fixed Price</p>
+                <div className="text-4xl font-black text-[var(--text-primary)] mb-6">₹200</div>
                 <Link 
                   href="/consultation"
                   className="w-full flex items-center justify-center gap-2 py-3 bg-[#FF9933] hover:bg-orange-600 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95"
                 >
                   <Phone className="w-5 h-5" /> Book Consultation
                 </Link>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-4">Callback within 2 hours</p>
+                <p className="text-xs text-[var(--text-muted)] mt-4">Callback within 2 hours</p>
               </div>
             </div>
           </div>
@@ -123,7 +123,7 @@ export default function LegalMarketplacePage() {
             <button
               key={cat.id}
               onClick={() => setActiveTab(cat.id)}
-              className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${ activeTab === cat.id ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm" : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800" }`}
+              className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${ activeTab === cat.id ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm" : "bg-[var(--card)] text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:bg-[#1F2937] dark:hover:bg-[var(--card-elevated)] border border-slate-200 dark:border-slate-800" }`}
             >
               {cat.label}
             </button>
@@ -133,23 +133,23 @@ export default function LegalMarketplacePage() {
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map(srv => (
-            <div key={srv.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col hover:border-[#FF9933]/50 transition-colors group">
+            <div key={srv.id} className="bg-[var(--card)] rounded-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col hover:border-[#FF9933]/50 transition-colors group">
               <div className="flex items-start justify-between mb-4">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${srv.color} text-white shadow-sm`}>
                   <srv.icon className="w-6 h-6" />
                 </div>
-                <span className="font-black text-xl text-slate-900 dark:text-white">{srv.price}</span>
+                <span className="font-black text-xl text-[var(--text-primary)]">{srv.price}</span>
               </div>
               
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-[#FF9933] transition-colors">
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 group-hover:text-[#FF9933] transition-colors">
                 {srv.title}
               </h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-6 flex-1">
+              <p className="text-sm text-[var(--text-muted)] dark:text-[var(--text-muted)] mb-6 flex-1">
                 {srv.desc}
               </p>
 
               <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                <span className="text-xs font-medium text-[var(--text-muted)] bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
                   {srv.duration}
                 </span>
                 
@@ -158,7 +158,7 @@ export default function LegalMarketplacePage() {
                     Book Now <ChevronRight className="w-4 h-4" />
                   </Link>
                 ) : (
-                  <button onClick={() => alert("Service added to your request queue.")} className="flex items-center gap-1 text-sm font-bold text-slate-900 dark:text-white hover:text-[#FF9933] transition-colors">
+                  <button onClick={() => alert("Service added to your request queue.")} className="flex items-center gap-1 text-sm font-bold text-[var(--text-primary)] hover:text-[#FF9933] transition-colors">
                     Order Service <ChevronRight className="w-4 h-4" />
                   </button>
                 )}

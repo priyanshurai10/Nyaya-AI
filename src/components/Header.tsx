@@ -265,13 +265,13 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-[#0B1220]/80 border-b border-slate-200 dark:border-white/5 px-3 sm:px-4 lg:px-6 py-2.5 transition-colors duration-200">
+    <header className="sticky top-0 z-40 bg-[var(--surface)]/90 backdrop-blur-xl border-b border-[var(--border)] px-3 sm:px-4 lg:px-6 py-2.5 transition-colors duration-200">
       <div className="flex items-center gap-2 min-w-0">
         {/* Left Section: Brand & Sidebar toggle */}
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onToggleSidebar}
-            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
+            className="p-1.5 rounded-lg hover:bg-[var(--card-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
             aria-label="Toggle Sidebar"
           >
             <Menu size={20} />
@@ -280,10 +280,10 @@ export default function Header({
           <Link href="/" className="flex items-center gap-2">
             <Logo size={32} animated={false} />
             <div className="hidden sm:flex flex-col">
-              <span className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-none">
+              <span className="font-bold text-sm tracking-tight text-[var(--text-primary)] leading-none">
                 {t('brandName')}
               </span>
-              <span className="text-[9px] text-slate-500 dark:text-white/40 hidden md:block mt-0.5 font-medium">
+              <span className="text-[9px] text-[var(--text-muted)] hidden md:block mt-0.5 font-medium">
                 {t('brandSubtitle')}
               </span>
             </div>
@@ -299,7 +299,7 @@ export default function Header({
             </div>
             <input
               type="text"
-              className="block w-full pl-9 pr-3 py-2 border border-slate-200 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-all"
+              className="block w-full pl-9 pr-3 py-2 border border-[var(--border)] rounded-xl bg-[var(--card)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-subtle)] focus:border-[var(--primary)] text-sm transition-all"
               placeholder="Search laws, judgments..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -316,7 +316,7 @@ export default function Header({
             
             {/* Search Results Dropdown */}
             {searchOpen && searchQuery.length >= 2 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden max-h-96 overflow-y-auto animate-scaleUp">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--border)] rounded-2xl shadow-2xl z-50 overflow-hidden max-h-96 overflow-y-auto animate-scale-in">
                 {searchResults.length > 0 ? (
                   <ul className="py-2">
                     {searchResults.map((result, idx) => (
@@ -327,20 +327,20 @@ export default function Header({
                             setSearchOpen(false);
                             setSearchQuery('');
                           }}
-                          className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b border-slate-100 dark:border-white/5 last:border-0"
+                          className="flex items-start gap-3 px-4 py-3 hover:bg-[var(--card-elevated)] transition-colors border-b border-[var(--border)] last:border-0"
                         >
-                          <div className="mt-0.5 p-1.5 bg-slate-100 dark:bg-slate-900/80 rounded-lg shrink-0">
+                          <div className="mt-0.5 p-1.5 bg-[var(--card-elevated)] rounded-lg shrink-0">
                             {getResultIcon(result.type)}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                            <p className="text-sm font-semibold text-[var(--text-primary)] truncate">
                               {result.title}
                             </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">
+                            <p className="text-xs text-[var(--text-muted)] line-clamp-2 mt-0.5">
                               {result.summary}
                             </p>
                           </div>
-                          <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50 dark:bg-slate-900/50 px-2 py-1 rounded-md shrink-0">
+                          <span className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-wider bg-[var(--card-elevated)] px-2 py-1 rounded-md shrink-0">
                             {result.type}
                           </span>
                         </Link>
@@ -348,7 +348,7 @@ export default function Header({
                     ))}
                   </ul>
                 ) : (
-                  <div className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 text-sm">
+                  <div className="px-4 py-8 text-center text-[var(--text-muted)] text-sm">
                     {isSearching ? 'Searching...' : 'No results found.'}
                   </div>
                 )}
@@ -363,15 +363,15 @@ export default function Header({
           {/* Pincode Location display */}
           <div className="relative">
             {location ? (
-              <div className="flex items-center gap-1.5 sm:gap-2.5 px-2 sm:px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 text-left shadow-sm">
-                <div className="text-indigo-600 dark:text-blue-400 shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-2.5 px-2 sm:px-3 py-1.5 rounded-xl bg-[var(--card-elevated)] border border-[var(--border)] text-left">
+                <div className="text-[var(--primary)] shrink-0">
                   <MapPin size={16} />
                 </div>
                 <div className="hidden md:flex flex-col text-[10px] leading-tight select-none">
-                  <span className="font-bold text-slate-800 dark:text-slate-200 text-xs truncate max-w-[80px]">
+                  <span className="font-bold text-[var(--text-primary)] text-xs truncate max-w-[80px]">
                     {location.city}
                   </span>
-                  <span className="font-bold text-indigo-600 dark:text-blue-400">
+                  <span className="font-bold text-[var(--primary)]">
                     PIN: {location.pincode}
                   </span>
                 </div>
@@ -380,7 +380,7 @@ export default function Header({
                     setCityListOpen(!cityListOpen);
                     setPincodeError(null);
                   }}
-                  className="ml-1 p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
+                  className="ml-1 p-1 rounded-lg hover:bg-[var(--card-hover)] text-[var(--text-muted)]"
                   aria-label="Change PIN"
                 >
                   <MapPin size={12} />
@@ -393,7 +393,7 @@ export default function Header({
                   setPincodeError(null);
                   setSearchOpen(false);
                 }}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:text-blue-400 dark:hover:bg-blue-500/10 transition-colors text-xs font-bold"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[var(--card-elevated)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-subtle)] transition-colors text-xs font-semibold"
               >
                 <MapPin size={15} />
                 <span className="hidden xl:inline">Set PIN</span>
@@ -402,8 +402,8 @@ export default function Header({
 
             {/* Pincode Search Dialog */}
             {cityListOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl p-4 shadow-2xl z-50 transition-all duration-200 animate-scaleUp">
-                <h4 className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-100 dark:border-white/5 pb-2 mb-3">
+              <div className="absolute top-full right-0 mt-2 w-72 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 shadow-2xl z-50 animate-scale-in">
+                <h4 className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest border-b border-[var(--border)] pb-2 mb-3">
                   Update Active Pincode
                 </h4>
                 <form onSubmit={handlePincodeSearch} className="space-y-3">
@@ -417,13 +417,13 @@ export default function Header({
                       placeholder="Enter 6-digit Pincode"
                       value={pincodeVal}
                       onChange={(e) => setPincodeVal(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/5 rounded-xl text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                      className="w-full px-3 py-2 bg-[var(--card-elevated)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--primary-subtle)] focus:border-[var(--primary)]"
                     />
                     {pincodeVal && (
                       <button
                         type="button"
                         onClick={() => setPincodeVal('')}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
                       >
                         <X size={14} />
                       </button>
@@ -431,7 +431,7 @@ export default function Header({
                   </div>
 
                   {pincodeError && (
-                    <div className="flex items-center gap-1.5 text-[10px] text-red-500 font-semibold bg-red-50 dark:bg-red-500/10 p-2 rounded-lg">
+                    <div className="flex items-center gap-1.5 text-[10px] text-[var(--danger)] font-semibold bg-[var(--danger-subtle)] p-2 rounded-lg">
                       <AlertCircle size={12} className="shrink-0" />
                       <span>{pincodeError}</span>
                     </div>
@@ -441,7 +441,7 @@ export default function Header({
                     <button
                       type="submit"
                       disabled={pincodeLoading || pincodeVal.length !== 6}
-                      className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-100 disabled:text-slate-400 dark:disabled:bg-slate-800 dark:bg-slate-900/50 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                      className="flex-1 py-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] disabled:bg-[var(--card-elevated)] disabled:text-[var(--text-muted)] text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
                     >
                       {pincodeLoading ? (
                         <Loader2 size={12} className="animate-spin" />
@@ -453,7 +453,7 @@ export default function Header({
                       <button
                         type="button"
                         onClick={handleClearLocation}
-                        className="px-3 py-2 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl text-xs font-bold transition-all"
+                        className="px-3 py-2 border border-[var(--border)] hover:bg-[var(--card-elevated)] text-[var(--text-muted)] rounded-xl text-xs font-bold transition-all"
                       >
                         Clear
                       </button>
@@ -467,7 +467,7 @@ export default function Header({
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
+            className="p-2 rounded-xl hover:bg-[var(--card-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
             aria-label="Toggle Theme"
           >
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
@@ -482,20 +482,24 @@ export default function Header({
                 setProfileOpen(false);
                 setCityListOpen(false);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-white/70 text-xs font-bold transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-[var(--card-elevated)] text-[var(--text-secondary)] text-xs font-semibold transition-colors"
             >
               <Globe size={16} />
               <span className="uppercase hidden sm:inline">{currentLang.code}</span>
             </button>
 
             {langOpen && (
-              <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl py-2 shadow-2xl z-50 animate-scaleUp">
+              <div className="absolute top-full right-0 mt-2 w-48 bg-[var(--card)] border border-[var(--border)] rounded-2xl py-2 shadow-2xl z-50 animate-scale-in">
                 <div className="grid grid-cols-2 gap-0.5 p-1">
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
                       onClick={() => changeLanguage(lang.code)}
-                      className={`flex items-center justify-start gap-2 px-2.5 py-1.5 rounded-lg text-left text-xs font-medium transition-all ${ selectedLang === lang.code ? 'bg-indigo-50 dark:bg-blue-500/10 text-indigo-650 dark:text-blue-400 font-extrabold' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-white/70' }`}
+                      className={`flex items-center justify-start gap-2 px-2.5 py-1.5 rounded-lg text-left text-xs font-medium transition-all ${
+                        selectedLang === lang.code
+                          ? 'bg-[var(--primary-subtle)] text-[var(--primary)] font-semibold'
+                          : 'hover:bg-[var(--card-elevated)] text-[var(--text-secondary)]'
+                      }`}
                     >
                       <span className="text-sm">{lang.flag}</span>
                       <span>{lang.label}</span>
@@ -515,36 +519,36 @@ export default function Header({
                 setProfileOpen(false);
                 setCityListOpen(false);
               }}
-              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors relative"
+              className="p-2 rounded-xl hover:bg-[var(--card-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors relative"
             >
               <Bell size={18} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--danger)] rounded-full" />
             </button>
 
             {notifOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl p-4 shadow-2xl z-50 animate-scaleUp">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-2 mb-3">
-                  <h4 className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              <div className="absolute top-full right-0 mt-2 w-72 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 shadow-2xl z-50 animate-scale-in">
+                <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
+                  <h4 className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
                     Notifications
                   </h4>
-                  <span className="text-[9px] font-extrabold text-indigo-600 dark:text-blue-400 bg-indigo-50 dark:bg-blue-500/10 px-1.5 py-0.5 rounded">
+                  <span className="text-[9px] font-extrabold text-[var(--primary)] bg-[var(--primary-subtle)] px-1.5 py-0.5 rounded">
                     3 New
                   </span>
                 </div>
                 <div className="space-y-3">
                   {notifications.map((n) => (
                     <div key={n.id} className="text-left">
-                      <p className="text-xs text-slate-700 dark:text-white/80 font-medium leading-relaxed">
+                      <p className="text-xs text-[var(--text-primary)] font-medium leading-relaxed">
                         {n.text}
                       </p>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 block">
+                      <span className="text-[10px] text-[var(--text-muted)] mt-0.5 block">
                         {n.time}
                       </span>
                     </div>
                   ))}
                 </div>
-                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/5 text-center">
-                  <Link href="/notifications" onClick={() => setNotifOpen(false)} className="text-xs font-bold text-indigo-600 dark:text-blue-400 hover:underline">
+                <div className="mt-3 pt-3 border-t border-[var(--border)] text-center">
+                  <Link href="/notifications" onClick={() => setNotifOpen(false)} className="text-xs font-bold text-[var(--primary)] hover:underline">
                     View All Notifications
                   </Link>
                 </div>
@@ -561,26 +565,26 @@ export default function Header({
                 setNotifOpen(false);
                 setCityListOpen(false);
               }}
-              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
+              className="p-2 rounded-xl hover:bg-[var(--card-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
             >
               <User size={18} />
             </button>
 
             {profileOpen && (
-              <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl p-4 shadow-2xl z-50 animate-scaleUp text-left">
+              <div className="absolute top-full right-0 mt-2 w-56 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 shadow-2xl z-50 animate-scale-in text-left">
                 {userData ? (
                   <div className="space-y-3">
-                    <div className="border-b border-slate-100 dark:border-white/5 pb-2">
-                      <div className="font-bold text-slate-900 dark:text-white text-xs">
+                    <div className="border-b border-[var(--border)] pb-2">
+                      <div className="font-bold text-[var(--text-primary)] text-xs">
                         {userData.name || 'Citizen'}
                       </div>
-                      <div className="text-[10px] text-slate-450 dark:text-slate-500 mt-0.5 truncate">
+                      <div className="text-[10px] text-[var(--text-muted)] mt-0.5 truncate">
                         {userData.email || userData.mobile}
                       </div>
                     </div>
                     <button
                       onClick={handleLogout}
-                      className="w-full py-2 px-3 hover:bg-red-50 dark:hover:bg-red-500/10 text-red-550 dark:text-red-400 rounded-xl text-xs font-bold transition-all flex items-center gap-2"
+                      className="w-full py-2 px-3 hover:bg-[var(--danger-subtle)] text-[var(--danger)] rounded-xl text-xs font-bold transition-all flex items-center gap-2"
                     >
                       <LogOut size={14} />
                       <span>Log Out</span>
@@ -588,13 +592,13 @@ export default function Header({
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <p className="text-xs text-slate-500 dark:text-white/40 mb-2">
+                    <p className="text-xs text-[var(--text-muted)] mb-2">
                       Please login to access personalized features.
                     </p>
                     <Link
                       href="/auth"
                       onClick={() => setProfileOpen(false)}
-                      className="w-full py-2 bg-indigo-650 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
+                      className="w-full py-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
                     >
                       <User size={14} />
                       <span>Log In</span>

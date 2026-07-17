@@ -102,7 +102,7 @@ function LitigationJourneyContent() {
             <button
               key={cat.id}
               onClick={() => handleCategorySelect(cat.id)}
-              className={`px-5 py-2.5 rounded-xl border text-sm font-semibold whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${ activeCategory === cat.id ? 'bg-gradient-to-r from-blue-600 to-indigo-600 border-blue-500 text-white shadow-md shadow-blue-500/15' : 'bg-white dark:bg-[#111827]/5 border-white/10 text-white/60 hover:bg-white dark:bg-[#111827]/10 hover:text-white' }`}
+              className={`px-5 py-2.5 rounded-xl border text-sm font-semibold whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${ activeCategory === cat.id ? 'bg-gradient-to-r from-blue-600 to-indigo-600 border-blue-500 text-white shadow-md shadow-blue-500/15' : 'bg-[var(--card)]/5 border-white/10 text-white/60 hover:bg-[var(--card)]/10 hover:text-white' }`}
             >
               <span>{cat.emoji}</span>
               <span>{cat.label}</span>
@@ -111,7 +111,7 @@ function LitigationJourneyContent() {
         </div>
 
         {error && (
-          <div className="max-w-3xl mx-auto w-full p-6 rounded-2xl bg-red-500/10 border border-red-500/30 shadow-lg text-center mt-8">
+          <div className="max-w-3xl mx-auto w-full p-6 rounded-2xl bg-[var(--danger-subtle)] border border-red-500/30 shadow-lg text-center mt-8">
             <div className="text-4xl mb-4">⚠️</div>
             <h3 className="text-xl font-bold text-red-400 mb-2">Error Loading Guide</h3>
             <p className="text-red-200/80">{error}</p>
@@ -135,7 +135,7 @@ function LitigationJourneyContent() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-4">
             
             {/* Left Column: Timeline / Steps */}
-            <div className="lg:col-span-7 bg-white dark:bg-[#111827]/[0.02] border border-white/5 shadow-xl rounded-2xl p-6 md:p-8">
+            <div className="lg:col-span-7 bg-[var(--card)]/[0.02] border border-white/5 shadow-xl rounded-2xl p-6 md:p-8">
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-white mb-2">{data.title}</h2>
                 <div className="text-sm text-white/50 flex flex-wrap gap-4">
@@ -160,7 +160,7 @@ function LitigationJourneyContent() {
                       </div>
 
                       {/* Card */}
-                      <div className={`p-5 rounded-2xl border transition-all duration-300 ${isSelected ? 'bg-blue-500/10 border-blue-500/30 shadow-lg shadow-blue-500/5' : 'bg-white dark:bg-[#111827]/[0.02] border-white/5 hover:bg-white dark:bg-[#111827]/[0.04] hover:border-white/10' }`}
+                      <div className={`p-5 rounded-2xl border transition-all duration-300 ${isSelected ? 'bg-blue-500/10 border-blue-500/30 shadow-lg shadow-blue-500/5' : 'bg-[var(--card)]/[0.02] border-white/5 hover:bg-[var(--card)]/[0.04] hover:border-white/10' }`}
                       >
                         <h3 className={`text-lg font-bold transition-colors ${isSelected ? 'text-blue-400' : 'text-white/90 group-hover:text-white'}`}>
                           {step.name}
@@ -178,12 +178,12 @@ function LitigationJourneyContent() {
             {/* Right Column: Details & Documents */}
             <div className="lg:col-span-5 space-y-6 sticky top-8">
               {selectedStep && (
-                <div className="bg-white dark:bg-[#111827]/[0.03] border border-blue-500/20 shadow-2xl rounded-2xl p-6 md:p-8 animate-fadeIn">
+                <div className="bg-[var(--card)]/[0.03] border border-blue-500/20 shadow-2xl rounded-2xl p-6 md:p-8 animate-fadeIn">
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     <span className="text-blue-400">Step {selectedStep.step}:</span> {selectedStep.name}
                   </h3>
                   
-                  <div className="bg-white dark:bg-[#111827]/[0.01] border border-white/5 rounded-xl p-5 mb-6 text-sm text-white/80 leading-relaxed">
+                  <div className="bg-[var(--card)]/[0.01] border border-white/5 rounded-xl p-5 mb-6 text-sm text-white/80 leading-relaxed">
                     {selectedStep.desc}
                   </div>
 
@@ -191,7 +191,7 @@ function LitigationJourneyContent() {
                     <h4 className="text-sm font-extrabold text-white/90 uppercase tracking-wider flex items-center gap-2">
                       📋 Required Documents
                     </h4>
-                    <ul className="space-y-3 bg-white dark:bg-[#111827]/[0.01] border border-white/5 rounded-xl p-5">
+                    <ul className="space-y-3 bg-[var(--card)]/[0.01] border border-white/5 rounded-xl p-5">
                       {data.documents.map((doc, idx) => (
                         <li key={idx} className="flex items-start gap-3 text-sm text-white/70 leading-normal">
                           <span className="text-green-400 mt-0.5">✓</span>

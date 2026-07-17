@@ -13,30 +13,30 @@ export default function EvidenceVaultPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220] p-6 lg:p-8">
+    <div className="min-h-screen bg-[var(--background)] p-6 lg:p-8">
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-[var(--text-primary)] flex items-center gap-3">
               <Lock className="w-8 h-8 text-[#FF9933]" />
               AI Evidence Vault
             </h1>
-            <p className="text-slate-600 dark:text-slate-400 dark:text-slate-500 mt-2">
+            <p className="text-slate-600 dark:text-[var(--text-muted)] dark:text-[var(--text-muted)] mt-2">
               Securely store, organize, and analyze your legal evidence with military-grade encryption.
             </p>
           </div>
           
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[var(--text-muted)]" />
               <input 
                 type="text" 
                 placeholder="Search files..."
-                className="pl-9 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#FF9933]"
+                className="pl-9 pr-4 py-2 bg-[var(--card)] border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[#FF9933]"
               />
             </div>
-            <button className="p-2 border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:bg-[#0B1220] dark:hover:bg-slate-800">
+            <button className="p-2 border border-slate-200 dark:border-slate-800 rounded-lg bg-[var(--card)] text-slate-600 dark:text-[var(--text-muted)] dark:text-[var(--text-muted)] hover:bg-[var(--background)] dark:hover:bg-[var(--card-elevated)]">
               <Filter className="w-4 h-4" />
             </button>
           </div>
@@ -49,21 +49,21 @@ export default function EvidenceVaultPage() {
         <div className="lg:col-span-2 space-y-8">
           {/* Upload Zone */}
           <div 
-            className={`border-2 border-dashed rounded-2xl p-10 text-center transition-colors ${ dragActive ? "border-[#FF9933] bg-[#FF9933]/5" : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 dark:bg-[#111827]" }`}
+            className={`border-2 border-dashed rounded-2xl p-10 text-center transition-colors ${ dragActive ? "border-[#FF9933] bg-[#FF9933]/5" : "border-slate-300 dark:border-slate-700 bg-[var(--card)] dark:bg-[var(--card)]" }`}
             onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
             onDragLeave={() => setDragActive(false)}
             onDrop={(e) => { e.preventDefault(); setDragActive(false); }}
           >
-            <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-blue-50 bg-[var(--primary-subtle)] text-blue-600 dark:text-[var(--primary)] rounded-full flex items-center justify-center mx-auto mb-4">
               <UploadCloud className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+            <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">
               Drag & Drop files to encrypt and upload
             </h3>
-            <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm mb-6">
+            <p className="text-[var(--text-muted)] dark:text-[var(--text-muted)] text-sm mb-6">
               Supports PDF, DOCX, JPG, PNG, MP4, MP3, ZIP (Max 500MB per file)
             </p>
-            <label className="px-6 py-2.5 bg-slate-900 dark:bg-[#111827] text-white dark:text-slate-900 dark:text-white font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 dark:bg-[#1F2937] transition-colors cursor-pointer inline-block">
+            <label className="px-6 py-2.5 bg-slate-900 dark:bg-[var(--card)] text-white dark:text-[var(--text-primary)] font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 dark:bg-[#1F2937] transition-colors cursor-pointer inline-block">
               Browse Files
               <input 
                 type="file" 
@@ -94,23 +94,23 @@ export default function EvidenceVaultPage() {
           </div>
 
           {/* File List */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <div className="bg-[var(--card)] rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-              <h3 className="font-bold text-slate-900 dark:text-white">Recent Uploads</h3>
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">12 Files stored</span>
+              <h3 className="font-bold text-[var(--text-primary)]">Recent Uploads</h3>
+              <span className="text-sm font-medium text-[var(--text-muted)]">12 Files stored</span>
             </div>
             
             <div className="divide-y divide-slate-100 dark:divide-slate-800/50">
               {files.map(file => (
-                <div key={file.id} className="p-4 hover:bg-slate-50 dark:bg-[#0B1220] dark:hover:bg-slate-800/30 transition-colors flex items-center gap-4">
+                <div key={file.id} className="p-4 hover:bg-[var(--background)] dark:hover:bg-[var(--card-elevated)]/30 transition-colors flex items-center gap-4">
                   <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                    {file.type === 'pdf' ? <FileText className="w-5 h-5 text-red-500" /> :
+                    {file.type === 'pdf' ? <FileText className="w-5 h-5 text-[var(--danger)]" /> :
                      file.type === 'video' ? <PlayCircleIcon className="w-5 h-5 text-blue-500" /> :
                      <ImageIcon className="w-5 h-5 text-emerald-500" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{file.name}</p>
-                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">{file.name}</p>
+                    <div className="flex items-center gap-3 text-xs text-[var(--text-muted)] mt-1">
                       <span>{file.size}</span>
                       <span>•</span>
                       <span>{file.date}</span>
@@ -127,7 +127,7 @@ export default function EvidenceVaultPage() {
                     <span className="hidden sm:flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded-full">
                       <CheckCircle className="w-3 h-3" /> {file.status}
                     </span>
-                    <button className="p-2 text-slate-400 hover:text-slate-500 dark:text-slate-400 dark:hover:text-slate-300">
+                    <button className="p-2 text-slate-400 hover:text-[var(--text-muted)] dark:hover:text-slate-300">
                       <MoreVertical className="w-4 h-4" />
                     </button>
                   </div>
@@ -139,16 +139,16 @@ export default function EvidenceVaultPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-            <h3 className="font-bold text-slate-900 dark:text-white mb-4">Vault Storage</h3>
+          <div className="bg-[var(--card)] rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
+            <h3 className="font-bold text-[var(--text-primary)] mb-4">Vault Storage</h3>
             <div className="mb-2 flex justify-between text-sm">
-              <span className="text-slate-500 dark:text-slate-400">Used: 2.1 GB</span>
-              <span className="font-medium text-slate-900 dark:text-white">5.0 GB</span>
+              <span className="text-[var(--text-muted)]">Used: 2.1 GB</span>
+              <span className="font-medium text-[var(--text-primary)]">5.0 GB</span>
             </div>
             <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-4">
               <div className="h-full bg-[#138808] w-[42%] rounded-full" />
             </div>
-            <button onClick={() => alert("Storage plans are currently managed in the admin panel.")} className="w-full py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-[#0B1220] dark:hover:bg-slate-800">
+            <button onClick={() => alert("Storage plans are currently managed in the admin panel.")} className="w-full py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-[var(--background)] dark:hover:bg-[var(--card-elevated)]">
               Upgrade Storage
             </button>
           </div>
@@ -159,7 +159,7 @@ export default function EvidenceVaultPage() {
             <p className="text-white/80 text-sm mb-4">
               Nyaya AI can automatically extract text, dates, and key entities from your uploaded images and PDFs.
             </p>
-            <button onClick={() => alert("AI Auto-Analysis enabled.")} className="px-4 py-2 bg-white dark:bg-slate-900 text-indigo-600 text-sm font-bold rounded-lg shadow-sm hover:bg-slate-50 dark:bg-[#0B1220]">
+            <button onClick={() => alert("AI Auto-Analysis enabled.")} className="px-4 py-2 bg-[var(--card)] text-indigo-600 text-sm font-bold rounded-lg shadow-sm hover:bg-[var(--background)]">
               Enable Auto-Analysis
             </button>
           </div>

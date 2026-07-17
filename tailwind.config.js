@@ -9,6 +9,61 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // ── Design System Tokens (mapped to CSS vars) ──────────────
+        background: 'var(--background)',
+        surface: 'var(--surface)',
+        card: 'var(--card)',
+        'card-elevated': 'var(--card-elevated)',
+        'card-hover': 'var(--card-hover)',
+        border: 'var(--border)',
+        'border-strong': 'var(--border-strong)',
+        'border-focus': 'var(--border-focus)',
+
+        primary: {
+          DEFAULT: 'var(--primary)',
+          hover: 'var(--primary-hover)',
+          subtle: 'var(--primary-subtle)',
+        },
+        accent: {
+          DEFAULT: 'var(--accent)',
+          hover: 'var(--accent-hover)',
+        },
+        success: {
+          DEFAULT: 'var(--success)',
+          subtle: 'var(--success-subtle)',
+        },
+        warning: {
+          DEFAULT: 'var(--warning)',
+        },
+        danger: {
+          DEFAULT: 'var(--danger)',
+          hover: 'var(--danger-hover)',
+          subtle: 'var(--danger-subtle)',
+        },
+
+        // ── Text Scale ───────────────────────────────────────────────
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-muted': 'var(--text-muted)',
+        'text-disabled': 'var(--text-disabled)',
+
+        // ── Legacy brand namespace ─────────────────────────────────
+        brand: {
+          background: 'var(--background)',
+          card: 'var(--card)',
+          'card-elevated': 'var(--card-elevated)',
+          border: 'var(--border)',
+          primary: 'var(--primary)',
+          'primary-hover': 'var(--primary-hover)',
+          accent: 'var(--accent)',
+          success: 'var(--success)',
+          danger: 'var(--danger)',
+          'text-primary': 'var(--text-primary)',
+          'text-secondary': 'var(--text-secondary)',
+          'text-muted': 'var(--text-muted)',
+        },
+
+        // ── Static Colors (India theme) ──────────────────────────
         navy: {
           50: '#E8EDF5',
           100: '#C5D0E6',
@@ -34,88 +89,94 @@ module.exports = {
           800: '#B36B24',
           900: '#804D1A',
         },
-        emerald: {
-          50: '#E6F5EC',
-          100: '#B3E0C4',
-          200: '#80CC9C',
-          300: '#4DB874',
-          400: '#26A85C',
-          500: '#138808',
-          600: '#107A07',
-          700: '#0D6B06',
-          800: '#0A5C05',
-          900: '#073D03',
-        },
         ashoka: {
           DEFAULT: '#000080',
           light: '#1A1AFF',
         },
       },
+
       fontFamily: {
         sans: ['Inter', 'Noto Sans', 'system-ui', 'sans-serif'],
         display: ['Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
+
+      fontSize: {
+        '2xs': ['0.625rem', { lineHeight: '0.875rem' }],
+        xs:  ['0.75rem',   { lineHeight: '1rem' }],
+        sm:  ['0.8125rem', { lineHeight: '1.25rem' }],
+        base:['0.875rem',  { lineHeight: '1.5rem' }],
+        md:  ['1rem',      { lineHeight: '1.5rem' }],
+        lg:  ['1.125rem',  { lineHeight: '1.75rem' }],
+        xl:  ['1.25rem',   { lineHeight: '1.75rem' }],
+        '2xl':['1.5rem',   { lineHeight: '2rem' }],
+        '3xl':['1.875rem', { lineHeight: '2.25rem' }],
+        '4xl':['2.25rem',  { lineHeight: '2.5rem' }],
+        '5xl':['3rem',     { lineHeight: '1.15' }],
+      },
+
+      borderRadius: {
+        'sm': '0.375rem',
+        'md': '0.625rem',
+        'lg': '0.875rem',
+        'xl': '1rem',
+        '2xl': '1.25rem',
+        '3xl': '1.5rem',
+        '4xl': '2rem',
+      },
+
+      boxShadow: {
+        'xs':  'var(--shadow-xs)',
+        'sm':  'var(--shadow-sm)',
+        'md':  'var(--shadow-md)',
+        'lg':  'var(--shadow-lg)',
+        'xl':  'var(--shadow-xl)',
+        '2xl': 'var(--shadow-2xl)',
+        'primary': 'var(--shadow-primary)',
+        // Legacy
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.2)',
+        'premium': '0 20px 60px rgba(0, 0, 0, 0.15)',
+      },
+
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-tricolor': 'linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%)',
-        'gradient-saffron': 'linear-gradient(135deg, #FF9933 0%, #E68A2E 100%)',
-        'gradient-navy': 'linear-gradient(135deg, #0A1628 0%, #142952 100%)',
+        'gradient-primary': 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)',
+        'gradient-accent': 'linear-gradient(135deg, var(--accent) 0%, #FF6B35 100%)',
         'gradient-glass': 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
       },
-      boxShadow: {
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-        'saffron': '0 4px 20px rgba(255, 153, 51, 0.3)',
-        'emerald': '0 4px 20px rgba(19, 136, 8, 0.3)',
-        'premium': '0 20px 60px rgba(0, 0, 0, 0.3)',
-      },
+
       animation: {
-        'float': 'none',
-        'pulse-slow': 'none',
-        'slide-up': 'slideUp 0.2s ease-out',
+        'fade-in': 'fadeIn 0.3s ease forwards',
+        'slide-up': 'slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'slide-down': 'slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'scale-in': 'scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'float': 'float 3s ease-in-out infinite',
+        'shimmer': 'shimmer 1.5s infinite',
+        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+        'typing': 'typing 1.4s ease-in-out infinite',
+        // Legacy
         'slide-in-right': 'slideInRight 0.2s ease-out',
-        'fade-in': 'fadeIn 0.2s ease-out',
-        'scale-in': 'scaleIn 0.2s ease-out',
-        'typing': 'typing 1.5s ease-in-out infinite',
-        'glow': 'none',
-        'shimmer': 'none',
       },
+
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-20px)' },
-        },
-        slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        slideInRight: {
-          '0%': { transform: 'translateX(20px)', opacity: '0' },
-          '100%': { transform: 'translateX(0)', opacity: '1' },
-        },
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        scaleIn: {
-          '0%': { transform: 'scale(0.95)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
-        },
-        typing: {
-          '0%': { opacity: '0.2' },
-          '50%': { opacity: '1' },
-          '100%': { opacity: '0.2' },
-        },
-        glow: {
-          '0%': { boxShadow: '0 0 5px rgba(255, 153, 51, 0.2)' },
-          '100%': { boxShadow: '0 0 20px rgba(255, 153, 51, 0.6)' },
-        },
-        shimmer: {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
-        },
+        fadeIn:      { from: { opacity: '0' },                                   to: { opacity: '1' } },
+        slideUp:     { from: { opacity: '0', transform: 'translateY(12px)' },    to: { opacity: '1', transform: 'translateY(0)' } },
+        slideDown:   { from: { opacity: '0', transform: 'translateY(-8px)' },    to: { opacity: '1', transform: 'translateY(0)' } },
+        scaleIn:     { from: { opacity: '0', transform: 'scale(0.95) translateY(-4px)' }, to: { opacity: '1', transform: 'scale(1) translateY(0)' } },
+        slideInRight:{ from: { opacity: '0', transform: 'translateX(20px)' },    to: { opacity: '1', transform: 'translateX(0)' } },
+        float:       { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-6px)' } },
+        shimmer:     { '0%': { backgroundPosition: '-200% center' }, '100%': { backgroundPosition: '200% center' } },
+        'glow-pulse':{ '0%, 100%': { boxShadow: '0 0 10px var(--primary-glow)' }, '50%': { boxShadow: '0 0 25px var(--primary-glow)' } },
+        typing:      { '0%, 100%': { opacity: '0.3', transform: 'translateY(0)' }, '50%': { opacity: '1', transform: 'translateY(-3px)' } },
       },
+
       backdropBlur: {
         xs: '2px',
+      },
+
+      transitionTimingFunction: {
+        'spring': 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
     },
   },
