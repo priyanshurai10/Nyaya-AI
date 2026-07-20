@@ -43,7 +43,7 @@ export class ApiClient {
         }
       });
     }
-    return url.pathname + url.search;
+    return url.toString();
   }
 
   private getHeaders(options: ApiRequestOptions, isFormData = false): Headers {
