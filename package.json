@@ -1,6 +1,9 @@
 {
   "name": "nyaya-ai",
   "version": "1.0.0",
+  "engines": {
+  "node": "22.x"
+},
   "private": true,
   "description": "India's Multilingual Legal Operating System",
   "scripts": {
