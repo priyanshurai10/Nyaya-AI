@@ -80,7 +80,8 @@ Vercel is the recommended platform for Next.js App Router projects.
    - `DIRECT_URL`
    - `JWT_SECRET`
    - `ENCRYPTION_KEY`
-   - `NEXT_PUBLIC_API_URL` (Set this to your backend server URL e.g. `https://api.nyaya-ai.com/api/v1`)
+   - `NEXT_PUBLIC_API_URL` (Set this to `/api/v1` to route through Next.js proxy)
+   - `NEXT_PUBLIC_BACKEND_URL` (Set this to your live FastAPI backend URL, e.g., `https://nyaya-ai-backend.onrender.com`)
 4. Vercel will build and deploy the Next.js app and output a live preview URL.
 
 ---
