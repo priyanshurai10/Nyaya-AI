@@ -51,7 +51,12 @@ export default function UserDashboardPage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/v1/user/logout', { method: 'POST' });
+    } catch (e) {
+      console.warn('Logout API error:', e);
+    }
     localStorage.removeItem("nyaya_user");
     localStorage.removeItem("nyaya_token");
     document.cookie = "nyaya_token=; path=/; max-age=0";

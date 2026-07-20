@@ -136,7 +136,12 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/v1/user/logout', { method: 'POST' });
+    } catch (e) {
+      console.warn('Logout API error:', e);
+    }
     localStorage.removeItem('nyaya_token');
     localStorage.removeItem('nyaya_user');
     setIsAuthenticated(false);
