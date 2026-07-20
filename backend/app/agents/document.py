@@ -43,42 +43,10 @@ class DocumentAnalysisAgent:
 
     async def analyze_document(self, text: str, filename: str, language: str = "en") -> DocumentAnalysisResult:
         if not settings.GEMINI_API_KEY and not settings.GROQ_API_KEY:
-            # Offline mock fallback
-            lower_name = filename.lower()
-            if "rent" in lower_name or "lease" in lower_name:
-                return DocumentAnalysisResult(
-                    document_type="Rent Agreement",
-                    summary="This is a Rent Agreement document. It establishes a tenancy relationship between the landlord and tenant.",
-                    key_points=["Landlord and Tenant identified", "Security deposit terms", "Monthly rent details"],
-                    clauses={
-                        "Security Deposit": "Typically 2-3 months rent, refundable at end of lease.",
-                        "Notice Period": "Generally 1 month notice required by either party.",
-                        "Rent Amount": "Payable monthly, usually with a yearly escalation clause."
-                    },
-                    recommended_steps=["Verify if the rent amount and deposit match your verbal agreement.", "Check the notice period clause for any hidden penalties."],
-                    legal_implications=["The agreement creates a binding lease contract under the Transfer of Property Act, 1882.", "Tenant could face eviction for non-payment of rent."]
-                )
-            elif "fir" in lower_name or "police" in lower_name:
-                return DocumentAnalysisResult(
-                    document_type="FIR",
-                    summary="First Information Report (FIR) registered at a police station. It initiates a criminal investigation.",
-                    key_points=["Complainant details", "Accused details", "Sections of IPC/BNS cited"],
-                    clauses={
-                        "Sections": "Indian Penal Code or Bhartiya Nyaya Sanhita sections outlining the alleged offence.",
-                        "Investigation Officer": "Officer assigned to investigate the complaint."
-                    },
-                    recommended_steps=["Obtain a certified copy of the FIR.", "Consult a legal expert or lawyer immediately to understand bail conditions and charges."],
-                    legal_implications=["Active criminal investigation initiated against the named accused.", "Police can arrest without warrant for cognizable offences."]
-                )
-            else:
-                return DocumentAnalysisResult(
-                    document_type="Unknown Document",
-                    summary="A general legal or official document has been uploaded.",
-                    key_points=["General parties and terms identified."],
-                    clauses={"General Term": "Extracted details from document text."},
-                    recommended_steps=["Review the document details with legal counsel if you have rights-related concerns."],
-                    legal_implications=["The document might create binding obligations or liabilities. Legal review is recommended."]
-                )
+            raise ValueError(
+                "AI Document Analysis Error: Both GEMINI_API_KEY and GROQ_API_KEY are missing in the environment. "
+                "Please configure at least one API key in the backend environment variables to enable the AI Document Analyzer."
+            )
 
         prompt = (
             "You are the Document Analysis Agent for Nyaya AI. Analyze the following extracted legal document text. "
@@ -105,15 +73,9 @@ class DocumentAnalysisAgent:
             if "classification_confidence" not in data or data["classification_confidence"] is None:
                 data["classification_confidence"] = 0.95
             return DocumentAnalysisResult(**data)
-        except Exception:
-            # Fallback
-            return DocumentAnalysisResult(
-                document_type="Unknown Document",
-                summary="Failed to analyze document with AI. Here is a basic extraction summary.",
-                key_points=["Document uploaded successfully."],
-                clauses={"Default": "No specific clauses identified."},
-                recommended_steps=["Please review the document text directly or retry with a clearer scan."],
-                legal_implications=["The document text could not be fully analyzed. Manual review is required."],
-                classification_confidence=0.5
-            )
+        except Exception as e:
+            import traceback
+            print(f"DEBUG: DocumentAnalysisAgent failed with error: {e}")
+            traceback.print_exc()
+            raise e
 

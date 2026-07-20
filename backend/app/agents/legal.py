@@ -39,9 +39,10 @@ class LegalChatAgent:
             skill_prompt = self.skill_manager.get_skill_prompt(active_skill_id)
 
         if not settings.GEMINI_API_KEY and not settings.GROQ_API_KEY:
-            # Fallback to local template-based response mock if no keys are configured
-            from app.agents.mock_fallback import get_fallback_legal_response
-            return get_fallback_legal_response(query, mother_mode), active_skill_id, active_skill_name
+            raise ValueError(
+                "AI Assistant Configuration Error: Both GEMINI_API_KEY and GROQ_API_KEY are missing in the environment. "
+                "Please configure at least one API key in the backend environment variables to enable the AI Assistant."
+            )
 
         # Build history context
         history_str = ""
@@ -128,5 +129,4 @@ class LegalChatAgent:
             import traceback
             print(f"DEBUG: LegalChatAgent failed with error: {e}")
             traceback.print_exc()
-            from app.agents.mock_fallback import get_fallback_legal_response
-            return get_fallback_legal_response(query, mother_mode), active_skill_id, active_skill_name
+            raise e

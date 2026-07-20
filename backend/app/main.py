@@ -93,3 +93,46 @@ def logout_endpoint():
     response.delete_cookie("nyaya_token", path="/")
     return response
 
+# Global Exception Handlers to guarantee all responses are JSON (Never HTML)
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi import Request
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "message": exc.detail,
+            "error": {"code": "HTTP_ERROR", "detail": exc.detail}
+        }
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "success": False,
+            "message": "Validation error.",
+            "error": {"code": "VALIDATION_ERROR", "detail": exc.errors()}
+        }
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    import traceback
+    print("[GLOBAL_EXCEPTION_ERROR]:")
+    traceback.print_exc()
+    return JSONResponse(
+        status_code=500,
+        content={
+            "success": False,
+            "message": "Internal server error.",
+            "error": {"code": "INTERNAL_SERVER_ERROR", "detail": str(exc)}
+        }
+    )
+
+

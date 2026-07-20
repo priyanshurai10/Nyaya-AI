@@ -54,16 +54,37 @@ async def send_message(payload: MessageCreate, request: Request, db: Session = D
             document_context = f"Document Filename: {doc.filename}\nDocument Type: {doc.document_type}\nExtracted Text:\n{doc.extracted_text}"
 
     # 4. Process the query using orchestrator service with security and evals enabled
-    result = await orchestrator_service.process_message(
-        user_message=payload.message,
-        current_summary=session.summary,
-        chat_history=history,
-        mother_mode=payload.mother_mode,
-        document_context=document_context,
-        db=db,
-        client_ip=client_ip,
-        session_id=session_id
-    )
+    try:
+        result = await orchestrator_service.process_message(
+            user_message=payload.message,
+            current_summary=session.summary,
+            chat_history=history,
+            mother_mode=payload.mother_mode,
+            document_context=document_context,
+            db=db,
+            client_ip=client_ip,
+            session_id=session_id
+        )
+    except ValueError as val_err:
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=400,
+            content={
+                "success": False,
+                "message": str(val_err),
+                "error": {"code": "CONFIG_ERROR", "detail": str(val_err)}
+            }
+        )
+    except Exception as e:
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "message": f"AI Assistant Error: {str(e)}",
+                "error": {"code": "LLM_ERROR", "detail": str(e)}
+            }
+        )
 
     # 5. Save user message to database
     user_msg = ChatMessage(
