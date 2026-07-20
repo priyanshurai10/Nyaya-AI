@@ -1,0 +1,5 @@
+[33m427f799[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Force deploy on Vercel
+[33m1637b78[m Set Node.js version for Vercel
+[33mcef010a[m Fix Vercel configuration
+[33ma095fd4[m Remove Vercel multi-service config
+[33m3d4dafd[m Fix Railway Prisma build
