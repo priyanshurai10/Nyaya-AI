@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { SignJWT } from "jose";
 import { hash } from "bcryptjs";
 
+export const dynamic = "force-dynamic";
+
 const SECRET_KEY = new TextEncoder().encode(
   process.env.JWT_SECRET || "nyaya_ai_super_secret_jwt_key_2026_production"
 );
@@ -74,6 +76,7 @@ export async function POST(request: Request) {
         success: true,
         message: "Registration successful.",
         token,
+        access_token: token,
         user: {
           id: user.id,
           name: user.name,
