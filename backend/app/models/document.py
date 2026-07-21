@@ -4,7 +4,7 @@ class Document(Base):
     __tablename__ = "documents"
     id = Column(String, primary_key=True, index=True)
     session_id = Column(String, ForeignKey("chat_sessions.id"), nullable=True)
-    user_id = Column(String, ForeignKey("users.id"), nullable=True)
+    user_id = Column(String, ForeignKey("User.id"), nullable=True)
     filename = Column(String)
     file_type = Column(String)
     file_size = Column(Integer)

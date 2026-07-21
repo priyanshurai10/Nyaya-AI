@@ -24,7 +24,7 @@ class Advocate(Base):
 class Appointment(Base):
     __tablename__ = "appointments"
     id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String, ForeignKey("User.id"), nullable=False)
     advocate_id = Column(String, ForeignKey("advocates.id"), nullable=False)
     date = Column(String, nullable=False)
     time = Column(String, nullable=False)

@@ -29,7 +29,7 @@ class Lesson(Base):
 class UserProgress(Base):
     __tablename__ = "user_progress"
     id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String, ForeignKey("User.id"), nullable=False)
     course_id = Column(String, ForeignKey("courses.id"), nullable=False)
     lesson_id = Column(String, ForeignKey("lessons.id"), nullable=False)
     module_id = Column(String, nullable=True)

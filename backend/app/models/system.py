@@ -40,7 +40,7 @@ class EvaluationLog(Base):
 class Feedback(Base):
     __tablename__ = "feedbacks"
     id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("users.id"), nullable=True)
+    user_id = Column(String, ForeignKey("User.id"), nullable=True)
     rating = Column(Integer, nullable=False)
     comments = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

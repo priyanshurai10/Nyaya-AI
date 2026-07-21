@@ -23,7 +23,7 @@ class Court(Base):
 class CourtBookmark(Base):
     __tablename__ = "court_bookmarks"
     id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("users.id"))
+    user_id = Column(String, ForeignKey("User.id"))
     court_id = Column(String, ForeignKey("courts.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

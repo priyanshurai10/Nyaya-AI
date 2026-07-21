@@ -3,7 +3,7 @@ from app.models.base import Base, Column, String, DateTime, ForeignKey, Text, Bo
 class SavedCase(Base):
     __tablename__ = "saved_cases"
     id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("users.id"))
+    user_id = Column(String, ForeignKey("User.id"))
     title = Column(String, nullable=False)
     category = Column(String, nullable=False)  # "civil", "criminal", "property", "family", "consumer", "labour", "cybercrime"
     summary = Column(Text, nullable=True)
@@ -16,7 +16,7 @@ class SavedCase(Base):
 class CaseFolder(Base):
     __tablename__ = "case_folders"
     id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String, ForeignKey("User.id"), nullable=False)
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     court_id = Column(String, ForeignKey("courts.id"), nullable=True)
@@ -44,7 +44,7 @@ class CaseTask(Base):
 class SearchHistory(Base):
     __tablename__ = "search_histories"
     id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("users.id"))
+    user_id = Column(String, ForeignKey("User.id"))
     query = Column(String, nullable=False)
     category = Column(String, nullable=True)  # "court", "rights", "general"
     created_at = Column(DateTime, default=datetime.utcnow)

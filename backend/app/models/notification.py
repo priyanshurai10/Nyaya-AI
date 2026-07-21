@@ -3,7 +3,7 @@ from app.models.base import Base, Column, String, DateTime, ForeignKey, Text, Bo
 class Notification(Base):
     __tablename__ = "notifications"
     id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String, ForeignKey("User.id"), nullable=False)
     title = Column(String, nullable=False)
     message = Column(Text, nullable=False)
     category = Column(String, nullable=True) # e.g. "legal_update", "hearing_reminder"

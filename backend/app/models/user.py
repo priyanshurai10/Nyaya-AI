@@ -1,16 +1,16 @@
 from app.models.base import Base, Column, String, DateTime, Float, Boolean, relationship, EncryptedText, datetime
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "User"
     id = Column(String, primary_key=True, index=True)
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=True)
-    mobile = Column(String, unique=True, index=True, nullable=True)
-    password_hash = Column(String, nullable=False)
+    mobile = Column("phone", String, unique=True, index=True, nullable=True)
+    password_hash = Column("passwordHash", String, nullable=False)
     language_preference = Column(String, default="en")
     is_admin = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column("createdAt", DateTime, default=datetime.utcnow)
+    updated_at = Column("updatedAt", DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Location fields
     location_village = Column(String, nullable=True)

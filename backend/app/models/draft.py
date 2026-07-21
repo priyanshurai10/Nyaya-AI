@@ -3,7 +3,7 @@ from app.models.base import Base, Column, String, DateTime, ForeignKey, Text, JS
 class DraftDocument(Base):
     __tablename__ = "draft_documents"
     id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String, ForeignKey("User.id"), nullable=False)
     template_type = Column(String, nullable=False) # e.g. "complaint", "legal_notice", "rti"
     title = Column(String, nullable=False)
     content_json = Column(JSON, nullable=True) # Form data that was filled out

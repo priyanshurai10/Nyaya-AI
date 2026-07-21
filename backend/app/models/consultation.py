@@ -4,7 +4,7 @@ class ConsultationRequest(Base):
     __tablename__ = "consultation_requests"
     id = Column(String, primary_key=True)
     consultation_id = Column(String, unique=True, nullable=True) # e.g. NYA-2026-001245
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String, ForeignKey("User.id"), nullable=False)
     service_name = Column(String, nullable=False) # e.g. "Talk to Legal Specialist"
     request_type = Column(String, nullable=False) # "pay_now", "callback", "email", "book_later"
     full_name = Column(String, nullable=False)
@@ -25,7 +25,7 @@ class ConsultationRequest(Base):
 class Transaction(Base):
     __tablename__ = "transactions"
     id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String, ForeignKey("User.id"), nullable=False)
     consultation_id = Column(String, nullable=True)
     amount = Column(Integer, nullable=False)
     payment_method = Column(String, nullable=False) # "upi", "qr", "card", "netbanking"
