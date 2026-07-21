@@ -33,9 +33,23 @@ export class ApiClient {
   }
 
   private buildUrl(endpoint: string, params?: Record<string, any>): string {
-    // Strip leading slash if present to avoid double slashes
-    const cleanEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
-    const url = new URL(`${BASE_URL}/${cleanEndpoint}`, window.location.origin);
+    let finalPath = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    
+    // Prevent duplicate /api/v1 if BASE_URL already contains /api/v1
+    const base = BASE_URL.endsWith("/") ? BASE_URL.slice(0, -1) : BASE_URL;
+    if ((base === "/api/v1" || base.endsWith("/api/v1")) && finalPath.startsWith("/api/v1")) {
+      finalPath = finalPath.slice(7); // Remove leading /api/v1
+    }
+
+    let fullUrlString = "";
+    if (base.startsWith("http://") || base.startsWith("https://")) {
+      fullUrlString = `${base}${finalPath}`;
+    } else {
+      const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+      fullUrlString = `${origin}${base}${finalPath}`;
+    }
+
+    const url = new URL(fullUrlString);
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {

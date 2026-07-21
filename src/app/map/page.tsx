@@ -74,6 +74,7 @@ export default function LegalMapPage() {
   const [markers, setMarkers] = useState<MapMarker[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null);
   const [dynamicJudge, setDynamicJudge] = useState<any>(null);
+  const [bookmarkedCourtIds, setBookmarkedCourtIds] = useState<string[]>([]);
   
   // Filters
   const [showCourts, setShowCourts] = useState(true);
@@ -163,6 +164,33 @@ export default function LegalMapPage() {
       })
       .catch(err => console.warn('Failed to query dynamic judge directory:', err));
   }, [selectedMarker]);
+
+  // Load bookmarked courts on mount
+  useEffect(() => {
+    apiClient.get<any>('/user/bookmarks')
+      .then(data => {
+        const list = data.data || data || [];
+        if (Array.isArray(list)) {
+          setBookmarkedCourtIds(list.map((b: any) => b.court_id));
+        }
+      })
+      .catch(err => console.warn('Failed to load bookmarks on map load:', err));
+  }, []);
+
+  const toggleBookmark = async (courtId: string) => {
+    try {
+      const res: any = await apiClient.post('/user/bookmark/toggle', { court_id: courtId });
+      if (res.status === 'added') {
+        setBookmarkedCourtIds(prev => [...prev, courtId]);
+      } else if (res.status === 'removed') {
+        setBookmarkedCourtIds(prev => prev.filter(id => id !== courtId));
+      }
+      // Dispatch event to trigger sidebar reload in main page.tsx
+      window.dispatchEvent(new Event('nyaya_bookmarks_changed'));
+    } catch (e) {
+      console.error('Failed to toggle bookmark:', e);
+    }
+  };
 
   // Seed DB first in case it is fresh
   const ensureSeeded = async () => {
@@ -624,9 +652,29 @@ export default function LegalMapPage() {
                   />
                 )}
                 <div className="space-y-1">
-                  <span className="inline-block px-2 py-0.5 rounded-full bg-white dark:bg-[#111827]/5 border border-white/10 text-[9px] uppercase font-bold text-white/60">
-                    {selectedMarker.type}
-                  </span>
+                  <div className="flex justify-between items-start gap-4">
+                    <span className="inline-block px-2 py-0.5 rounded-full bg-white dark:bg-[#111827]/5 border border-white/10 text-[9px] uppercase font-bold text-white/60">
+                      {selectedMarker.type}
+                    </span>
+                    {selectedMarker.type === 'court' && (
+                      <button
+                        onClick={() => toggleBookmark(selectedMarker.id)}
+                        className="p-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors shrink-0"
+                        title={bookmarkedCourtIds.includes(selectedMarker.id) ? "Remove from Bookmarked Courts" : "Bookmark this Court"}
+                      >
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          viewBox="0 0 24 24" 
+                          fill={bookmarkedCourtIds.includes(selectedMarker.id) ? "#138808" : "none"} 
+                          stroke={bookmarkedCourtIds.includes(selectedMarker.id) ? "#138808" : "currentColor"} 
+                          strokeWidth="2" 
+                          className="w-3.5 h-3.5"
+                        >
+                          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                   <h3 className="text-sm font-bold text-white leading-snug">{selectedMarker.name}</h3>
                   <p className="text-[10px] text-white/40">Distance: <span className="font-semibold text-green-400">{selectedMarker.distance_km.toFixed(2)} km</span> away</p>
                 </div>

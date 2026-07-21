@@ -212,12 +212,27 @@ export default function VerifiedAdvocatesPage() {
 
         {/* Empty State */}
         {emptyState && (
-          <div className="flex flex-col items-center justify-center py-16 text-center max-w-md mx-auto space-y-4">
-            <AlertCircle className="w-12 h-12 text-slate-400 dark:text-white/20 animate-pulse" />
-            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">No verified advocates found</h3>
-            <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-              No verified advocate is currently registered for your selected location pincode. Try PINs like 110001 (Delhi), 400001 (Mumbai), or 560001 (Bengaluru).
-            </p>
+          <div className="flex flex-col items-center justify-center py-16 text-center max-w-lg mx-auto space-y-5">
+            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+              <Briefcase className="w-8 h-8 text-slate-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-2">No advocates found for this PIN</h3>
+              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+                No verified advocate is currently registered for your selected pincode. Try major city PINs like <strong>110001</strong> (Delhi), <strong>400001</strong> (Mumbai), or <strong>560001</strong> (Bengaluru).
+              </p>
+            </div>
+            {/* Next Update Banner */}
+            <div className="w-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-2xl p-4 text-left">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm">🔮</span>
+                <span className="text-xs font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Next Update — v2.1</span>
+              </div>
+              <p className="text-sm font-bold text-[var(--text-primary)] mb-1">Pan-India Verified Advocate Network</p>
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                We are onboarding verified advocates from all 28 states and 8 union territories with Bar Council verification, video consultation, and direct WhatsApp booking.
+              </p>
+            </div>
           </div>
         )}
 

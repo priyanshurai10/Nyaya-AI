@@ -88,7 +88,7 @@ def detect_prompt_injection(text: str) -> Dict[str, Any]:
 # ---------------------------------------------------------
 # 3. Document Integrity Validation
 # ---------------------------------------------------------
-ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.jpg', '.jpeg', '.png'}
+ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.jpg', '.jpeg', '.png', '.txt', '.md'}
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB limit
 
 # File signatures (magic bytes) mapping

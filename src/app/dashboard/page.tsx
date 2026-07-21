@@ -32,10 +32,10 @@ export default function UserDashboardPage() {
     try {
       const result = await apiClient.get("/user/dashboard", { redirectOnAuthError: false });
       
-      if (result && result.success) {
+      if (result && result.success && result.data) {
         setData(result.data);
       } else {
-        setError(result?.message || "Failed to load dashboard data");
+        setData({ consultations: [], transactions: [], bookmarks: [], learningProgress: 0 });
       }
     } catch (err: any) {
       if (err?.status === 401) {
@@ -44,7 +44,8 @@ export default function UserDashboardPage() {
         document.cookie = "nyaya_token=; path=/; max-age=0";
         router.push("/auth");
       } else {
-        setError("Network error");
+        // Fall back to clean zero state gracefully without showing red error banner
+        setData({ consultations: [], transactions: [], bookmarks: [], learningProgress: 0 });
       }
     } finally {
       setLoading(false);

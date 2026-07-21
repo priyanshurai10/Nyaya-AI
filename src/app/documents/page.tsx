@@ -77,7 +77,7 @@ export default function DocumentAnalyzerPage() {
           </p>
           <label className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer inline-block">
             {isLoading ? "Analyzing..." : "Select Document"}
-            <input type="file" className="hidden" onChange={handleFileChange} accept=".pdf,.docx,.jpg,.png" disabled={isLoading} />
+            <input type="file" className="hidden" onChange={handleFileChange} accept=".pdf,.docx,.jpg,.png,.txt,.md" disabled={isLoading} />
           </label>
           {error && <p className="mt-4 text-sm font-bold text-red-600">{error}</p>}
           {selectedFile && !error && (

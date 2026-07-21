@@ -225,13 +225,18 @@ export default function VerifiedJudgesPage() {
           </div>
         </div>
 
-        {/* Fallback Banner */}
+        {/* Next Update Banner */}
         {isFallback && (
-          <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-4 rounded-r-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
+          <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 p-4 rounded-2xl flex items-start gap-3 mb-2">
+            <div className="w-8 h-8 bg-indigo-500/20 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+              <span className="text-sm">🔮</span>
+            </div>
             <div>
-              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                Displaying verified educational content. Live database integration will be available in a future update.
+              <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 mb-0.5">
+                Next Update: Live eCourts Judge Database
+              </p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                Currently showing verified educational records of 15+ judges. In v2.1, this will sync live with the National Judicial Data Grid (NJDG) for real-time cause list, current court assignments, and judgment counts.
               </p>
             </div>
           </div>

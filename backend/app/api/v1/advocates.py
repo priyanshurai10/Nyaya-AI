@@ -217,6 +217,12 @@ def cancel_appointment(id: str, user: User = Depends(get_current_user), db: Sess
     if not appt:
         raise HTTPException(status_code=404, detail="Appointment not found.")
         
-    appt.status = "cancelled"
-    db.commit()
     return {"status": "success", "message": "Appointment cancelled successfully."}
+
+@router.post("/nearby")
+def get_nearby_advocates(payload: AdvocateSearchPayload, db: Session = Depends(get_db)):
+    # Fallback to New Delhi coordinates if user coordinates are missing or invalid
+    if payload.latitude is None or payload.longitude is None:
+        payload.latitude = 28.6139
+        payload.longitude = 77.2090
+    return search_advocates(payload, db)

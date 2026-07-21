@@ -62,31 +62,51 @@ export default function TalkToSeniorSpecialistPage() {
     setError("");
     
     try {
-      const formDataObj = new FormData();
-      formDataObj.append("name", formData.name);
-      formDataObj.append("mobile", formData.mobile);
-      formDataObj.append("language", formData.language);
-      formDataObj.append("category", formData.category);
-      formDataObj.append("time", formData.time);
-      formDataObj.append("summary", formData.summary);
-      formDataObj.append("utr", formData.utr);
-      formDataObj.append("screenshot", screenshot);
+      // Step 1: Submit payment request to initiate transaction and create request
+      const submitData = new FormData();
+      submitData.append("service_name", "Talk to Senior Legal Specialist");
+      submitData.append("amount", "200");
+      submitData.append("payment_method", "upi");
+      submitData.append("full_name", formData.name);
+      submitData.append("mobile_number", formData.mobile);
+      submitData.append("preferred_language", formData.language);
+      submitData.append("legal_issue_type", formData.category);
+      submitData.append("description", formData.summary);
 
-      const res = await fetch("/api/v1/consultation/request", {
+      const submitRes = await fetch("/api/v1/consultation/payment/submit", {
         method: "POST",
-        body: formDataObj
+        body: submitData
       });
       
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setBookingRef(data.data.consultation_id);
+      const submitResult = await submitRes.json();
+      if (!submitRes.ok || !submitResult.success) {
+        if (submitRes.status === 401) {
+          setError("You must be logged in to book a consultation.");
+        } else {
+          setError(submitResult.message || "Failed to initiate consultation request.");
+        }
+        return;
+      }
+
+      const txId = submitResult.transaction_id;
+      const displayId = submitResult.display_id || submitResult.consultation_id;
+
+      // Step 2: Verify payment by uploading UTR and screenshot
+      const verifyData = new FormData();
+      verifyData.append("utr_number", formData.utr);
+      verifyData.append("screenshot", screenshot);
+
+      const verifyRes = await fetch(`/api/v1/consultation/payment/verify/${txId}`, {
+        method: "POST",
+        body: verifyData
+      });
+
+      const verifyResult = await verifyRes.json();
+      if (verifyRes.ok && verifyResult.success) {
+        setBookingRef(displayId);
         setStep(4); // Success Step
       } else {
-        if (res.status === 401) {
-            setError("You must be logged in to book a consultation.");
-        } else {
-            setError(data.message || "Failed to submit request.");
-        }
+        setError(verifyResult.message || "Failed to submit payment verification.");
       }
     } catch (err) {
       setError("Network error occurred.");

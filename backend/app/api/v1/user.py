@@ -381,20 +381,21 @@ def get_dashboard(user: User = Depends(get_current_user), db: Session = Depends(
     # Map snake_case to camelCase
     mapped_consultations = []
     for c in consultations:
+        tx = db.query(Transaction).filter(Transaction.id == c.transaction_id).first() if c.transaction_id else None
         mapped_consultations.append({
             "id": c.id,
             "userId": c.user_id,
-            "name": c.name,
-            "mobile": c.mobile,
-            "language": c.language,
-            "time": c.time,
-            "category": c.category,
-            "summary": c.summary,
+            "name": c.full_name,
+            "mobile": c.mobile_number,
+            "language": c.preferred_language,
+            "time": "ASAP",
+            "category": c.legal_issue_type,
+            "summary": c.description,
             "status": c.status,
-            "upiId": c.upi_id,
-            "utr": c.utr,
-            "screenshotUrl": c.screenshot_url,
-            "adminRemarks": c.admin_remarks,
+            "upiId": "priyanshurai121111@oksbi",
+            "utr": tx.utr_number if tx else None,
+            "screenshotUrl": tx.screenshot_path if tx else None,
+            "adminRemarks": None,
             "createdAt": c.created_at.isoformat() if c.created_at else None,
             "updatedAt": c.updated_at.isoformat() if c.updated_at else None,
         })
@@ -406,15 +407,15 @@ def get_dashboard(user: User = Depends(get_current_user), db: Session = Depends(
             "userId": t.user_id,
             "consultationId": t.consultation_id,
             "amount": t.amount,
-            "utr": t.utr,
-            "screenshotUrl": t.screenshot_url,
+            "utr": t.utr_number,
+            "screenshotUrl": t.screenshot_path,
             "status": t.status,
             "paymentMethod": t.payment_method,
-            "remarks": t.remarks,
+            "remarks": None,
             "createdAt": t.created_at.isoformat() if t.created_at else None,
             "updatedAt": t.updated_at.isoformat() if t.updated_at else None,
-            "approvedAt": t.approved_at.isoformat() if t.approved_at else None,
-            "approvedBy": t.approved_by,
+            "approvedAt": None,
+            "approvedBy": None,
         })
         
     mapped_bookmarks = []

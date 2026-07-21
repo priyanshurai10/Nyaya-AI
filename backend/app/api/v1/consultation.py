@@ -101,6 +101,11 @@ def submit_payment(
     service_name: str = Form(...),
     amount: int = Form(...),
     payment_method: str = Form(...), # "upi", "qr", "card", "netbanking"
+    full_name: Optional[str] = Form(None),
+    mobile_number: Optional[str] = Form(None),
+    preferred_language: Optional[str] = Form(None),
+    legal_issue_type: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
@@ -115,7 +120,10 @@ def submit_payment(
     )
     db.add(tx)
     
-    # Also create placeholder consultation request linked to this transaction
+    # Use provided details or fallback to logged-in user details
+    clean_name = full_name.strip() if (full_name and full_name.strip()) else user.name
+    clean_mobile = mobile_number if mobile_number else user.mobile
+    
     req_id = str(uuid.uuid4())
     display_id = f"NYA-{datetime.now().year}-{random.randint(100000, 999999)}"
     req = ConsultationRequest(
@@ -124,9 +132,12 @@ def submit_payment(
         user_id=user.id,
         service_name=service_name,
         request_type="pay_now",
-        full_name=user.name,
-        mobile_number=user.mobile,
+        full_name=clean_name,
+        mobile_number=clean_mobile,
         email=user.email,
+        preferred_language=preferred_language,
+        legal_issue_type=legal_issue_type,
+        description=description,
         status="Pending Payment Verification",
         transaction_id=tx_id,
         created_at=datetime.utcnow()
@@ -135,7 +146,7 @@ def submit_payment(
     db.commit()
     
     log_audit(db, "Payment Initiated", f"Initiated {payment_method} payment for {service_name}", user.id)
-    return {"success": True, "transaction_id": tx_id, "consultation_id": req_id, "message": "Payment initiated."}
+    return {"success": True, "transaction_id": tx_id, "consultation_id": req_id, "display_id": display_id, "message": "Payment initiated."}
 
 @router.post("/payment/verify/{tx_id}")
 def verify_payment(
