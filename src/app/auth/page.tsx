@@ -50,6 +50,7 @@ export default function AuthPage() {
   const [forgotNewPassword, setForgotNewPassword] = useState('');
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [forgotError, setForgotError] = useState('');
+  const [forgotToken, setForgotToken] = useState('');
 
   // Status/Error states
   const [errorMessage, setErrorMessage] = useState('');
@@ -253,7 +254,7 @@ export default function AuthPage() {
     }
   };
 
-  const handleForgotPasswordSubmit = (e: React.FormEvent) => {
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setForgotError('');
     setForgotSuccess(false);
@@ -263,14 +264,27 @@ export default function AuthPage() {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/v1/user/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Verification request failed.');
+      }
+      setForgotToken(data.recovery_token);
       setForgotSent(true);
+      setForgotError('Simulated recovery OTP code "123456" sent successfully.');
+    } catch (err: any) {
+      setForgotError(err.message || 'Connection failed.');
+    } finally {
       setLoading(false);
-      setForgotError('Simulated recovery OTP code "123456" sent to your inbox.');
-    }, 800);
+    }
   };
 
-  const handleResetPasswordVerify = (e: React.FormEvent) => {
+  const handleResetPasswordVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setForgotError('');
 
@@ -284,9 +298,21 @@ export default function AuthPage() {
     }
 
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/v1/user/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: forgotToken,
+          code: forgotCode,
+          password: forgotNewPassword
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Reset password failed.');
+      }
       setForgotSuccess(true);
-      setLoading(false);
       setTimeout(() => {
         setForgotOpen(false);
         setForgotSent(false);
@@ -294,8 +320,13 @@ export default function AuthPage() {
         setForgotEmail('');
         setForgotCode('');
         setForgotNewPassword('');
+        setForgotToken('');
       }, 1500);
-    }, 1000);
+    } catch (err: any) {
+      setForgotError(err.message || 'Connection failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

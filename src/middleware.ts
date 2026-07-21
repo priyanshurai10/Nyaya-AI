@@ -65,7 +65,9 @@ export async function middleware(req: NextRequest) {
     (path.startsWith('/api/v1/user') && 
      !path.startsWith('/api/v1/user/login') && 
      !path.startsWith('/api/v1/user/register') &&
-     !path.startsWith('/api/v1/user/otp')) || 
+     !path.startsWith('/api/v1/user/otp') &&
+     !path.startsWith('/api/v1/user/forgot-password') &&
+     !path.startsWith('/api/v1/user/reset-password')) || 
     path.startsWith('/api/v1/bookmarks') ||
     path.startsWith('/api/v1/evidence-vault') ||
     path.startsWith('/api/v1/payments') ||
