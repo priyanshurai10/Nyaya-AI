@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { 
-  User, Clock, CheckCircle2, AlertCircle, BookOpen, Bookmark as BookmarkIcon, 
+  User, Users, Clock, CheckCircle2, AlertCircle, BookOpen, Bookmark as BookmarkIcon, 
   Receipt, Settings, Sparkles, Shield, Scale, FileText, ArrowRight, 
   Activity, Zap, Landmark, Search, ShieldAlert, Award, PhoneCall, 
   FileCheck, ChevronRight, Gavel, FolderOpen, HeartHandshake, RefreshCw,
