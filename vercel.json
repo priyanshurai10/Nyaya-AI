@@ -4,12 +4,7 @@
   "installCommand": "npm install",
   "framework": "nextjs",
    
-  "rewrites": [
-    {
-      "source": "/api/v1/:path*",
-      "destination": "https://nyaya-ai-production-04ba.up.railway.app/api/v1/:path*"
-    }
-  ],
+ 
   "headers": [
     {
       "source": "/:path*",
