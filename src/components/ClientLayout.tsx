@@ -9,29 +9,12 @@ import Sidebar from '@/components/Sidebar';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  // Sidebar remains collapsed (false) by default across all screen sizes
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Sync initial sidebar state to screen width to avoid hydration mismatch
+  // Automatically collapse sidebar on route change so main content is always full-screen
   useEffect(() => {
-    if (window.innerWidth >= 1024) {
-      setSidebarOpen(true);
-    }
-
-    const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        setSidebarOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Whenever pathname changes, automatically close sidebar on mobile/tablet so main content shows in full screen!
-  useEffect(() => {
-    if (window.innerWidth < 1024) {
-      setSidebarOpen(false);
-    }
+    setSidebarOpen(false);
   }, [pathname]);
 
   // Auth page renders without layout shell
