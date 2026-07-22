@@ -271,7 +271,7 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--surface)]/90 backdrop-blur-xl border-b border-[var(--border)] px-3 sm:px-4 lg:px-6 py-2.5 transition-colors duration-200">
-      <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center justify-between gap-2 min-w-0">
         {/* Left Section: Brand & Sidebar toggle */}
         <div className="flex items-center gap-2 shrink-0">
           <button
@@ -293,73 +293,6 @@ export default function Header({
               </span>
             </div>
           </Link>
-        </div>
-
-
-        {/* Middle Section: Global Search — shrinks on small screens */}
-        <div className="flex-1 min-w-0 mx-2 sm:mx-3 lg:mx-4 max-w-xl" ref={searchRef}>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search size={16} className="text-slate-450 dark:text-slate-500" />
-            </div>
-            <input
-              type="text"
-              className="block w-full pl-9 pr-3 py-2 border border-[var(--border)] rounded-xl bg-[var(--card)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-subtle)] focus:border-[var(--primary)] text-sm transition-all"
-              placeholder="Search laws, judgments..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => { 
-                if (searchQuery.length >= 2) setSearchOpen(true); 
-                setCityListOpen(false);
-              }}
-            />
-            {isSearching && (
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <Loader2 size={14} className="animate-spin text-indigo-500" />
-              </div>
-            )}
-            
-            {/* Search Results Dropdown */}
-            {searchOpen && searchQuery.length >= 2 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--border)] rounded-2xl shadow-2xl z-50 overflow-hidden max-h-96 overflow-y-auto animate-scale-in">
-                {searchResults.length > 0 ? (
-                  <ul className="py-2">
-                    {searchResults.map((result, idx) => (
-                      <li key={idx}>
-                        <Link
-                          href={getResultLink(result.type, result.id)}
-                          onClick={() => {
-                            setSearchOpen(false);
-                            setSearchQuery('');
-                          }}
-                          className="flex items-start gap-3 px-4 py-3 hover:bg-[var(--card-elevated)] transition-colors border-b border-[var(--border)] last:border-0"
-                        >
-                          <div className="mt-0.5 p-1.5 bg-[var(--card-elevated)] rounded-lg shrink-0">
-                            {getResultIcon(result.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-[var(--text-primary)] truncate">
-                              {result.title}
-                            </p>
-                            <p className="text-xs text-[var(--text-muted)] line-clamp-2 mt-0.5">
-                              {result.summary}
-                            </p>
-                          </div>
-                          <span className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-wider bg-[var(--card-elevated)] px-2 py-1 rounded-md shrink-0">
-                            {result.type}
-                          </span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="px-4 py-8 text-center text-[var(--text-muted)] text-sm">
-                    {isSearching ? 'Searching...' : 'No results found.'}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
         </div>
 
 
