@@ -198,15 +198,14 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         ref={sidebarRef}
         role="navigation"
         aria-label="Sidebar Navigation"
-        className={`
-          fixed top-0 bottom-0 left-0 z-50 flex flex-col h-full w-64
-          bg-[var(--surface)] border-r border-[var(--border)]
-          transition-all duration-300 ease-in-out overflow-hidden shadow-2xl
-          ${isOpen
-            ? 'translate-x-0 opacity-100 pointer-events-auto'
-            : '-translate-x-full opacity-0 pointer-events-none'
-          }
-        `}
+        className="fixed top-0 bottom-0 left-0 z-50 flex flex-col h-full w-64 bg-[var(--surface)] border-r border-[var(--border)] overflow-hidden shadow-2xl"
+        style={{
+          transform: isOpen ? 'translateX(0%)' : 'translateX(-100%)',
+          opacity: isOpen ? 1 : 0,
+          pointerEvents: isOpen ? 'auto' : 'none',
+          visibility: isOpen ? 'visible' : 'hidden',
+          transition: 'transform 300ms ease-in-out, opacity 300ms ease-in-out, visibility 300ms ease-in-out',
+        }}
       >
         <div className="w-64 min-w-[16rem] h-full flex flex-col overflow-hidden">
 
