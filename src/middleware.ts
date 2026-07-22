@@ -5,6 +5,7 @@ import { jwtVerify } from 'jose';
 const SECRET_KEY = new TextEncoder().encode(
   process.env.JWT_SECRET || "nyaya_ai_super_secret_jwt_key_2026_production"
 );
+const SUPER_ADMIN_EMAIL = "priyanshurai121111@gmail.com";
 
 export async function middleware(req: NextRequest) {
   let token = req.cookies.get('nyaya_token')?.value;
@@ -15,21 +16,24 @@ export async function middleware(req: NextRequest) {
     }
   }
   const path = req.nextUrl.pathname;
-  console.log('[Middleware] Path:', path, 'Token length:', token ? token.length : 0);
 
   let isAuthed = false;
   let role = 'USER';
+  let email = '';
 
   if (token) {
     try {
       const { payload } = await jwtVerify(token, SECRET_KEY);
       const userId = payload.id || payload.sub;
+      email = (payload.email as string) || '';
       if (payload && userId) {
         isAuthed = true;
         role = (payload.role as string) || 'USER';
+        if (email === SUPER_ADMIN_EMAIL) {
+          role = 'ADMIN';
+        }
       }
     } catch (err) {
-      console.error('[Middleware JWT Verification Failed]:', err);
       isAuthed = false;
     }
   }
@@ -45,12 +49,12 @@ export async function middleware(req: NextRequest) {
     path.startsWith('/evidence-vault') ||
     path.startsWith('/payments');
 
-  // Protect Admin UI
+  // Protect Admin UI: Super Admin email or ADMIN role required
   if (path.startsWith('/admin')) {
     if (!isAuthed) {
       return NextResponse.redirect(new URL(`/auth?redirect=${encodeURIComponent(path)}&error=AdminAccessDenied`, req.url));
     }
-    if (role !== 'ADMIN') {
+    if (role !== 'ADMIN' && email !== SUPER_ADMIN_EMAIL) {
       return NextResponse.redirect(new URL('/dashboard', req.url));
     }
   }
@@ -76,7 +80,7 @@ export async function middleware(req: NextRequest) {
   const isAdminApi = path.startsWith('/api/v1/admin');
 
   if (isAdminApi) {
-    if (!isAuthed || role !== 'ADMIN') {
+    if (!isAuthed || (role !== 'ADMIN' && email !== SUPER_ADMIN_EMAIL)) {
       return NextResponse.json({ success: false, error: 'Unauthorized Admin API access' }, { status: 401 });
     }
   }
@@ -99,12 +103,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
