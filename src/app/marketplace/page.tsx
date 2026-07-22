@@ -11,6 +11,7 @@ import {
   CheckCircle2, 
   X, 
   User, 
+  Mail,
   Upload, 
   AlertCircle,
   Copy,
@@ -42,6 +43,7 @@ export default function LegalMarketplacePage() {
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
+    email: "",
     notes: "",
     utr: ""
   });
@@ -119,7 +121,7 @@ export default function LegalMarketplacePage() {
     setSelectedService(srv);
     setStep(1);
     setError("");
-    setFormData({ name: "", mobile: "", notes: "", utr: "" });
+    setFormData({ name: "", mobile: "", email: "", notes: "", utr: "" });
     setScreenshot(null);
     setPaymentOption("qr");
   };
@@ -144,8 +146,8 @@ export default function LegalMarketplacePage() {
 
   const handleNextToPayment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.mobile) {
-      setError("Please fill in your name and mobile number.");
+    if (!formData.name.trim() || !formData.mobile.trim() || !formData.email.trim()) {
+      setError("Please fill in your Name, Mobile Number, and Email ID.");
       return;
     }
     setError("");
@@ -207,6 +209,7 @@ export default function LegalMarketplacePage() {
                   <span className="flex items-center gap-1.5"><CheckCircle2 className="w-5 h-5 text-emerald-400" /> 100% Confidential</span>
                   <span className="flex items-center gap-1.5"><CheckCircle2 className="w-5 h-5 text-emerald-400" /> Bar Council Verified</span>
                   <span className="flex items-center gap-1.5"><CheckCircle2 className="w-5 h-5 text-emerald-400" /> Direct QR & UPI Payment</span>
+                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-5 h-5 text-emerald-400" /> Fixed Price</span>
                 </div>
               </div>
               <div className="bg-[var(--card)] p-6 rounded-2xl w-full md:w-80 shrink-0 shadow-lg text-center border border-slate-200 dark:border-slate-800">
@@ -329,14 +332,15 @@ export default function LegalMarketplacePage() {
                     </span>
                   </div>
 
+                  {/* Name */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Your Full Name</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Your Full Name *</label>
                     <div className="relative">
                       <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         required
                         type="text"
-                        placeholder="Advocate / Client Name"
+                        placeholder="Advocate / Client Full Name"
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9933]"
                         value={formData.name}
                         onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -344,14 +348,15 @@ export default function LegalMarketplacePage() {
                     </div>
                   </div>
 
+                  {/* Mobile Number */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Mobile Number (For Call & Updates)</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Contact Number (For Call & Updates) *</label>
                     <div className="relative">
                       <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         required
                         type="tel"
-                        placeholder="9876543210"
+                        placeholder="10-digit mobile number"
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9933]"
                         value={formData.mobile}
                         onChange={e => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
@@ -359,6 +364,23 @@ export default function LegalMarketplacePage() {
                     </div>
                   </div>
 
+                  {/* Email ID */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Email ID (For Receiving Legal Drafts & Updates) *</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        required
+                        type="email"
+                        placeholder="yourname@example.com"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9933]"
+                        value={formData.email}
+                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Case Notes / Instructions */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Case Notes / Instructions (Optional)</label>
                     <textarea
@@ -562,6 +584,9 @@ export default function LegalMarketplacePage() {
 
                   <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl text-left text-xs space-y-1.5 border border-slate-100 dark:border-slate-700">
                     <p className="text-slate-500">Order Reference: <span className="font-mono font-bold text-slate-900 dark:text-white">{orderRef}</span></p>
+                    <p className="text-slate-500">Name: <span className="font-bold text-slate-900 dark:text-white">{formData.name}</span></p>
+                    <p className="text-slate-500">Contact Number: <span className="font-bold text-slate-900 dark:text-white">{formData.mobile}</span></p>
+                    <p className="text-slate-500">Email ID: <span className="font-bold text-slate-900 dark:text-white">{formData.email}</span></p>
                     <p className="text-slate-500">Service: <span className="font-bold text-slate-900 dark:text-white">{selectedService.title}</span></p>
                     <p className="text-slate-500">Amount Paid: <span className="font-bold text-emerald-600 dark:text-emerald-400">{selectedService.price}</span></p>
                     <p className="text-slate-500">Status: <span className="font-bold text-amber-500">Awaiting Verification</span></p>
