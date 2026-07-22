@@ -353,7 +353,7 @@ export default function UserDashboardPage() {
                 
                 {/* WhatsApp with Username @priyanshu.rai18 */}
                 <a
-                  href="https://wa.me/917541881152"
+                  href="https://wa.me/?text=Hi%20Priyanshu"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-colors text-xs font-bold"
