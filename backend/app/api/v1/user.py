@@ -215,28 +215,165 @@ def verify_otp(payload: OTPVerifyRequest, db: Session = Depends(get_db)):
 
 # ─── User Profile & Dashboard Data ───
 
+class ProfileUpdatePayload(BaseModel):
+    name: Optional[str] = None
+    dob: Optional[str] = None
+    gender: Optional[str] = None
+    marital_status: Optional[str] = None
+    blood_group: Optional[str] = None
+    occupation: Optional[str] = None
+    education: Optional[str] = None
+    aadhaar: Optional[str] = None
+    pan: Optional[str] = None
+    avatar_url: Optional[str] = None
+
 @router.get("/profile")
-def get_profile(user: User = Depends(get_current_user)):
+def get_profile(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=401, detail="Authentication required for profile access.")
         
+    from app.models import Notification, Document, ChatSession, AuditLog
+    from app.core.security import encrypt_data, decrypt_data, mask_aadhaar, mask_pan
+
+    # Fetch real relations from PostgreSQL
+    consultations = db.query(ConsultationRequest).filter(ConsultationRequest.user_id == user.id).order_by(ConsultationRequest.created_at.desc()).all()
+    transactions = db.query(Transaction).filter(Transaction.user_id == user.id).order_by(Transaction.created_at.desc()).all()
+    notifications = db.query(Notification).filter(Notification.user_id == user.id).order_by(Notification.created_at.desc()).all()
+    documents = db.query(Document).filter(Document.user_id == user.id).order_by(Document.created_at.desc()).all()
+    chats = db.query(ChatSession).filter(ChatSession.user_id == user.id).order_by(ChatSession.created_at.desc()).all()
+    activities = db.query(AuditLog).filter(AuditLog.user_id == user.id).order_by(AuditLog.timestamp.desc()).limit(50).all()
+
+    # Decrypt & mask Aadhaar / PAN
+    aadhaar_raw = decrypt_data(user.aadhaar_enc) if user.aadhaar_enc else None
+    pan_raw = decrypt_data(user.pan_enc) if user.pan_enc else None
+
     return {
-        "id": user.id,
-        "name": user.name,
-        "email": user.email,
-        "mobile": user.mobile,
-        "language_preference": user.language_preference,
-        "location_village": user.location_village,
-        "location_town": user.location_town,
-        "location_city": user.location_city,
-        "location_district": user.location_district,
-        "location_state": user.location_state,
-        "location_pincode": user.location_pincode,
-        "location_latitude": user.location_latitude,
-        "location_longitude": user.location_longitude,
-        "last_login": user.last_login.isoformat() if user.last_login else None,
-        "created_at": user.created_at.isoformat()
+        "success": True,
+        "data": {
+            "personal_information": {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "mobile": user.mobile,
+                "avatar_url": user.avatar_url,
+                "dob": user.dob,
+                "gender": user.gender,
+                "marital_status": user.marital_status,
+                "blood_group": user.blood_group,
+                "occupation": user.occupation,
+                "education": user.education,
+                "language_preference": user.language_preference,
+                "is_admin": user.is_admin,
+                "location": {
+                    "village": user.location_village,
+                    "town": user.location_town,
+                    "city": user.location_city,
+                    "district": user.location_district,
+                    "state": user.location_state,
+                    "pincode": user.location_pincode,
+                },
+                "created_at": user.created_at.isoformat() if user.created_at else None,
+            },
+            "sensitive_identity": {
+                "aadhaar_masked": mask_aadhaar(aadhaar_raw),
+                "pan_masked": mask_pan(pan_raw),
+                "has_aadhaar": bool(aadhaar_raw),
+                "has_pan": bool(pan_raw),
+            },
+            "payment_history": [
+                {
+                    "id": t.id,
+                    "amount": t.amount,
+                    "utr_number": t.utr_number,
+                    "screenshot_path": t.screenshot_path,
+                    "status": t.status,
+                    "payment_method": t.payment_method,
+                    "created_at": t.created_at.isoformat() if t.created_at else None,
+                }
+                for t in transactions
+            ],
+            "consultation_history": [
+                {
+                    "id": c.id,
+                    "consultation_id": c.consultation_id,
+                    "service_name": c.service_name,
+                    "legal_issue": c.legal_issue_type,
+                    "description": c.description,
+                    "status": c.status,
+                    "scheduled_date": getattr(c, "scheduled_date", None),
+                    "scheduled_time": getattr(c, "scheduled_time", None),
+                    "meeting_mode": getattr(c, "meeting_mode", "PHONE"),
+                    "created_at": c.created_at.isoformat() if c.created_at else None,
+                }
+                for c in consultations
+            ],
+            "notifications": [
+                {
+                    "id": n.id,
+                    "title": n.title,
+                    "message": n.message,
+                    "category": n.category,
+                    "is_read": n.is_read,
+                    "created_at": n.created_at.isoformat() if n.created_at else None,
+                }
+                for n in notifications
+            ],
+            "documents": [
+                {
+                    "id": d.id,
+                    "filename": d.filename,
+                    "file_type": d.file_type,
+                    "document_type": d.document_type,
+                    "created_at": d.created_at.isoformat() if d.created_at else None,
+                }
+                for d in documents
+            ],
+            "ai_chat_history": [
+                {
+                    "session_id": s.id,
+                    "title": s.title,
+                    "created_at": s.created_at.isoformat() if s.created_at else None,
+                }
+                for s in chats
+            ],
+            "activity_timeline": [
+                {
+                    "id": a.id,
+                    "action": a.action_type,
+                    "description": a.action_description,
+                    "timestamp": a.timestamp.isoformat() if a.timestamp else None,
+                }
+                for a in activities
+            ],
+        }
     }
+
+@router.put("/profile/update")
+def update_profile(payload: ProfileUpdatePayload, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not user:
+        raise HTTPException(status_code=401, detail="Authentication required.")
+        
+    from app.core.security import encrypt_data
+
+    if payload.name is not None: user.name = payload.name
+    if payload.dob is not None: user.dob = payload.dob
+    if payload.gender is not None: user.gender = payload.gender
+    if payload.marital_status is not None: user.marital_status = payload.marital_status
+    if payload.blood_group is not None: user.blood_group = payload.blood_group
+    if payload.occupation is not None: user.occupation = payload.occupation
+    if payload.education is not None: user.education = payload.education
+    if payload.avatar_url is not None: user.avatar_url = payload.avatar_url
+    
+    if payload.aadhaar is not None and payload.aadhaar.strip() != "":
+        user.aadhaar_enc = encrypt_data(payload.aadhaar.strip())
+    if payload.pan is not None and payload.pan.strip() != "":
+        user.pan_enc = encrypt_data(payload.pan.strip())
+
+    user.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(user)
+
+    return {"success": True, "message": "Profile updated successfully."}
 
 @router.post("/location/update")
 def update_user_location(payload: LocationUpdatePayload, user: User = Depends(get_current_user), db: Session = Depends(get_db)):

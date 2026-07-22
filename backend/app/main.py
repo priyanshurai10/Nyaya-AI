@@ -35,6 +35,7 @@ from app.api.v1.judgments import router as judgments_router
 from app.api.v1.academy import router as academy_router
 from app.api.v1.ai_insights import router as ai_insights_router
 from app.api.v1.vault_analyze import router as vault_analyze_router
+from app.api.v1.admin_consultation import router as admin_consultation_router
 
 # Ensure upload directory exists
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
@@ -46,6 +47,13 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
+
+@app.on_event("startup")
+def startup_event():
+    import threading
+    from app.core.retention_cron import run_data_retention_cleanup
+    # Run data retention cleanup in a background thread on startup
+    threading.Thread(target=run_data_retention_cleanup, daemon=True).start()
 
 # Setup CORS - For MVP, allow all origins to ease local testing
 app.add_middleware(
@@ -81,6 +89,7 @@ app.include_router(judgments_router, prefix=f"{settings.API_V1_STR}/judgments", 
 app.include_router(academy_router, prefix=f"{settings.API_V1_STR}/academy", tags=["academy"])
 app.include_router(ai_insights_router, prefix=f"{settings.API_V1_STR}/ai-insights", tags=["ai-insights"])
 app.include_router(vault_analyze_router, prefix=f"{settings.API_V1_STR}/vault", tags=["vault-analyze"])
+app.include_router(admin_consultation_router, prefix=f"{settings.API_V1_STR}/admin/consultations", tags=["admin-consultations"])
 
 @app.get("/")
 def health_check():

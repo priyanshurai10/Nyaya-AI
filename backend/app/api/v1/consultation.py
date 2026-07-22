@@ -9,9 +9,10 @@ import shutil
 import re
 
 from app.core.database import get_db
-from app.models import User, ConsultationRequest, Transaction, AuditLog, PaymentSettings
+from app.models import User, ConsultationRequest, Transaction, AuditLog, PaymentSettings, Notification
 from app.core.auth import get_current_user
 from app.core.config import settings
+from app.core.email_service import send_admin_new_payment_request
 
 router = APIRouter()
 
@@ -179,7 +180,35 @@ def verify_payment(
     tx.status = "under_review"
     
     req.status = "Payment Under Review"
+
+    # Create user notification in DB
+    notif = Notification(
+        id=str(uuid.uuid4()),
+        user_id=user.id,
+        title="Payment Submitted",
+        message=f"Your payment request for {req.service_name} (UTR: {utr_number}) has been submitted and is under review.",
+        category="PAYMENT",
+        is_read=False,
+        created_at=datetime.utcnow()
+    )
+    db.add(notif)
     db.commit()
+
+    # Automatically send email to Admin immediately after payment request
+    try:
+        send_admin_new_payment_request(
+            user_name=req.full_name or user.name,
+            user_email=req.email or user.email or "",
+            user_mobile=req.mobile_number or getattr(user, "phone", "") or "",
+            legal_issue=req.legal_issue_type or req.service_name,
+            amount=float(tx.amount),
+            utr_number=utr_number,
+            payment_id=tx.id,
+            screenshot_path=filepath,
+            submitted_at=tx.created_at or datetime.utcnow()
+        )
+    except Exception as e:
+        print(f"[ADMIN_EMAIL_ERROR] {e}")
     
     log_audit(db, "Payment Verified", f"Submitted UTR {utr_number} for review", user.id)
     return {"success": True, "message": "Payment details submitted for review successfully."}

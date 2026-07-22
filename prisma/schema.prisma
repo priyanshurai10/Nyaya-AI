@@ -17,13 +17,241 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  progress       UserProgress[]
-  bookmarks      Bookmark[]
-  consultations  Consultation[]
-  transactions   Transaction[]
-  readingHistory ReadingHistory[]
+  // Extended Profile Fields
+  dob                    String?
+  gender                 String?
+  maritalStatus          String?
+  bloodGroup             String?
+  nationality            String?
+  occupation             String?
+  education              String?
+  aadhaarEnc             String?
+  panEnc                 String?
+  altMobile              String?
+  address                String?
+  city                   String?
+  district               String?
+  state                  String?
+  country                String?
+  pincode                String?
+  preferredLanguage      String?
+  emergencyContactName   String?
+  emergencyContactNumber String?
+  previousCases          String?
+  currentCases           String?
+  preferredLawyer        String?
+
+  progress               UserProgress[]
+  bookmarks              Bookmark[]
+  consultations          Consultation[]
+  transactions           Transaction[]
+  readingHistory         ReadingHistory[]
+  payments               Payment[]
+  fileMetadata           FileMetadata[]
+  activityTimeline       UserActivityTimeline[]
+  notifications          Notification[]
+  errorLogs              SystemErrorLog[]
 
   @@index([role])
+  @@index([email])
+}
+
+model Lawyer {
+  id              String   @id @default(uuid())
+  name            String
+  phone           String
+  email           String   @unique
+  specialization  String
+  languages       String
+  experience      Int
+  availability    String   @default("Available")
+  consultationFee Float    @default(500)
+  rating          Float    @default(4.9)
+  status          String   @default("ACTIVE")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  consultations Consultation[]
+
+  @@index([status])
+}
+
+model Payment {
+  id            String    @id // Formatted: NYA-PAY-YYYYMMDD-XXXXXX
+  userId        String
+  fullName      String
+  email         String
+  mobile        String
+  issue         String
+  amount        Float
+  utrNumber     String?
+  screenshotUrl String?
+  fileId        String?
+  status        String    @default("PENDING") // PENDING, VERIFIED, DECLINED
+  declineReason String?
+  adminNotes    String?
+  verifiedAt    DateTime?
+  verifiedBy    String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  consultations Consultation[]
+  notifications Notification[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([utrNumber])
+}
+
+model Consultation {
+  id              String    @id // Formatted: NYA-CON-YYYYMMDD-XXXXXX
+  userId          String
+  paymentId       String?
+  lawyerId        String?
+  name            String
+  mobile          String
+  language        String
+  time            String
+  category        String
+  summary         String?
+  adviceProvided  String?
+  followupRequired Boolean  @default(false)
+  nextMeetingDate String?
+  documentsShared String?
+  durationMinutes Int?
+  meetingMode     String    @default("PHONE") // PHONE, WHATSAPP, GOOGLE_MEET
+  scheduledDate   String?
+  scheduledTime   String?
+  status          String    @default("WAITING") // WAITING, SCHEDULED, COMPLETED, CANCELLED
+  upiId           String?
+  utr             String?
+  screenshotUrl   String?
+  adminRemarks    String?
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment       Payment?      @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  lawyer        Lawyer?       @relation(fields: [lawyerId], references: [id], onDelete: SetNull)
+  transactions  Transaction[]
+  notifications Notification[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([scheduledDate])
+}
+
+model FileMetadata {
+  id          String   @id // Formatted: NYA-DOC-YYYYMMDD-XXXXXX
+  userId      String
+  fileName    String
+  filePath    String
+  publicUrl   String
+  fileSize    Int
+  mimeType    String
+  category    String   @default("PAYMENT_PROOF") // PAYMENT_PROOF, LEGAL_DOC
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([category])
+}
+
+model AuditLog {
+  id              String   @id @default(uuid())
+  adminEmail      String
+  action          String   // PAYMENT_VERIFIED, PAYMENT_REJECTED, CONSULTATION_SCHEDULED, etc.
+  targetUserEmail String?
+  targetRecordId  String?
+  ipAddress       String?
+  userAgent       String?
+  previousStatus  String?
+  newStatus       String?
+  notes           String?
+  createdAt       DateTime @default(now())
+
+  @@index([adminEmail])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model UserActivityTimeline {
+  id           String   @id @default(uuid())
+  userId       String
+  activityType String   // ACCOUNT_CREATED, PAYMENT_SUBMITTED, PAYMENT_VERIFIED, etc.
+  title        String
+  description  String
+  metadata     String?  // JSON string
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([activityType])
+  @@index([createdAt])
+}
+
+model Notification {
+  id             String   @id // Formatted: NYA-NOT-YYYYMMDD-XXXXXX
+  userId         String
+  title          String
+  message        String
+  category       String   @default("SYSTEM") // PAYMENT, CONSULTATION, SYSTEM
+  isRead         Boolean  @default(false)
+  paymentId      String?
+  consultationId String?
+  createdAt      DateTime @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment      Payment?      @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  consultation Consultation? @relation(fields: [consultationId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model SystemErrorLog {
+  id         String   @id @default(uuid())
+  category   String   // API_ERROR, EMAIL_FAILURE, STORAGE_FAILURE, AUTH_FAILURE, DB_ERROR
+  endpoint   String?
+  userId     String?
+  message    String
+  stackTrace String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([category])
+  @@index([createdAt])
+}
+
+model EmailLog {
+  id        String   @id @default(uuid())
+  recipient String
+  subject   String
+  template  String
+  status    String   @default("SENT") // SENT, FAILED
+  createdAt DateTime @default(now())
+
+  @@index([recipient])
+  @@index([createdAt])
+}
+
+model BackupLog {
+  id         String   @id @default(uuid())
+  backupType String   // DAILY, WEEKLY, MONTHLY
+  filePath   String
+  fileSize   Int
+  status     String   @default("COMPLETED")
+  createdAt  DateTime @default(now())
+
+  @@index([backupType])
+  @@index([createdAt])
 }
 
 model UserProgress {
@@ -55,32 +283,6 @@ model Bookmark {
   @@unique([userId, type, contentId])
   @@index([userId])
   @@index([type])
-}
-
-model Consultation {
-  id       String  @id @default(uuid())
-  userId   String
-  name     String
-  mobile   String
-  language String
-  time     String
-  category String
-  summary  String?
-  status   String  @default("PENDING_PAYMENT") // PENDING_PAYMENT, PENDING_VERIFICATION, APPROVED, REJECTED
-
-  upiId         String?
-  utr           String?
-  screenshotUrl String?
-  adminRemarks  String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
-
-  @@index([userId])
-  @@index([status])
 }
 
 model Transaction {

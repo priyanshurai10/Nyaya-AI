@@ -13,9 +13,17 @@ class ConsultationRequest(Base):
     preferred_language = Column(String, nullable=True)
     legal_issue_type = Column(String, nullable=True)
     description = Column(Text, nullable=True)
-    status = Column(String, default="requested") # "requested", "callback_requested", "email_requested", "pending_verification", "verified", "failed", "assigned", "completed"
+    status = Column(String, default="requested")
+    # "requested", "Pending Payment Verification", "Payment Under Review",
+    # "Payment Verified – Awaiting Schedule", "Consultation Scheduled",
+    # "Consultation Completed", "Payment Declined"
     assigned_specialist = Column(String, nullable=True)
     transaction_id = Column(String, ForeignKey("transactions.id"), nullable=True)
+    # Scheduling fields
+    scheduled_date = Column(String, nullable=True)
+    scheduled_time = Column(String, nullable=True)
+    meeting_mode = Column(String, nullable=True, default="PHONE")  # PHONE, WHATSAPP, GOOGLE_MEET
+    admin_notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -31,7 +39,8 @@ class Transaction(Base):
     payment_method = Column(String, nullable=False) # "upi", "qr", "card", "netbanking"
     utr_number = Column(String, nullable=True)
     screenshot_path = Column(String, nullable=True)
-    status = Column(String, default="pending") # "pending", "verified", "failed"
+    status = Column(String, default="pending") # "pending", "under_review", "verified", "declined", "failed"
+    admin_notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

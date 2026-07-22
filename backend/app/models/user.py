@@ -12,6 +12,17 @@ class User(Base):
     created_at = Column("createdAt", DateTime, default=datetime.utcnow)
     updated_at = Column("updatedAt", DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    # Extended Profile Fields
+    dob = Column(String, nullable=True)
+    gender = Column(String, nullable=True)
+    marital_status = Column("maritalStatus", String, nullable=True)
+    blood_group = Column("bloodGroup", String, nullable=True)
+    occupation = Column(String, nullable=True)
+    education = Column(String, nullable=True)
+    aadhaar_enc = Column("aadhaarEnc", EncryptedText, nullable=True)
+    pan_enc = Column("panEnc", EncryptedText, nullable=True)
+    avatar_url = Column(String, nullable=True)
+
     # Location fields
     location_village = Column(String, nullable=True)
     location_town = Column(String, nullable=True)

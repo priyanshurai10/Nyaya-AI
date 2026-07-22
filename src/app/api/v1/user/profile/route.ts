@@ -74,7 +74,7 @@ export async function GET(request: Request) {
         email: user.email,
         phone: user.phone,
         role: user.role,
-        createdAt: user.createdAt.toISOString()
+        createdAt: user.createdAt ? user.createdAt.toISOString() : null
       }
     });
   } catch (error: any) {

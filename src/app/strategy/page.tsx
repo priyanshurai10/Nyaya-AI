@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Brain, Gavel, Scale, FileText, CheckCircle, ArrowRight, Loader2, Calendar, ShieldCheck, HelpCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Brain, Gavel, Scale, FileText, CheckCircle, ArrowRight, Loader2, Calendar, ShieldCheck, FolderPlus } from "lucide-react";
 
 interface StrategyResponse {
   possible_issues: string[];
@@ -23,6 +24,7 @@ const CASE_TYPES = [
 ];
 
 export default function StrategyPage() {
+  const router = useRouter();
   const [caseType, setCaseType] = useState("Property Dispute");
   const [position, setPosition] = useState("Complainant / Victim");
   const [description, setDescription] = useState("");
@@ -30,6 +32,8 @@ export default function StrategyPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [strategy, setStrategy] = useState<StrategyResponse | null>(null);
   const [error, setError] = useState("");
+  const [isSavingCase, setIsSavingCase] = useState(false);
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState("");
 
   const handleBuildStrategy = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +41,7 @@ export default function StrategyPage() {
 
     setIsLoading(true);
     setError("");
+    setSaveSuccessMsg("");
     setStrategy(null);
 
     const fullSituation = `[Case Type: ${caseType}] [Position: ${position}] [Desired Outcome: ${desiredOutcome || "Fair resolution"}] Details: ${description}`;
@@ -55,6 +60,40 @@ export default function StrategyPage() {
       setError(err.message || "Something went wrong.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSaveToVault = async () => {
+    if (!strategy) return;
+    setIsSavingCase(true);
+    setSaveSuccessMsg("");
+
+    try {
+      const res = await fetch("/api/v1/cases", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: `${caseType} - Strategy Blueprint`,
+          category: caseType,
+          summary: description,
+          actSections: strategy.applicable_laws.join(", "),
+          status: "PRE_LITIGATION",
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSaveSuccessMsg("Saved to Litigation Cases Vault!");
+        setTimeout(() => {
+          router.push(`/cases/${data.data.caseId}`);
+        }, 1200);
+      } else {
+        throw new Error(data.detail || "Failed to save case.");
+      }
+    } catch (err: any) {
+      setError(err.message || "Could not save to cases vault.");
+    } finally {
+      setIsSavingCase(false);
     }
   };
 
@@ -156,7 +195,7 @@ export default function StrategyPage() {
         {strategy && (
           <div className="space-y-6">
             <div className="bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-blue-500/10 border border-[#FF9933]/30 rounded-2xl p-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                   <span className="text-[10px] font-black uppercase tracking-widest text-[#FF9933] bg-[#FF9933]/10 px-2.5 py-1 rounded-full border border-[#FF9933]/20">
                     Strategy Blueprint
@@ -165,11 +204,33 @@ export default function StrategyPage() {
                     {caseType} Roadmap
                   </h2>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-[var(--text-muted)] bg-[var(--card)] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                  <Calendar className="w-4 h-4 text-[#138808]" />
-                  Estimated Timeline: <strong className="text-[var(--text-primary)]">{strategy.estimated_timeline}</strong>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-sm text-[var(--text-muted)] bg-[var(--card)] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <Calendar className="w-4 h-4 text-[#138808]" />
+                    Estimated Timeline: <strong className="text-[var(--text-primary)]">{strategy.estimated_timeline}</strong>
+                  </div>
+
+                  <button
+                    onClick={handleSaveToVault}
+                    disabled={isSavingCase}
+                    className="px-4 py-2 bg-[#138808] hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50"
+                  >
+                    {isSavingCase ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <FolderPlus className="w-4 h-4" />
+                    )}
+                    Save to Litigation Vault
+                  </button>
                 </div>
               </div>
+
+              {saveSuccessMsg && (
+                <div className="mt-3 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                  {saveSuccessMsg}
+                </div>
+              )}
             </div>
 
             {/* Applicable Statutes */}

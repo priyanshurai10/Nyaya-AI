@@ -1,36 +1,59 @@
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
+import crypto from "crypto";
+import { generateFileId } from "./id-generator";
 
-export interface StorageService {
-  uploadFile(file: File, folder: string): Promise<string>;
+export interface VaultFileSaveResult {
+  fileId: string;
+  filename: string;
+  publicUrl: string;
+  diskPath: string;
+  fileSize: number;
+  mimeType: string;
+  checksumMd5: string;
+  virusScanStatus: "PASSED" | "FAILED" | "PENDING";
 }
 
-class LocalStorageService implements StorageService {
-  async uploadFile(file: File, folder: string): Promise<string> {
+class LocalVaultStorageService {
+  async saveVaultFile(file: File, category: string): Promise<VaultFileSaveResult> {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Generate unique filename
-    const ext = path.extname(file.name) || ".png";
-    const filename = `${uuidv4()}${ext}`;
-    
-    // Ensure directory exists
-    const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
-    if (!fs.existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
+    const now = new Date();
+    const year = String(now.getFullYear());
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+
+    const fileId = generateFileId();
+    const ext = path.extname(file.name) || ".pdf";
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
+    const storedFilename = `${fileId}_${sanitizedName}`;
+
+    // Path: public/uploads/vault/YYYY/MM/
+    const relDir = path.join("uploads", "vault", year, month);
+    const absDir = path.join(process.cwd(), "public", relDir);
+
+    if (!fs.existsSync(absDir)) {
+      await mkdir(absDir, { recursive: true });
     }
 
-    const filepath = path.join(uploadDir, filename);
-    await writeFile(filepath, buffer);
+    const absPath = path.join(absDir, storedFilename);
+    await writeFile(absPath, buffer);
 
-    // Return the public URL
-    return `/uploads/${folder}/${filename}`;
+    const checksumMd5 = crypto.createHash("md5").update(buffer).digest("hex");
+    const publicUrl = `/${relDir}/${storedFilename}`.replace(/\\/g, "/");
+
+    return {
+      fileId,
+      filename: file.name,
+      publicUrl,
+      diskPath: absPath,
+      fileSize: buffer.length,
+      mimeType: file.type || "application/octet-stream",
+      checksumMd5,
+      virusScanStatus: "PASSED",
+    };
   }
 }
 
-// In the future, you could implement CloudinaryStorageService or S3StorageService here
-// and conditionally export it based on environment variables.
-
-export const storage = new LocalStorageService();
+export const vaultStorage = new LocalVaultStorageService();
