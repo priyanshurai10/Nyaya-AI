@@ -18,7 +18,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
 
     const handleResize = () => {
-      // Auto-close on mobile/tablet resize to prevent drawer overlays showing when going back/forth
       if (window.innerWidth < 1024) {
         setSidebarOpen(false);
       }
@@ -28,7 +27,14 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Auth page and full-screen routes render without layout shells
+  // Whenever pathname changes, automatically close sidebar on mobile/tablet so main content shows in full screen!
+  useEffect(() => {
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
+  }, [pathname]);
+
+  // Auth page renders without layout shell
   if (pathname === '/auth') {
     return (
       <LanguageProvider>

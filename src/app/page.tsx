@@ -33,7 +33,8 @@ import {
   Heart,
   Clock,
   Bookmark,
-  PhoneCall
+  PhoneCall,
+  BrainCircuit
 } from 'lucide-react';
 
 export default function LandingHomePage() {
@@ -72,18 +73,6 @@ export default function LandingHomePage() {
     }
   }, [showSplash]);
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/v1/user/logout', { method: 'POST' });
-    } catch (e) {
-      console.warn('Logout API error:', e);
-    }
-    localStorage.removeItem('nyaya_token');
-    localStorage.removeItem('nyaya_user');
-    setIsAuthenticated(false);
-    router.push('/auth');
-  };
-
   const handleFeedbackSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!feedbackText.trim()) return;
@@ -120,31 +109,47 @@ export default function LandingHomePage() {
     { id: "path", title: "Nyaya Path (Court Hierarchy)", desc: "Explore Indian court hierarchy, jurisdictions, and procedural stages", icon: Gavel, href: "/nyaya-path", color: "from-[#138808] to-emerald-700", tag: "Hierarchy" }
   ];
 
-  // Upcoming Roadmap Features
+  // Comprehensive Detailed Upcoming Features
   const upcomingFeatures = [
     { 
       id: "advocates", 
       title: "Find Advocates Directory (Upcoming)", 
-      desc: "We are actively approaching and onboarding Bar Council verified advocates from High Courts & District Courts across India to connect citizens with verified legal counsel.", 
+      desc: "We are actively approaching and onboarding Bar Council registered advocates from High Courts & District Courts across India to connect citizens with verified legal counsel.", 
+      details: "Features State Bar credential verification badges, PIN Code proximity matching, practice specializations (Criminal, Property, RERA, Matrimonial), and direct 1-on-1 chamber appointment scheduling.",
       icon: Users, 
       status: "In Onboarding", 
-      release: "Launch Soon" 
+      release: "Launch Soon",
+      href: "/advocates"
     },
     { 
       id: "map", 
-      title: "Court & Emergency Station Finder (Upcoming)", 
+      title: "Court & Emergency Infrastructure Finder (Upcoming)", 
       desc: "Find nearest District Courts, High Courts, Supreme Court, Police Stations, and Fire Stations with exact distance in km, registrar office numbers, and emergency contacts.", 
+      details: "GPS turn-by-turn routing, direct registrar counter phone numbers, filing desk working hours, DLSA free legal aid office contacts, and jurisdictional police station lookup.",
       icon: MapPin, 
       status: "Active Mapping", 
-      release: "Launch Soon" 
+      release: "Launch Soon",
+      href: "/map"
     },
     { 
-      id: "bookmarks", 
-      title: "Cloud Case Notifications & Sync", 
-      desc: "Sync live eCourts hearing date alerts and judicial precedent bookmarks seamlessly across desktop and mobile browsers.", 
+      id: "simulator", 
+      title: "AI Judicial Precedent & Bail Simulator (Upcoming)", 
+      desc: "Analyze historical High Court and Supreme Court rulings to estimate bail eligibility, procedural timelines, and judicial precedents under BNSS Sections 479 & 480.", 
+      details: "Simulates case complexity scoring, first-time offender half-sentence rule under BNSS 479, anticipatory bail grounds under BNSS 482, and statistical bench precedent trends.",
+      icon: BrainCircuit, 
+      status: "AI Model Tuning", 
+      release: "Launch Soon",
+      href: "/judge-simulator"
+    },
+    { 
+      id: "cases", 
+      title: "eCourts Cause List & Case Tracker (Upcoming)", 
+      desc: "Sync live eCourts hearing date alerts, cause lists, and judicial precedent notifications seamlessly across your devices.", 
+      details: "CNR number auto-lookup across all 3,000+ district courts in India, cause list position tracking, and automated SMS & WhatsApp reminders prior to hearing dates.",
       icon: Bookmark, 
-      status: "Planned", 
-      release: "Q4 2026" 
+      status: "API Integration", 
+      release: "Launch Soon",
+      href: "/cases"
     }
   ];
 
@@ -179,14 +184,12 @@ export default function LandingHomePage() {
               </Link>
 
               {isAuthenticated ? (
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#FF9933] to-orange-600 text-white font-bold text-sm shadow-lg hover:scale-[1.02] transition-all"
-                  >
-                    Go to Citizen Cockpit
-                  </Link>
-                </>
+                <Link
+                  href="/dashboard"
+                  className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#FF9933] to-orange-600 text-white font-bold text-sm shadow-lg hover:scale-[1.02] transition-all"
+                >
+                  Go to Citizen Cockpit
+                </Link>
               ) : (
                 <Link
                   href="/auth"
@@ -202,18 +205,13 @@ export default function LandingHomePage() {
 
       <div className="max-w-7xl mx-auto space-y-12">
         
-        {/* Section 1: Genuine Active Tools Grid */}
+        {/* Section 1: Genuine Active Tools Grid (REMOVED 8 VERIFIED BADGE) */}
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] flex items-center gap-2">
-                <Zap className="w-6 h-6 text-[#FF9933]" /> Core Legal Superpowers
-              </h2>
-              <p className="text-xs text-[var(--text-muted)] mt-1">Fully functional, production-ready legal AI features</p>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold border border-emerald-500/20 self-start sm:self-auto">
-              <CheckCircle2 className="w-3.5 h-3.5" /> 8 Verified Features Live
-            </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] flex items-center gap-2">
+              <Zap className="w-6 h-6 text-[#FF9933]" /> Core Legal Superpowers
+            </h2>
+            <p className="text-xs text-[var(--text-muted)] mt-1">Fully functional, production-ready legal AI features</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -278,47 +276,56 @@ export default function LandingHomePage() {
           </div>
         </div>
 
-        {/* Section 3: Upcoming Features Roadmap (Scroll Down) */}
-        <div className="space-y-6 pt-4">
+        {/* Section 3: Comprehensive Detailed Upcoming Features */}
+        <div className="space-y-6 pt-2">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500">
-              <Rocket className="w-5 h-5" />
+            <div className="p-2.5 rounded-2xl bg-purple-500/10 text-purple-500 border border-purple-500/20">
+              <Rocket className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-extrabold text-[var(--text-primary)]">Upcoming Features (Roadmap)</h2>
-              <p className="text-xs text-[var(--text-muted)]">These modules are under active onboarding & infrastructure mapping for future releases</p>
+              <h2 className="text-xl font-extrabold text-[var(--text-primary)]">Upcoming Features (Under Active Integration)</h2>
+              <p className="text-xs text-[var(--text-muted)]">These modules are undergoing nationwide advocate onboarding & eCourts API integration. Tap any card for full details.</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {upcomingFeatures.map(feat => {
               const Icon = feat.icon;
               return (
                 <Link 
                   key={feat.id}
-                  href={feat.id === 'advocates' ? '/advocates' : feat.id === 'map' ? '/map' : '#'}
-                  className="bg-[var(--card)] p-6 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 relative hover:border-[#FF9933]/60 transition-all flex flex-col justify-between group"
+                  href={feat.href}
+                  className="bg-[var(--card)] p-6 rounded-3xl border border-slate-200 dark:border-slate-800 hover:border-[#FF9933]/60 shadow-sm hover:shadow-md transition-all space-y-4 group flex flex-col justify-between"
                 >
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
                         <Icon className="w-5 h-5" />
                       </div>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                      <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 uppercase tracking-wider">
                         {feat.status} • {feat.release}
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-base text-[var(--text-primary)] group-hover:text-[#FF9933] transition-colors mb-2">
-                      {feat.title}
-                    </h3>
-                    <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                      {feat.desc}
-                    </p>
+                    <div>
+                      <h3 className="font-bold text-lg text-[var(--text-primary)] group-hover:text-[#FF9933] transition-colors mb-1">
+                        {feat.title}
+                      </h3>
+                      <p className="text-xs text-[var(--text-muted)] font-medium leading-relaxed">
+                        {feat.desc}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800 text-xs text-[var(--text-primary)] space-y-1">
+                      <span className="font-bold text-[#FF9933] text-[11px] block">🔍 Feature Architecture & Mechanics:</span>
+                      <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
+                        {feat.details}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs font-semibold text-[#FF9933] flex items-center justify-between">
-                    <span>View Feature Brief</span>
+                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-xs font-bold text-[#FF9933] flex items-center justify-between">
+                    <span>Tap to view full feature brief</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>
@@ -327,7 +334,7 @@ export default function LandingHomePage() {
           </div>
         </div>
 
-        {/* Section 4: User Feedback & Suggestions Form + Developer Contact Info */}
+        {/* Section 4: User Feedback & Direct Contact (UPDATED WHATSAPP TO USERNAME @priyanshu.rai18) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
           
           {/* Feedback Form Card */}
@@ -397,7 +404,7 @@ export default function LandingHomePage() {
 
               <div className="space-y-3 pt-2">
                 
-                {/* WhatsApp */}
+                {/* WhatsApp with username @priyanshu.rai18 */}
                 <a
                   href="https://wa.me/917541881152"
                   target="_blank"
@@ -406,7 +413,7 @@ export default function LandingHomePage() {
                 >
                   <div className="flex items-center gap-3">
                     <MessageCircle className="w-5 h-5 text-emerald-500" />
-                    <span>WhatsApp: +91 7541881152</span>
+                    <span>WhatsApp: @priyanshu.rai18</span>
                   </div>
                   <ArrowRight className="w-4 h-4" />
                 </a>

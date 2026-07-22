@@ -5,7 +5,7 @@ import {
   User, CheckCircle2, BookOpen, Sparkles, Shield, Scale, FileText, ArrowRight, 
   Zap, Landmark, Search, ShieldAlert, Award, PhoneCall, ChevronRight, Gavel, 
   FolderOpen, Compass, FileSignature, MessageSquare, Star, Send, MessageCircle,
-  Instagram, Linkedin, Github, MapPin, Bookmark, Users, Clock, Lightbulb, Rocket, Heart, Briefcase
+  Instagram, Linkedin, Github, MapPin, Bookmark, Users, Clock, Lightbulb, Rocket, Heart, BrainCircuit
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -15,13 +15,6 @@ export default function UserDashboardPage() {
   const router = useRouter();
   const { selectedLang, t } = useLanguage();
   const [user, setUser] = useState<any>(null);
-
-  // Saved Bookmarks State
-  const [savedItems, setSavedItems] = useState([
-    { id: "1", title: "Kesavananda Bharati v. State of Kerala (1973)", category: "Landmark Judgment", type: "Constitutional Bench", tag: "Basic Structure" },
-    { id: "2", title: "Bharatiya Nyaya Sanhita (BNS) Section 103", category: "Criminal Law", type: "BNS Code", tag: "Murder Definition" },
-    { id: "3", title: "Consumer Protection Act 2019 - Product Liability", category: "Consumer Rights", type: "Statute Guide", tag: "Citizen Remedy" }
-  ]);
 
   // Feedback State
   const [feedbackRating, setFeedbackRating] = useState(5);
@@ -37,7 +30,7 @@ export default function UserDashboardPage() {
     try {
       setUser(JSON.parse(storedUser));
     } catch (e) {
-      setUser({ name: "Priyanshu Rai", email: "priyanshu.rai121111@gmail.com", role: "CITIZEN" });
+      setUser({ name: "Priyanshu Rai", email: "priyanshurai121111@gmail.com", role: "CITIZEN" });
     }
   }, [router]);
 
@@ -62,13 +55,9 @@ export default function UserDashboardPage() {
     }, 4000);
   };
 
-  const removeBookmark = (id: string) => {
-    setSavedItems(prev => prev.filter(item => item.id !== id));
-  };
-
   if (!user) return null;
 
-  // Genuine Active Tools (Fully working modules)
+  // Functional Core Legal Tools
   const coreTools = [
     { id: "chat", title: "AI Legal Chat Assistant", desc: "Ask questions on Indian laws, BNS, BNSS & IPC sections in simple language", icon: MessageSquare, href: "/chat", color: "from-orange-500 to-amber-600", tag: "Interactive AI" },
     { id: "consultation", title: "Talk to Senior Specialist", desc: "Schedule a 1-on-1 confidential consultation with a senior legal specialist", icon: PhoneCall, href: "/consultation", color: "from-emerald-600 to-teal-700", tag: "Specialist Call" },
@@ -80,31 +69,47 @@ export default function UserDashboardPage() {
     { id: "path", title: "Nyaya Path (Court Hierarchy)", desc: "Explore Indian court hierarchy, jurisdictions, and procedural steps", icon: Gavel, href: "/nyaya-path", color: "from-[#138808] to-emerald-700", tag: "Hierarchy" },
   ];
 
-  // Upcoming Features (Roadmap)
+  // Comprehensive Detailed Upcoming Features
   const upcomingFeatures = [
     { 
       id: "advocates", 
       title: "Find Advocates Directory (Upcoming)", 
-      desc: "We are actively approaching and onboarding Bar Council verified advocates from High Courts & District Courts across India to connect citizens with verified legal counsel.", 
+      desc: "We are actively approaching and onboarding Bar Council registered advocates from High Courts & District Courts across India to connect citizens with verified legal counsel.", 
+      details: "Features State Bar credential verification badges, PIN Code proximity matching, practice specializations (Criminal, Property, RERA, Matrimonial), and direct 1-on-1 chamber appointment scheduling.",
       icon: Users, 
       status: "In Onboarding", 
-      release: "Launch Soon" 
+      release: "Launch Soon",
+      href: "/advocates"
     },
     { 
       id: "map", 
-      title: "Court & Emergency Station Finder (Upcoming)", 
+      title: "Court & Emergency Infrastructure Finder (Upcoming)", 
       desc: "Find nearest District Courts, High Courts, Supreme Court, Police Stations, and Fire Stations with exact distance in km, registrar office numbers, and emergency contacts.", 
+      details: "GPS turn-by-turn routing, direct registrar counter phone numbers, filing desk working hours, DLSA free legal aid office contacts, and jurisdictional police station lookup.",
       icon: MapPin, 
       status: "Active Mapping", 
-      release: "Launch Soon" 
+      release: "Launch Soon",
+      href: "/map"
     },
     { 
-      id: "bookmarks", 
-      title: "Cloud Case Notifications & Sync", 
-      desc: "Sync live eCourts hearing date alerts and judicial precedent bookmarks seamlessly across desktop and mobile browsers.", 
+      id: "simulator", 
+      title: "AI Judicial Precedent & Bail Simulator (Upcoming)", 
+      desc: "Analyze historical High Court and Supreme Court rulings to estimate bail eligibility, procedural timelines, and judicial precedents under BNSS Sections 479 & 480.", 
+      details: "Simulates case complexity scoring, first-time offender half-sentence rule under BNSS 479, anticipatory bail grounds under BNSS 482, and statistical bench precedent trends.",
+      icon: BrainCircuit, 
+      status: "AI Model Tuning", 
+      release: "Launch Soon",
+      href: "/judge-simulator"
+    },
+    { 
+      id: "cases", 
+      title: "eCourts Cause List & Case Tracker (Upcoming)", 
+      desc: "Sync live eCourts hearing date alerts, cause lists, and judicial precedent notifications seamlessly across your devices.", 
+      details: "CNR number auto-lookup across all 3,000+ district courts in India, cause list position tracking, and automated SMS & WhatsApp reminders prior to hearing dates.",
       icon: Bookmark, 
-      status: "Planned", 
-      release: "Q4 2026" 
+      status: "API Integration", 
+      release: "Launch Soon",
+      href: "/cases"
     }
   ];
 
@@ -147,18 +152,13 @@ export default function UserDashboardPage() {
           </div>
         </div>
 
-        {/* Section 1: Active Functional Legal Tools */}
+        {/* Section 1: Active Functional Legal Tools (REMOVED '8 Verified Features Live' BADGE) */}
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] flex items-center gap-2">
-                <Zap className="w-6 h-6 text-[#FF9933]" /> Core Legal Superpowers
-              </h2>
-              <p className="text-xs text-[var(--text-muted)] mt-1">Fully functional, production-ready legal AI features</p>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold border border-emerald-500/20 self-start sm:self-auto">
-              <CheckCircle2 className="w-3.5 h-3.5" /> 8 Verified Features Live
-            </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] flex items-center gap-2">
+              <Zap className="w-6 h-6 text-[#FF9933]" /> Core Legal Superpowers
+            </h2>
+            <p className="text-xs text-[var(--text-muted)] mt-1">Fully functional, production-ready legal AI features</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -197,43 +197,7 @@ export default function UserDashboardPage() {
           </div>
         </div>
 
-        {/* Section 2: Clean Saved Bookmarks Manager (No Location Dependency!) */}
-        <div className="bg-[var(--card)] p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-            <h3 className="font-bold text-base text-[var(--text-primary)] flex items-center gap-2">
-              <Bookmark className="w-5 h-5 text-[#FF9933]" /> Saved Legal Bookmarks & Precedents
-            </h3>
-            <span className="text-xs text-[var(--text-muted)]">{savedItems.length} Saved</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {savedItems.map(item => (
-              <div key={item.id} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-3">
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
-                      {item.type}
-                    </span>
-                    <button 
-                      onClick={() => removeBookmark(item.id)}
-                      className="text-[10px] font-semibold text-rose-500 hover:underline"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                  <h4 className="font-bold text-xs text-[var(--text-primary)] leading-snug">{item.title}</h4>
-                  <p className="text-[10px] text-[var(--text-muted)] mt-1">{item.category}</p>
-                </div>
-                <div className="pt-2 border-t border-slate-200/50 dark:border-slate-800 text-[10px] text-slate-400 flex items-center justify-between">
-                  <span>Tag: {item.tag}</span>
-                  <Link href="/judgments" className="text-[#FF9933] font-bold hover:underline">View Details</Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Section 3: Legal Learning Academy Featured Spotlight */}
+        {/* Section 2: Legal Learning Academy Featured Spotlight */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 border border-blue-900/40 p-6 sm:p-8 shadow-lg">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             <div className="space-y-3 max-w-2xl text-center lg:text-left">
@@ -259,47 +223,56 @@ export default function UserDashboardPage() {
           </div>
         </div>
 
-        {/* Section 4: Upcoming Features (Roadmap on Scroll Down) */}
-        <div className="space-y-6 pt-4">
+        {/* Section 3: Comprehensive Detailed Upcoming Features */}
+        <div className="space-y-6 pt-2">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500">
-              <Rocket className="w-5 h-5" />
+            <div className="p-2.5 rounded-2xl bg-purple-500/10 text-purple-500 border border-purple-500/20">
+              <Rocket className="w-6 h-6" />
             </div>
             <div>
               <h2 className="text-xl font-extrabold text-[var(--text-primary)]">Upcoming Features (Under Active Integration)</h2>
-              <p className="text-xs text-[var(--text-muted)]">These modules are undergoing nationwide onboarding & eCourts API integration</p>
+              <p className="text-xs text-[var(--text-muted)]">These modules are undergoing nationwide advocate onboarding & eCourts API integration. Tap any card for full details.</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {upcomingFeatures.map(feat => {
               const Icon = feat.icon;
               return (
                 <Link
                   key={feat.id}
-                  href={feat.id === 'advocates' ? '/advocates' : feat.id === 'map' ? '/map' : '#'}
-                  className="bg-[var(--card)] p-6 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 relative hover:border-[#FF9933]/60 transition-all flex flex-col justify-between group"
+                  href={feat.href}
+                  className="bg-[var(--card)] p-6 rounded-3xl border border-slate-200 dark:border-slate-800 hover:border-[#FF9933]/60 shadow-sm hover:shadow-md transition-all space-y-4 group flex flex-col justify-between"
                 >
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
                         <Icon className="w-5 h-5" />
                       </div>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                      <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 uppercase tracking-wider">
                         {feat.status} • {feat.release}
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-base text-[var(--text-primary)] group-hover:text-[#FF9933] transition-colors mb-2">
-                      {feat.title}
-                    </h3>
-                    <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                      {feat.desc}
-                    </p>
+                    <div>
+                      <h3 className="font-bold text-lg text-[var(--text-primary)] group-hover:text-[#FF9933] transition-colors mb-1">
+                        {feat.title}
+                      </h3>
+                      <p className="text-xs text-[var(--text-muted)] font-medium leading-relaxed">
+                        {feat.desc}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800 text-xs text-[var(--text-primary)] space-y-1">
+                      <span className="font-bold text-[#FF9933] text-[11px] block">🔍 Feature Architecture & Mechanics:</span>
+                      <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
+                        {feat.details}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs font-semibold text-[#FF9933] flex items-center justify-between">
-                    <span>View Feature Brief</span>
+                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-xs font-bold text-[#FF9933] flex items-center justify-between">
+                    <span>Tap to view full feature brief</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>
@@ -308,7 +281,7 @@ export default function UserDashboardPage() {
           </div>
         </div>
 
-        {/* Section 5: User Feedback & Suggestions Form */}
+        {/* Section 4: User Feedback & Direct Contact (UPDATED WHATSAPP TO USERNAME @priyanshu.rai18) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
           
           {/* Feedback Form Card */}
@@ -378,7 +351,7 @@ export default function UserDashboardPage() {
 
               <div className="space-y-3 pt-2">
                 
-                {/* WhatsApp */}
+                {/* WhatsApp with Username @priyanshu.rai18 */}
                 <a
                   href="https://wa.me/917541881152"
                   target="_blank"
@@ -387,7 +360,7 @@ export default function UserDashboardPage() {
                 >
                   <div className="flex items-center gap-3">
                     <MessageCircle className="w-5 h-5 text-emerald-500" />
-                    <span>WhatsApp: +91 7541881152</span>
+                    <span>WhatsApp: @priyanshu.rai18</span>
                   </div>
                   <ArrowRight className="w-4 h-4" />
                 </a>

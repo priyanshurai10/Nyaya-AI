@@ -534,7 +534,7 @@ ${data.analysis.key_points.map((p: string) => `• ${p}`).join('\n')}
               placeholder={
                 motherMode
                   ? 'Aapki pareshani simple words mein bataein...'
-                  : t('chatPlaceholder') || 'Ask your legal question...'
+                  : 'Describe your legal issue, question, or situation in simple English or Hindi (e.g. land dispute, FIR, rental notice)...'
               }
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
