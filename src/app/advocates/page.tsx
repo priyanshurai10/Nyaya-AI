@@ -1,441 +1,193 @@
 'use client';
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import PincodeSearch from '@/components/PincodeSearch';
-import { apiClient } from '@/lib/api-client';
-import { translations } from '@/lib/translations';
-import {
-  Award,
-  Calendar,
-  Clock,
-  Briefcase,
-  MapPin,
-  Star,
-  CheckCircle,
-  AlertCircle,
-  Loader2,
-  Phone,
-  Bookmark,
-  ChevronRight,
-  BookOpen,
-  X,
+import { 
+  Users, Award, Rocket, CheckCircle2, ShieldCheck, MapPin, Scale, Clock, 
+  Sparkles, ArrowRight, PhoneCall, Send, Building, FileCheck, HelpCircle 
 } from 'lucide-react';
 
-interface Advocate {
-  id: number;
-  name: string;
-  experience_years: number;
-  practice_areas: string; // JSON string in DB
-  languages: string; // JSON string in DB
-  phone_number: string;
-  latitude: number;
-  longitude: number;
-  photo_url: string;
-  rating: number;
-  reviews_count: number;
-  court_association: string;
-  chamber_address: string;
-  office_address: string;
-  consultation_fees: number;
-  availability_status: string;
-}
+export default function AdvocatesUpcomingPage() {
+  const [onboardSubmitted, setOnboardSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    barNumber: '',
+    state: 'Delhi',
+    specialization: 'Criminal & Property Dispute'
+  });
 
-export default function VerifiedAdvocatesPage() {
-  const [selectedLang, setSelectedLang] = useState('en');
-  const [advocates, setAdvocates] = useState<Advocate[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [emptyState, setEmptyState] = useState(false);
-  const [selectedAdvocate, setSelectedAdvocate] = useState<Advocate | null>(null);
-
-  // Booking states
-  const [bookingStatus, setBookingStatus] = useState<'idle' | 'confirming' | 'pending' | 'success'>('idle');
-  const [bookingDate, setBookingDate] = useState('');
-  const [bookingTime, setBookingTime] = useState('');
-
-  const searchAbortControllerRef = useRef<AbortController | null>(null);
-
-  // Sync language selection
-  React.useEffect(() => {
-    const savedLang = localStorage.getItem('nyaya_lang') || 'en';
-    setSelectedLang(savedLang);
-
-    const handleLangChange = () => {
-      setSelectedLang(localStorage.getItem('nyaya_lang') || 'en');
-    };
-    window.addEventListener('nyaya_lang_changed', handleLangChange);
-    return () => window.removeEventListener('nyaya_lang_changed', handleLangChange);
-  }, []);
-
-  const t = useCallback((key: string): string => {
-    const entry = (translations as Record<string, Record<string, string>>)[key];
-    return entry?.[selectedLang] || entry?.['en'] || key;
-  }, [selectedLang]);
-
-  const fetchDiscoveryData = async (loc?: any) => {
-    if (searchAbortControllerRef.current) {
-      searchAbortControllerRef.current.abort();
-    }
-    const controller = new AbortController();
-    searchAbortControllerRef.current = controller;
-    
-    setLoading(true);
-    setError(null);
-    setEmptyState(false);
-    setSelectedAdvocate(null);
-    setAdvocates([]);
-    
-    try {
-      // Use location coordinates for nearby advocate search
-      const data = await apiClient.post<any>('/advocates/nearby', {
-        latitude: loc?.latitude || null,
-        longitude: loc?.longitude || null,
-        state: loc?.state || null,
-        pincode: loc?.pincode || null,
-      }, {
-        signal: controller.signal,
-      });
-      
-      const results = data?.advocates || data || [];
-      if (!Array.isArray(results) || results.length === 0) {
-        setEmptyState(true);
-      } else {
-        setAdvocates(results);
-      }
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        return;
-      }
-      setError(err.message || 'Failed to load advocates for this location.');
-    } finally {
-      if (searchAbortControllerRef.current === controller) {
-        setLoading(false);
-      }
-    }
-  };
-
-  // Sync location selection on mount and when it changes
-  useEffect(() => {
-    const handleLocChange = () => {
-      const storedLoc = localStorage.getItem('nyaya_location');
-      if (storedLoc) {
-        try {
-          const parsed = JSON.parse(storedLoc);
-          fetchDiscoveryData(parsed);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    };
-
-    window.addEventListener('nyaya_location_changed', handleLocChange);
-    // Call immediately on mount!
-    handleLocChange();
-
-    return () => window.removeEventListener('nyaya_location_changed', handleLocChange);
-  }, []);
-
-  const handleLocationResolved = (loc: any) => {
-    fetchDiscoveryData(loc);
-  };
-
-  const parseJsonStr = (str: string): string[] => {
-    if (!str) return [];
-    try {
-      return JSON.parse(str);
-    } catch {
-      return [];
-    }
-  };
-
-  const startBooking = (adv: Advocate) => {
-    setSelectedAdvocate(adv);
-    setBookingStatus('confirming');
-    setBookingDate('');
-    setBookingTime('');
-  };
-
-  const submitBooking = async () => {
-    if (!selectedAdvocate || !bookingDate || !bookingTime) {
-      setError('Please select a valid date and time for consultation.');
-      return;
-    }
-    try {
-      setBookingStatus('pending');
-      await apiClient.post('/advocates/book', {
-        advocate_id: selectedAdvocate.id,
-        date: bookingDate,
-        time: bookingTime,
-        fees: selectedAdvocate.consultation_fees,
-        consent_given: true,
-      });
-      setBookingStatus('success');
-    } catch (err: any) {
-      setError(err.message || 'Failed to book consultation.');
-      setBookingStatus('confirming');
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setOnboardSubmitted(true);
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)] pt-24 pb-12 px-4 sm:px-6 transition-colors duration-200 font-sans">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[var(--background)] p-4 sm:p-6 lg:p-8 text-[var(--text-primary)] font-sans">
+      <div className="max-w-6xl mx-auto space-y-10">
         
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <div className="flex items-center justify-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase bg-[var(--primary-subtle)]0/10 text-[var(--primary)] dark:text-[var(--primary)] border border-indigo-500/20 tracking-wider">
-              💼 Legal Directory
-            </span>
+        {/* Prominent Header Banner */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 p-6 sm:p-10 shadow-xl text-center space-y-4">
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
+          
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-extrabold uppercase tracking-widest mx-auto">
+            <Rocket className="w-4 h-4 animate-bounce text-amber-400" /> UPCOMING FEATURE • UNDER ACTIVE ONBOARDING
           </div>
-          <h1 className="text-3xl font-black text-[var(--text-primary)]">
-            Verified Advocates Near You
+
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight max-w-4xl mx-auto">
+            Verified Advocates Directory & Legal Network
           </h1>
-          <p className="text-sm text-[var(--text-muted)]">
-            Find and book consultations with verified legal professionals in your district by entering your PIN code.
+
+          <p className="text-slate-300 text-sm sm:text-base max-w-3xl mx-auto leading-relaxed">
+            We are actively approaching, verifying, and onboarding Bar Council registered advocates across High Courts, District Courts, and Municipalities all over India to connect citizens with verified legal experts.
           </p>
+
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+            <Link 
+              href="/consultation"
+              className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#FF9933] to-orange-600 text-white font-bold text-sm shadow-lg hover:scale-[1.02] transition-all flex items-center gap-2"
+            >
+              <PhoneCall className="w-4 h-4" /> Consult Senior Legal Specialist Now
+            </Link>
+            <Link 
+              href="/dashboard"
+              className="px-6 py-3.5 rounded-2xl bg-slate-800 text-slate-300 hover:text-white border border-slate-700 font-semibold text-sm transition-all"
+            >
+              Back to Home Dashboard
+            </Link>
+          </div>
         </div>
 
-        {/* Pincode Search component */}
-        <PincodeSearch
-          onLocationResolved={handleLocationResolved}
-          storageKey="nyaya_location_key"
-        />
-
-        {/* Error message */}
-        {error && (
-          <div className="max-w-4xl mx-auto mt-4 p-4 bg-red-50 dark:bg-[var(--danger-subtle)] text-red-700 dark:text-[var(--danger)] border border-red-200 dark:border-[var(--danger-subtle)] rounded-xl flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <div className="text-sm font-semibold">{error}</div>
+        {/* Feature Breakdown Cards */}
+        <div className="space-y-6">
+          <div className="text-center space-y-1">
+            <h2 className="text-xl font-extrabold text-[var(--text-primary)]">What to Expect When Launched</h2>
+            <p className="text-xs text-[var(--text-muted)]">Building a 100% transparent and verified legal counsel network</p>
           </div>
-        )}
 
-        {/* Empty State */}
-        {emptyState && (
-          <div className="flex flex-col items-center justify-center py-16 text-center max-w-lg mx-auto space-y-5">
-            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
-              <Briefcase className="w-8 h-8 text-slate-400" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-2">No advocates found for this PIN</h3>
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                No verified advocate is currently registered for your selected pincode. Try major city PINs like <strong>110001</strong> (Delhi), <strong>400001</strong> (Mumbai), or <strong>560001</strong> (Bengaluru).
-              </p>
-            </div>
-            {/* Next Update Banner */}
-            <div className="w-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-2xl p-4 text-left">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm">🔮</span>
-                <span className="text-xs font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Next Update — v2.1</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-[var(--card)] p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
+                <MapPin className="w-6 h-6" />
               </div>
-              <p className="text-sm font-bold text-[var(--text-primary)] mb-1">Pan-India Verified Advocate Network</p>
+              <h3 className="font-bold text-lg text-[var(--text-primary)]">PIN Code Proximity Match</h3>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                We are onboarding verified advocates from all 28 states and 8 union territories with Bar Council verification, video consultation, and direct WhatsApp booking.
+                Find practicing advocates within your specific district or municipal PIN code, with distance calculations from your local District Court or High Court bench.
+              </p>
+            </div>
+
+            <div className="bg-[var(--card)] p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-lg text-[var(--text-primary)]">State Bar Verification</h3>
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                Every listed advocate undergoes credential verification including State Bar Enrollment Numbers, active practice standing, and specializations audit.
+              </p>
+            </div>
+
+            <div className="bg-[var(--card)] p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 flex items-center justify-center">
+                <Clock className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-lg text-[var(--text-primary)]">Direct Appointment Booking</h3>
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                Book confidential 1-on-1 consultation calls, schedule chamber meetings, and share legal evidence packages securely before your hearing date.
               </p>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Loading Spinner */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-16 text-[var(--text-muted)] space-y-3">
-            <Loader2 className="animate-spin h-8 w-8 text-[var(--primary)] dark:text-blue-500" />
-            <p className="text-xs font-semibold">Searching verified database...</p>
-          </div>
-        )}
-
-        {/* Advocates Listings Grid */}
-        {!loading && advocates.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-            {advocates.map((adv) => (
-              <div
-                key={adv.id}
-                className="bg-[var(--card)] rounded-2xl shadow-sm border border-[var(--border)] p-6 flex flex-col justify-between hover-lift transition-all duration-200"
-              >
-                <div>
-                  <div className="flex gap-4">
-                    {/* Avatar */}
-                    <div className="w-16 h-16 rounded-full bg-slate-200 dark:bg-[var(--card)]/5 overflow-hidden flex-shrink-0">
-                      {adv.photo_url ? (
-                        <img src={adv.photo_url} alt={adv.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-white/20 font-bold">
-                          {adv.name[0]}
-                        </div>
-                      )}
-                    </div>
-                    {/* Details */}
-                    <div className="space-y-1">
-                      <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-                        {adv.name}
-                        <span className="text-[10px] font-extrabold uppercase tracking-wide px-1.5 py-0.5 rounded bg-green-500/10 text-[var(--success)]">
-                          Verified
-                        </span>
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-white/40 font-medium">
-                        ⚖️ {adv.court_association}
-                      </p>
-                      <div className="flex items-center gap-1 text-xs font-bold text-amber-500">
-                        <Star className="w-3.5 h-3.5 fill-amber-500 stroke-none" />
-                        {adv.rating.toFixed(1)} <span className="text-slate-400 dark:text-[var(--text-muted)] font-medium">({adv.reviews_count} reviews)</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-                    <div className="flex items-center gap-1.5 text-[var(--text-muted)]">
-                      <Briefcase className="w-4 h-4 text-slate-400 dark:text-[var(--text-muted)]" />
-                      <span>{adv.experience_years} Years Experience</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-[var(--text-muted)]">
-                      <Clock className="w-4 h-4 text-slate-400 dark:text-[var(--text-muted)]" />
-                      <span className="text-green-500">{adv.availability_status}</span>
-                    </div>
-                  </div>
-
-                  {/* Practice Areas */}
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {parseJsonStr(adv.practice_areas).map((area, i) => (
-                      <span
-                        key={i}
-                        className="text-[10px] font-extrabold text-indigo-600 dark:text-[var(--primary)] bg-[var(--primary-subtle)] bg-[var(--primary-subtle)] px-2 py-0.5 rounded-md border border-indigo-100 dark:border-blue-500/20 uppercase tracking-wide"
-                      >
-                        {area}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t border-slate-100 dark:border-[var(--border)] space-y-1.5 text-xs text-slate-500 dark:text-white/40">
-                    <div className="flex items-start gap-2">
-                      <MapPin className="w-4 h-4 text-slate-400 dark:text-[var(--text-muted)] mt-0.5 shrink-0" />
-                      <span>Office: {adv.office_address}</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <BookOpen className="w-4 h-4 text-slate-400 dark:text-[var(--text-muted)] mt-0.5 shrink-0" />
-                      <span>Languages: {parseJsonStr(adv.languages).join(', ')}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 flex items-center justify-between border-t border-slate-100 dark:border-[var(--border)] pt-4">
-                  <div className="flex flex-col">
-                    <span className="text-[9px] uppercase tracking-wider text-slate-400 dark:text-[var(--text-muted)]">Consultation Fee</span>
-                    <span className="text-lg font-black text-[var(--text-primary)]">
-                      ₹{adv.consultation_fees}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => startBooking(adv)}
-                    className="px-5 py-2.5 bg-indigo-650 hover:bg-[var(--primary-hover)] text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-500/10 flex items-center gap-1.5"
-                  >
-                    <span>Book Session</span>
-                    <ChevronRight size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Booking Dialog Modal */}
-        {bookingStatus !== 'idle' && selectedAdvocate && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-[var(--card)] border border-[var(--border)] rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4">
-              
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-[var(--border)] pb-3">
-                <h3 className="text-base font-bold text-[var(--text-primary)]">
-                  {bookingStatus === 'success' ? 'Consultation Booked' : 'Confirm Consultation'}
-                </h3>
-                <button
-                  onClick={() => setBookingStatus('idle')}
-                  className="p-1 rounded-lg hover:bg-[var(--card-elevated)] text-slate-400 dark:text-[var(--text-muted)]"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-
-              {bookingStatus === 'confirming' && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-[var(--card)]/5 overflow-hidden">
-                      <img src={selectedAdvocate.photo_url} alt="" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-slate-800 dark:text-slate-200">{selectedAdvocate.name}</div>
-                      <div className="text-[10px] text-slate-400 dark:text-[var(--text-muted)]">{selectedAdvocate.court_association}</div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-bold text-slate-400 dark:text-[var(--text-muted)] uppercase">Select Date</label>
-                      <input
-                        type="date"
-                        value={bookingDate}
-                        onChange={(e) => setBookingDate(e.target.value)}
-                        className="px-3 py-2 bg-slate-50 dark:bg-[var(--card)]/[0.02] border border-slate-250 dark:border-[var(--border)] rounded-xl text-[var(--text-primary)] text-xs font-semibold focus:outline-none"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-bold text-slate-400 dark:text-[var(--text-muted)] uppercase">Select Time Slot</label>
-                      <select
-                        value={bookingTime}
-                        onChange={(e) => setBookingTime(e.target.value)}
-                        className="px-3 py-2 bg-slate-50 dark:bg-[var(--card)]/[0.02] border border-slate-250 dark:border-[var(--border)] rounded-xl text-[var(--text-primary)] text-xs font-semibold focus:outline-none"
-                      >
-                        <option value="">Choose a slot...</option>
-                        <option value="10:00 AM - 10:30 AM">10:00 AM - 10:30 AM</option>
-                        <option value="11:30 AM - 12:00 PM">11:30 AM - 12:00 PM</option>
-                        <option value="02:30 PM - 03:00 PM">02:30 PM - 03:00 PM</option>
-                        <option value="04:00 PM - 04:30 PM">04:00 PM - 04:30 PM</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between border-t border-slate-100 dark:border-[var(--border)] pt-4 text-xs">
-                    <div className="flex flex-col">
-                      <span className="text-[9px] uppercase tracking-wider text-slate-400 dark:text-[var(--text-muted)]">Total Consultation Fee</span>
-                      <span className="text-base font-black text-[var(--text-primary)]">
-                        ₹{selectedAdvocate.consultation_fees}
-                      </span>
-                    </div>
-                    <button
-                      onClick={submitBooking}
-                      disabled={!bookingDate || !bookingTime}
-                      className="px-5 py-2.5 bg-indigo-650 hover:bg-[var(--primary-hover)] disabled:bg-slate-200 dark:disabled:bg-slate-800 dark:bg-[var(--card)]/5 text-white text-xs font-bold rounded-xl transition-all shadow"
-                    >
-                      Confirm Book
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {bookingStatus === 'pending' && (
-                <div className="flex flex-col items-center justify-center py-8 text-[var(--text-muted)] space-y-3">
-                  <Loader2 className="animate-spin h-8 w-8 text-[var(--primary)] dark:text-blue-500" />
-                  <p className="text-xs font-semibold">Processing booking request...</p>
-                </div>
-              )}
-
-              {bookingStatus === 'success' && (
-                <div className="text-center py-6 space-y-4">
-                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-2 animate-bounce" />
-                  <h3 className="text-lg font-black text-[var(--text-primary)]">Request Sent Successfully</h3>
-                  <p className="text-xs text-[var(--text-muted)] leading-relaxed max-w-sm mx-auto">
-                    Your consultation request is pending confirmation from <strong>{selectedAdvocate.name}</strong>. You will be notified once it is accepted.
-                  </p>
-                  <button
-                    onClick={() => setBookingStatus('idle')}
-                    className="w-full px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-[var(--card)]/5 dark:hover:bg-[var(--card-elevated)] text-slate-700 dark:text-white/80 rounded-xl text-xs font-bold transition-colors"
-                  >
-                    Close
-                  </button>
-                </div>
-              )}
-
+        {/* Advocate Onboarding Form Section */}
+        <div className="bg-[var(--card)] rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-10 shadow-sm grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold border border-emerald-500/20">
+              <Users className="w-3.5 h-3.5" /> For Legal Professionals
             </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)]">
+              Are you a Bar Council Verified Advocate?
+            </h2>
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed">
+              Join India's fastest growing digital legal platform. Expand your practice reach and assist citizens seeking specialized legal counsel in your district.
+            </p>
+
+            <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 pt-2">
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Verified badge & public profile listing</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Direct client appointment scheduling</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Zero listing fees for active Bar Council members</span>
+              </li>
+            </ul>
           </div>
-        )}
+
+          <div className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+            {onboardSubmitted ? (
+              <div className="text-center p-8 space-y-3">
+                <CheckCircle2 className="w-12 h-12 mx-auto text-emerald-500" />
+                <h3 className="font-bold text-lg text-[var(--text-primary)]">Registration Application Received!</h3>
+                <p className="text-xs text-[var(--text-muted)]">
+                  Our verification team will review your Bar Enrollment details and contact you shortly.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <h3 className="font-bold text-base text-[var(--text-primary)] mb-2">Apply for Advocate Onboarding</h3>
+                
+                <div>
+                  <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1">Full Advocate Name</label>
+                  <input 
+                    type="text"
+                    required
+                    placeholder="Adv. Priyanshu Rai"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full p-3 rounded-xl bg-[var(--card)] border border-slate-200 dark:border-slate-800 text-xs focus:ring-2 focus:ring-[#FF9933]/50 outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1">Email Address</label>
+                    <input 
+                      type="email"
+                      required
+                      placeholder="advocate@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full p-3 rounded-xl bg-[var(--card)] border border-slate-200 dark:border-slate-800 text-xs focus:ring-2 focus:ring-[#FF9933]/50 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1">Bar Enrollment No.</label>
+                    <input 
+                      type="text"
+                      required
+                      placeholder="D/1234/2020"
+                      value={formData.barNumber}
+                      onChange={(e) => setFormData({ ...formData, barNumber: e.target.value })}
+                      className="w-full p-3 rounded-xl bg-[var(--card)] border border-slate-200 dark:border-slate-800 text-xs focus:ring-2 focus:ring-[#FF9933]/50 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3.5 rounded-xl bg-[#FF9933] hover:bg-orange-600 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2"
+                >
+                  <Send className="w-4 h-4" /> Submit Onboarding Request
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
 
       </div>
     </div>

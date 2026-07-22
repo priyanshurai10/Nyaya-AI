@@ -171,11 +171,11 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const getLabel = (key: string): string => {
     const labels: Record<string, Record<string, string>> = {
       '/journey': { hi: 'अदालत पदानुक्रम', bn: 'আদালতের শ্রেণিবিন্যাস', ta: 'நீதிமன்ற படிநிலை', te: 'కోర్టు సోపానక్రమం', en: 'Court Hierarchy' },
-      '/judges': { hi: 'न्यायाधीश निर्देशिका', bn: 'বিচারকদের তথ্য', ta: 'நீதிபதி அடைவு', te: 'న్యాయమూర్తుల డైరెక్టరీ', en: 'Judge Directory' },
+      '/judges': { hi: 'न्यायाधीश निर्देशिका', bn: 'বিচারকদের जानकारी', ta: 'நீதிபதி அடைவு', te: 'న్యాయమూర్తుల డైరెక్టరీ', en: 'Judge Directory' },
       '/nyaya-path': { hi: 'न्याय पथ™ नेविगेटर', bn: 'ন্যায় পথ™', ta: 'நியாயா பாதை™', te: 'న్యాయ మార్గం™', en: 'NYAYA PATH™ Navigator' },
-      '/evidence-vault': { hi: 'एआई साक्ष्य तिजोरी', bn: 'এআই প্রমাণ ভল্ট', ta: 'ஏஐ சான்று பெட்டகம்', te: 'ఏఐ साक్ష్యాల వాల్ట్', en: 'AI Evidence Vault' },
-      '/academy': { hi: 'कानूनी शिक्षा अकादमी', bn: 'আইনি শিক্ষা একাডেমি', ta: 'சட்டக் கல்வி அகாடமி', te: 'న్యాయ విద్యా అకాడమీ', en: 'Legal Academy' },
-      '/advocates': { hi: 'वकील खोजें', bn: 'উকিল খুঁজুন', ta: 'வழக்கறிஞரை தேடுங்கள்', te: 'న్యాయవాది కనుగొనండి', en: 'Find Advocates' },
+      '/evidence-vault': { hi: 'एआई साक्ष्य तिजोरी', bn: 'এআই প্রমাণ ভল্ট', ta: 'ஏஐ சான்று பெட்டகம்', te: 'ఏఐ సాక్ష్యాల వాల్ట్', en: 'AI Evidence Vault' },
+      '/academy': { hi: 'कानूनी शिक्षा अकादमी', bn: 'আইনি শিক্ষা একাডেমি', ta: 'சட்டக் கல்வி அகாடமி', te: 'న్యాయ విద్యా అకాడమీ', en: 'Legal Learning Academy' },
+      '/advocates': { hi: 'वकील खोजें (आगामी)', bn: 'উকিল খুঁজুন', ta: 'வழக்கறிஞரை தேடுங்கள்', te: 'న్యాయవాది కనుగొనండి', en: 'Find Advocates (Upcoming)' },
       '/cases': { hi: 'केस फ़ोल्डर्स', bn: 'কেস ফোল্ডার', ta: 'வழக்கு கோப்புகள்', te: 'కేసు ఫోల్డర్లు', en: 'Case Management' },
       '/calendar': { hi: 'एजेंडा कैलेंडर', bn: 'এজেন্ডা ক্যালেন্ডার', ta: 'அஜண்டா நாட்காட்டி', te: 'ఎజెండా క్యాలెండర్', en: 'Agenda Calendar' },
       '/document-generator': { hi: 'दस्तावेज जनरेटर', bn: 'নথি জেনারেটর', ta: 'ஆவண ஜெனரேட்டர்', te: 'డాక్యుమెంట్ జనరేటర్', en: 'Document Drafting Hub' },
@@ -196,10 +196,10 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       items: [
         { path: '/', label: t('sidebarHome') || 'Home Dashboard', icon: House },
         { path: '/chat', label: t('sidebarChat') || 'AI Legal Assistant', icon: MessageSquare, badge: 'AI', badgeType: 'primary' },
-        { path: '/advocates', label: getLabel('/advocates'), icon: Award },
+        { path: '/advocates', label: getLabel('/advocates'), icon: Award, badge: 'Soon', badgeType: 'warning' },
         { path: '/nyaya-path', label: getLabel('/nyaya-path'), icon: Route },
         { path: '/documents', label: t('sidebarDoc') || 'Document Analyzer', icon: FileText },
-        { path: '/map', label: 'Verified Courts Map', icon: MapPin },
+        { path: '/map', label: 'Court & Emergency Station Finder', icon: MapPin, badge: 'Soon', badgeType: 'warning' },
         { path: '/document-generator', label: getLabel('/document-generator'), icon: FilePenLine },
         { path: '/marketplace', label: getLabel('/marketplace'), icon: ShoppingBag },
       ],
