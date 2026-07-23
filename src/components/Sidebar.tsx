@@ -110,65 +110,53 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   // Dynamic Navigation Groups
   const navGroups: NavGroup[] = [
     {
-      title: 'Core Console',
+      title: t('catCore') || 'Core Console',
       items: [
-        { path: '/dashboard', label: 'Home Dashboard', icon: House },
+        { path: '/dashboard', label: t('navHome') || 'Home Dashboard', icon: House },
         { path: '/chat', label: t('navChat') || 'AI Legal Chat', icon: MessageSquare, badge: 'AI', badgeType: 'primary' },
-        { path: '/advocates', label: 'Find Advocates (Upcoming)', icon: Award, badge: 'Soon', badgeType: 'warning' },
-        { path: '/nyaya-path', label: 'NYAYA PATH™ Navigator', icon: Route },
-        { path: '/risk', label: 'AI Risk Analyzer', icon: ShieldAlert, badge: 'AI', badgeType: 'primary' },
-        { path: '/map', label: 'Court & Emergency Finder (Upcoming)', icon: MapPin, badge: 'Soon', badgeType: 'warning' },
-        { path: '/document-generator', label: 'Document Drafting Hub', icon: FilePenLine },
-        { path: '/marketplace', label: 'Services Marketplace', icon: ShoppingBag },
+        { path: '/advocates', label: t('navAdvocates') || 'Find Advocates', icon: Award, badge: 'Soon', badgeType: 'warning' },
+        { path: '/nyaya-path', label: t('navNyayaPath') || 'NYAYA PATH™ Navigator', icon: Route },
+        { path: '/risk', label: t('navRisk') || 'AI Risk Analyzer', icon: ShieldAlert, badge: 'AI', badgeType: 'primary' },
+        { path: '/map', label: t('navMap') || 'Court & Emergency Finder', icon: MapPin, badge: 'Soon', badgeType: 'warning' },
+        { path: '/document-generator', label: t('navDocGen') || 'Document Drafting Hub', icon: FilePenLine },
+        { path: '/marketplace', label: t('navMarketplace') || 'Services Marketplace', icon: ShoppingBag },
       ],
     },
     {
-      title: 'Legal Aid & Drafts',
+      title: t('catAid') || 'Legal Aid & Drafts',
       items: [
-        { path: '/knowledge', label: 'Knowledge Center', icon: Scale },
-        { path: '/journey', label: 'Legal Rights Guide', icon: Shield },
-        { path: '/strategy', label: 'Strategy Engine', icon: ShieldCheck },
-        { path: '/judge-simulator', label: 'Judge Simulator', icon: Gavel },
-        { path: '/drafts', label: 'Draft Generation', icon: FileCode },
+        { path: '/knowledge', label: t('navKnowledge') || 'Knowledge Center', icon: Scale },
+        { path: '/journey', label: t('navJourney') || 'Legal Rights Guide', icon: Shield },
+        { path: '/strategy', label: t('navStrategy') || 'Strategy Engine', icon: ShieldCheck },
+        { path: '/judge-simulator', label: t('navJudge') || 'Judge Simulator', icon: Gavel },
+        { path: '/drafts', label: t('navDrafts') || 'Draft Generation', icon: FileCode },
         { path: '/emergency', label: t('navEmergency') || 'Emergency Help', icon: Heart, badge: 'SOS', badgeType: 'warning' },
       ],
     },
     {
-      title: 'Case Management',
+      title: t('catCase') || 'Case Management',
       items: [
-        { path: '/cases', label: 'Case Folders', icon: Briefcase },
-        { path: '/evidence-vault', label: 'Evidence Vault', icon: FolderOpen },
-        { path: '/calendar', label: 'Court Calendar', icon: Calendar },
-        { path: '/documents', label: 'Document Vault', icon: Archive },
+        { path: '/cases', label: t('navCases') || 'Case Folders', icon: Briefcase },
+        { path: '/evidence-vault', label: t('navVault') || 'Evidence Vault', icon: FolderOpen },
+        { path: '/calendar', label: t('navCalendar') || 'Court Calendar', icon: Calendar },
+        { path: '/documents', label: t('navDocuments') || 'Document Vault', icon: Archive },
       ],
     },
     {
-      title: 'Education & Community',
+      title: t('catEdu') || 'Education & Community',
       items: [
-        { path: '/academy', label: 'Legal Learning Academy', icon: BookOpen },
-        { path: '/judgments', label: 'Landmark Judgments', icon: Bookmark },
-        { path: '/notifications', label: 'Legal Alerts & News', icon: Bell },
+        { path: '/academy', label: t('navAcademy') || 'Legal Learning Academy', icon: BookOpen },
+        { path: '/judgments', label: t('navJudgments') || 'Landmark Judgments', icon: Bookmark },
       ],
     },
     {
-      title: 'System',
+      title: t('catSystem') || 'System',
       items: [
-        { path: '/trust-privacy', label: 'Trust & Privacy', icon: ShieldCheck },
-        { path: '/observability', label: 'System Observability', icon: Building },
+        { path: '/trust-privacy', label: t('navTrust') || 'Trust & Privacy', icon: ShieldCheck },
+        { path: '/observability', label: t('navObservability') || 'System Observability', icon: Building },
       ],
     },
   ];
-
-  if (userData?.is_admin) {
-    navGroups.push({
-      title: 'Administration',
-      items: [
-        { path: '/admin', label: 'Admin Console', icon: Building, badge: 'ADMIN', badgeType: 'primary' },
-        { path: '/admin/marketplace', label: 'Manage Services', icon: ShoppingBag },
-        { path: '/admin/payments', label: 'Payment Ledger', icon: FileText },
-      ],
-    });
-  }
 
   const toggleGroup = (title: string) => {
     setCollapsedGroups((prev) => {

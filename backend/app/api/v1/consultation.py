@@ -1,20 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Form, UploadFile, File
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime
 import uuid
 import random
 import os
-import shutil
 import re
 
+from supabase import create_client, Client
 from app.core.database import get_db
-from app.models import User, ConsultationRequest, Transaction, AuditLog, PaymentSettings, Notification
+from app.models import User, ConsultationRequest, Transaction, AuditLog, Notification
 from app.core.auth import get_current_user
 from app.core.config import settings
 from app.core.email_service import send_admin_new_payment_request
 
 router = APIRouter()
+
+# Initialize Supabase Client
+supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
 def log_audit(db: Session, action_type: str, action_desc: str, user_id: Optional[str] = None):
     audit = AuditLog(
@@ -30,7 +33,7 @@ def log_audit(db: Session, action_type: str, action_desc: str, user_id: Optional
 
 @router.post("/request")
 def create_consultation_request(
-    request_type: str = Form(...), # "callback", "email", "pay_now"
+    request_type: str = Form(...),
     service_name: str = Form(...),
     full_name: str = Form(...),
     mobile_number: Optional[str] = Form(None),
@@ -101,7 +104,7 @@ def create_consultation_request(
 def submit_payment(
     service_name: str = Form(...),
     amount: int = Form(...),
-    payment_method: str = Form(...), # "upi", "qr", "card", "netbanking"
+    payment_method: str = Form(...),
     full_name: Optional[str] = Form(None),
     mobile_number: Optional[str] = Form(None),
     preferred_language: Optional[str] = Form(None),
@@ -121,7 +124,6 @@ def submit_payment(
     )
     db.add(tx)
     
-    # Use provided details or fallback to logged-in user details
     clean_name = full_name.strip() if (full_name and full_name.strip()) else user.name
     clean_mobile = mobile_number if mobile_number else user.mobile
     
@@ -168,20 +170,26 @@ def verify_payment(
     if not screenshot.filename:
         raise HTTPException(status_code=400, detail="Screenshot is required.")
 
-    # Save screenshot
+    # Upload to Supabase Storage
     ext = os.path.splitext(screenshot.filename)[1]
     filename = f"tx_{tx_id}{ext}"
-    filepath = os.path.join(settings.UPLOAD_DIR, filename)
-    with open(filepath, "wb") as buffer:
-        shutil.copyfileobj(screenshot.file, buffer)
+    file_bytes = screenshot.file.read()
+
+    try:
+        supabase.storage.from_("payments").upload(
+            file=file_bytes, 
+            path=filename, 
+            file_options={"content-type": screenshot.content_type}
+        )
+        public_url = supabase.storage.from_("payments").get_public_url(filename)
+        tx.screenshot_path = public_url
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload screenshot to storage: {str(e)}")
 
     tx.utr_number = utr_number
-    tx.screenshot_path = f"/uploads/{filename}"
     tx.status = "under_review"
-    
     req.status = "Payment Under Review"
 
-    # Create user notification in DB
     notif = Notification(
         id=str(uuid.uuid4()),
         user_id=user.id,
@@ -194,7 +202,6 @@ def verify_payment(
     db.add(notif)
     db.commit()
 
-    # Automatically send email to Admin immediately after payment request
     try:
         send_admin_new_payment_request(
             user_name=req.full_name or user.name,
@@ -204,7 +211,7 @@ def verify_payment(
             amount=float(tx.amount),
             utr_number=utr_number,
             payment_id=tx.id,
-            screenshot_path=filepath,
+            screenshot_path=tx.screenshot_path,
             submitted_at=tx.created_at or datetime.utcnow()
         )
     except Exception as e:
@@ -225,6 +232,6 @@ def list_orders(db: Session = Depends(get_db), user: User = Depends(get_current_
             "request_type": o.request_type,
             "status": o.status,
             "created_at": o.created_at.isoformat(),
-            "transaction": None # simplified
+            "transaction": None
         })
     return {"success": True, "data": res}

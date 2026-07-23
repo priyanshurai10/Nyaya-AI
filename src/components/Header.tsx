@@ -14,7 +14,6 @@ import {
   Globe,
   Moon,
   Sun,
-  Bell,
   User,
   LogOut,
   X,
@@ -71,7 +70,6 @@ export default function Header({
 
   // Dropdowns
   const [langOpen, setLangOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
   // Search state
@@ -416,7 +414,6 @@ export default function Header({
             <button
               onClick={() => {
                 setLangOpen(!langOpen);
-                setNotifOpen(false);
                 setProfileOpen(false);
                 setCityListOpen(false);
               }}
@@ -448,59 +445,12 @@ export default function Header({
             )}
           </div>
 
-          {/* Notifications */}
-          <div className="relative">
-            <button
-              onClick={() => {
-                setNotifOpen(!notifOpen);
-                setLangOpen(false);
-                setProfileOpen(false);
-                setCityListOpen(false);
-              }}
-              className="p-2 rounded-xl hover:bg-[var(--card-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors relative"
-            >
-              <Bell size={18} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--danger)] rounded-full" />
-            </button>
-
-            {notifOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 shadow-2xl z-50 animate-scale-in">
-                <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
-                  <h4 className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
-                    Notifications
-                  </h4>
-                  <span className="text-[9px] font-extrabold text-[var(--primary)] bg-[var(--primary-subtle)] px-1.5 py-0.5 rounded">
-                    3 New
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  {notifications.map((n) => (
-                    <div key={n.id} className="text-left">
-                      <p className="text-xs text-[var(--text-primary)] font-medium leading-relaxed">
-                        {n.text}
-                      </p>
-                      <span className="text-[10px] text-[var(--text-muted)] mt-0.5 block">
-                        {n.time}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-3 pt-3 border-t border-[var(--border)] text-center">
-                  <Link href="/notifications" onClick={() => setNotifOpen(false)} className="text-xs font-bold text-[var(--primary)] hover:underline">
-                    View All Notifications
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Profile Dropdown */}
           <div className="relative">
             <button
               onClick={() => {
                 setProfileOpen(!profileOpen);
                 setLangOpen(false);
-                setNotifOpen(false);
                 setCityListOpen(false);
               }}
               className="p-2 rounded-xl hover:bg-[var(--card-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
@@ -545,16 +495,6 @@ export default function Header({
                         <BookOpen size={14} className="text-blue-500" />
                         <span>Dashboard</span>
                       </Link>
-                      {(userData?.is_admin || userData?.role === 'ADMIN' || userData?.email?.toLowerCase().includes('priyanshurai121111')) && (
-                        <Link
-                          href="/admin"
-                          onClick={() => setProfileOpen(false)}
-                          className="w-full py-1.5 px-2 bg-orange-500/10 text-[#FF9933] border border-orange-500/20 rounded-lg text-xs font-bold transition-all flex items-center gap-2 mt-1"
-                        >
-                          <Landmark size={14} />
-                          <span>Admin Control Center</span>
-                        </Link>
-                      )}
                     </div>
                     <button
                       onClick={handleLogout}

@@ -45,17 +45,30 @@ export async function GET(request: Request) {
     }
 
     const userId = (payload.id || payload.sub) as string;
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "Invalid token payload structure." },
-        { status: 401 }
-      );
-    }
+    const tokenEmail = (payload.email as string) || "";
 
-    // 3. Query user from Database
-    const user = await prisma.user.findUnique({
-      where: { id: userId }
+    // 3. Query user from Database (by ID or email)
+    let user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          ...(userId ? [{ id: userId }] : []),
+          ...(tokenEmail ? [{ email: tokenEmail }] : [])
+        ]
+      }
     });
+
+    if (!user && tokenEmail) {
+      // Auto-create user record if not present
+      user = await prisma.user.create({
+        data: {
+          id: userId || `usr-${Date.now()}`,
+          email: tokenEmail,
+          name: tokenEmail.split('@')[0] || "Citizen",
+          passwordHash: "$2a$10$dummyHashForAutoCreatedProfileUserAccountKey2026",
+          role: tokenEmail.toLowerCase().includes("priyanshurai121111") ? "ADMIN" : "USER"
+        }
+      });
+    }
 
     if (!user) {
       return NextResponse.json(
@@ -64,14 +77,32 @@ export async function GET(request: Request) {
       );
     }
 
-    // 4. Query relational records from Database
-    const [payments, consultations, notifications, documents, timeline] = await Promise.all([
-      prisma.payment.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } }),
-      prisma.consultation.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } }),
-      prisma.notification.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } }),
-      prisma.fileMetadata.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } }),
-      prisma.userActivityTimeline.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } }),
-    ]);
+    // 4. Safely query relational records from Database with fallbacks
+    let payments: any[] = [];
+    let consultations: any[] = [];
+    let notifications: any[] = [];
+    let documents: any[] = [];
+    let timeline: any[] = [];
+
+    try {
+      payments = await prisma.payment.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
+    } catch (e) {}
+
+    try {
+      consultations = await prisma.consultation.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
+    } catch (e) {}
+
+    try {
+      notifications = await prisma.notification.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
+    } catch (e) {}
+
+    try {
+      documents = await prisma.fileMetadata.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
+    } catch (e) {}
+
+    try {
+      timeline = await prisma.userActivityTimeline.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
+    } catch (e) {}
 
     const isSuper = user.email && user.email.toLowerCase().includes("priyanshurai121111");
 
@@ -82,7 +113,7 @@ export async function GET(request: Request) {
         id: user.id,
         name: user.name,
         email: user.email,
-        phone: user.phone,
+        phone: user.phone || "",
         role: isSuper ? "ADMIN" : user.role,
         is_admin: isSuper || user.role === "ADMIN",
         createdAt: user.createdAt ? user.createdAt.toISOString() : null
@@ -90,8 +121,8 @@ export async function GET(request: Request) {
       data: {
         personal_information: {
           id: user.id,
-          name: user.name,
-          email: user.email,
+          name: user.name || "",
+          email: user.email || "",
           phone: user.phone || "",
           dob: user.dob || "",
           gender: user.gender || "",
@@ -99,30 +130,33 @@ export async function GET(request: Request) {
           blood_group: user.bloodGroup || "",
           occupation: user.occupation || "",
           education: user.education || "",
+          address: user.address || "",
+          state: user.state || "",
+          district: user.district || "",
+          pincode: user.pincode || "",
+          preferred_language: user.preferredLanguage || "en",
           avatar_url: "",
-        },
-        sensitive_identity: {
-          aadhaar_encrypted: !!user.aadhaarEnc,
-          pan_encrypted: !!user.panEnc,
-          aadhaar_masked: user.aadhaarEnc ? "XXXX-XXXX-1234" : "Not Uploaded",
-          pan_masked: user.panEnc ? "XXXXX1234X" : "Not Uploaded",
+          is_admin: isSuper || user.role === "ADMIN",
         },
         payment_history: payments.map(p => ({
+          id: p.id,
           payment_id: p.id,
           amount: p.amount,
           utr_number: p.utrNumber,
           screenshot_url: p.screenshotUrl,
           status: p.status,
-          created_at: p.createdAt.toISOString(),
+          created_at: p.createdAt ? p.createdAt.toISOString() : "",
         })),
         consultation_history: consultations.map(c => ({
+          id: c.id,
           consultation_id: c.id,
+          service_name: c.category || "Legal Consultation",
           legal_issue: c.category,
           scheduled_date: c.scheduledDate,
           scheduled_time: c.scheduledTime,
           meeting_mode: c.meetingMode,
           status: c.status,
-          created_at: c.createdAt.toISOString(),
+          created_at: c.createdAt ? c.createdAt.toISOString() : "",
         })),
         notifications: notifications.map(n => ({
           id: n.id,
@@ -130,7 +164,7 @@ export async function GET(request: Request) {
           message: n.message,
           category: n.category,
           is_read: n.isRead,
-          created_at: n.createdAt.toISOString(),
+          created_at: n.createdAt ? n.createdAt.toISOString() : "",
         })),
         documents: documents.map(d => ({
           id: d.id,
@@ -139,14 +173,14 @@ export async function GET(request: Request) {
           category: d.category,
           file_size: d.fileSize,
           mime_type: d.mimeType,
-          created_at: d.createdAt.toISOString(),
+          created_at: d.createdAt ? d.createdAt.toISOString() : "",
         })),
         timeline: timeline.map(t => ({
           id: t.id,
           type: t.activityType,
           title: t.title,
           description: t.description,
-          created_at: t.createdAt.toISOString(),
+          created_at: t.createdAt ? t.createdAt.toISOString() : "",
         })),
       }
     });

@@ -1,9 +1,14 @@
 import os
 import re
 import hashlib
+import uuid
 from typing import Tuple, Dict, List, Optional, Any
 from cryptography.fernet import Fernet
+from fastapi import HTTPException, status, Depends
+
 from app.core.config import settings
+from app.core.auth import get_current_user
+from app.models.user import User
 
 # Initialize Fernet cryptography
 try:
@@ -14,7 +19,30 @@ except Exception as e:
     cipher_suite = Fernet(fallback_key)
 
 # ---------------------------------------------------------
-# 1. Symmetric Data Encryption
+# 1. Super Admin Authorization
+# ---------------------------------------------------------
+SUPER_ADMIN_EMAIL = "priyanshurai121111@gmail.com"
+
+def verify_super_admin(current_user: User = Depends(get_current_user)) -> User:
+    """
+    Dependency to enforce Super Admin only access.
+    Strict exact-match email validation.
+    """
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required."
+        )
+    
+    if not current_user.email or current_user.email.lower().strip() != SUPER_ADMIN_EMAIL:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access restricted to Super Admin only."
+        )
+    return current_user
+
+# ---------------------------------------------------------
+# 2. Symmetric Data Encryption
 # ---------------------------------------------------------
 def encrypt_data(plain_text: Optional[str]) -> Optional[str]:
     if not plain_text:
@@ -37,7 +65,7 @@ def decrypt_data(cipher_text: Optional[str]) -> Optional[str]:
         return cipher_text
 
 # ---------------------------------------------------------
-# 2. Prompt Injection Protection
+# 3. Prompt Injection Protection
 # ---------------------------------------------------------
 INJECTION_KEYWORDS = [
     r"ignore\s+(?:the\s+)?(?:above|previous|instruction|system)",
@@ -86,7 +114,7 @@ def detect_prompt_injection(text: str) -> Dict[str, Any]:
     return {"is_injection": False, "confidence_score": 0.0, "reason": ""}
 
 # ---------------------------------------------------------
-# 3. Document Integrity Validation
+# 4. Document Integrity Validation
 # ---------------------------------------------------------
 ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.jpg', '.jpeg', '.png', '.txt', '.md'}
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB limit
@@ -128,7 +156,7 @@ def verify_document_integrity(file_bytes: bytes, filename: str) -> Tuple[bool, s
     return True, "File integrity verified."
 
 # ---------------------------------------------------------
-# 4. Agent Role Permission Control
+# 5. Agent Role Permission Control
 # ---------------------------------------------------------
 AGENT_ROLES: Dict[str, List[str]] = {
     "legal_agent": ["analyze_document", "read_legal_memory", "write_legal_response", "cite_laws"],
@@ -150,6 +178,9 @@ def validate_agent_permission(agent_name: str, action: str) -> Tuple[bool, str]:
         
     return True, "Action authorized."
 
+# ---------------------------------------------------------
+# 6. Audit Logging
+# ---------------------------------------------------------
 def log_audit_event(
     db,
     action_type: str,
@@ -162,8 +193,10 @@ def log_audit_event(
 ):
     if db is None:
         return
-    import uuid
-    from app.models import AuditLog
+    
+    # Imported locally to prevent circular imports if models import from security
+    from app.models import AuditLog 
+    
     # Hash IP for privacy
     ip_hash = None
     if client_ip:
@@ -184,4 +217,3 @@ def log_audit_event(
         db.commit()
     except Exception as e:
         print(f"Failed to log audit event: {e}")
-

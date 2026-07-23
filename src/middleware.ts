@@ -5,10 +5,10 @@ import { jwtVerify } from 'jose';
 const SECRET_KEY = new TextEncoder().encode(
   process.env.JWT_SECRET || "nyaya_ai_super_secret_jwt_key_2026_production"
 );
+
 function isSuperAdminEmail(e?: string): boolean {
   if (!e) return false;
-  const clean = e.toLowerCase().trim();
-  return clean === "priyanshurai121111@gmail.com" || clean === "priyanshurai1211111@gmail.com" || clean.startsWith("priyanshurai121111");
+  return e.toLowerCase().trim() === "priyanshurai121111@gmail.com";
 }
 
 export async function middleware(req: NextRequest) {
@@ -42,33 +42,24 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // Completely redirect removed UI routes (/admin, /notifications) to /dashboard
+  if (path.startsWith('/admin') || path.startsWith('/notifications')) {
+    return NextResponse.redirect(new URL(isAuthed ? '/dashboard' : '/auth', req.url));
+  }
+
   // Define protected routes
   const isProtectedUI = 
     path.startsWith('/dashboard') || 
-    path.startsWith('/admin') ||
-    path.startsWith('/bookmarks') ||
-    path.startsWith('/learning-progress') ||
-    path.startsWith('/notifications') ||
     path.startsWith('/consultation') ||
     path.startsWith('/evidence-vault') ||
     path.startsWith('/payments');
-
-  // Protect Admin UI: Super Admin email or ADMIN role required
-  if (path.startsWith('/admin')) {
-    if (!isAuthed) {
-      return NextResponse.redirect(new URL(`/auth?redirect=${encodeURIComponent(path)}&error=AdminAccessDenied`, req.url));
-    }
-    if (role !== 'ADMIN' && !isSuperAdminEmail(email)) {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
-    }
-  }
 
   // Protect general UI
   if (isProtectedUI && !isAuthed) {
     return NextResponse.redirect(new URL(`/auth?redirect=${encodeURIComponent(path)}`, req.url));
   }
 
-  // Protect API routes
+  // Protect API routes (Removed dead APIs)
   const isProtectedApi = 
     (path.startsWith('/api/v1/user') && 
      !path.startsWith('/api/v1/user/login') && 
@@ -76,7 +67,6 @@ export async function middleware(req: NextRequest) {
      !path.startsWith('/api/v1/user/otp') &&
      !path.startsWith('/api/v1/user/forgot-password') &&
      !path.startsWith('/api/v1/user/reset-password')) || 
-    path.startsWith('/api/v1/bookmarks') ||
     path.startsWith('/api/v1/evidence-vault') ||
     path.startsWith('/api/v1/payments') ||
     path.startsWith('/api/v1/consultation');
@@ -84,8 +74,8 @@ export async function middleware(req: NextRequest) {
   const isAdminApi = path.startsWith('/api/v1/admin');
 
   if (isAdminApi) {
-    if (!isAuthed || (role !== 'ADMIN' && !isSuperAdminEmail(email))) {
-      return NextResponse.json({ success: false, error: 'Unauthorized Admin API access' }, { status: 401 });
+    if (!isAuthed || !isSuperAdminEmail(email)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized Admin API access' }, { status: 403 });
     }
   }
 

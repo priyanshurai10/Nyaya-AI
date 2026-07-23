@@ -1,14 +1,9 @@
-"""
-Enhanced Admin Consultation API with full RBAC, CRUD, email triggers, and audit logs.
-Super Admin only: priyanshurai121111@gmail.com
-"""
 from fastapi import APIRouter, Depends, HTTPException, status, Form, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, or_, func
 from datetime import datetime, timedelta
 from typing import Optional, List
 import uuid
-import os
 
 from app.core.database import get_db
 from app.models import User, ConsultationRequest, Transaction, AuditLog, Notification
@@ -24,23 +19,21 @@ SUPER_ADMIN_EMAIL = "priyanshurai121111@gmail.com"
 
 router = APIRouter()
 
-
 def require_super_admin(user: Optional[User] = Depends(get_current_user)) -> User:
-    """Enforce super-admin check by email on EVERY admin route."""
+    """Enforce strict super-admin check by exact email match on EVERY admin route."""
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication required."
         )
-    if not user.email or "priyanshurai121111" not in user.email.lower():
+    if not user.email or user.email.lower().strip() != SUPER_ADMIN_EMAIL:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Super Admin access required. This action is restricted to the system administrator."
         )
     return user
 
-
-def _create_notification(db: Session, user_id: str, title: str, message: str, category: str, payment_id: Optional[str] = None, consultation_id: Optional[str] = None):
+def _create_notification(db: Session, user_id: str, title: str, message: str, category: str):
     notif = Notification(
         id=str(uuid.uuid4()),
         user_id=user_id,
@@ -51,7 +44,6 @@ def _create_notification(db: Session, user_id: str, title: str, message: str, ca
         created_at=datetime.utcnow(),
     )
     db.add(notif)
-
 
 def _audit(db: Session, admin_email: str, action: str, target_id: str, notes: str = ""):
     log = AuditLog(
@@ -64,11 +56,6 @@ def _audit(db: Session, admin_email: str, action: str, target_id: str, notes: st
     )
     db.add(log)
 
-
-# ─────────────────────────────────────────────
-# PAYMENT MANAGEMENT
-# ─────────────────────────────────────────────
-
 @router.get("/payments")
 def list_all_payments(
     status_filter: Optional[str] = Query(None, alias="status"),
@@ -78,7 +65,6 @@ def list_all_payments(
     db: Session = Depends(get_db),
     admin: User = Depends(require_super_admin),
 ):
-    """List all payment requests with optional filter and search."""
     query = db.query(Transaction)
 
     if status_filter and status_filter != "ALL":
@@ -86,7 +72,6 @@ def list_all_payments(
 
     if search:
         s = f"%{search}%"
-        # Join with ConsultationRequest to search by name/email/mobile/UTR
         query = query.join(
             ConsultationRequest,
             ConsultationRequest.transaction_id == Transaction.id,
@@ -129,7 +114,6 @@ def list_all_payments(
 
     return {"success": True, "total": total, "data": result}
 
-
 @router.post("/payments/{payment_id}/verify")
 def verify_payment(
     payment_id: str,
@@ -137,7 +121,6 @@ def verify_payment(
     db: Session = Depends(get_db),
     admin: User = Depends(require_super_admin),
 ):
-    """Mark a payment as verified, trigger email + notification."""
     tx = db.query(Transaction).filter(Transaction.id == payment_id).first()
     if not tx:
         raise HTTPException(status_code=404, detail="Payment not found.")
@@ -154,7 +137,6 @@ def verify_payment(
 
     _audit(db, admin.email, "PAYMENT_VERIFIED", payment_id, admin_notes or "")
 
-    # Fetch user for notification + email
     user = db.query(User).filter(User.id == tx.user_id).first()
     if user:
         _create_notification(
@@ -173,7 +155,6 @@ def verify_payment(
     db.commit()
     return {"success": True, "message": "Payment verified successfully. User notified via email."}
 
-
 @router.post("/payments/{payment_id}/decline")
 def decline_payment(
     payment_id: str,
@@ -181,7 +162,6 @@ def decline_payment(
     db: Session = Depends(get_db),
     admin: User = Depends(require_super_admin),
 ):
-    """Decline a payment with a reason, trigger email + notification."""
     tx = db.query(Transaction).filter(Transaction.id == payment_id).first()
     if not tx:
         raise HTTPException(status_code=404, detail="Payment not found.")
@@ -214,11 +194,6 @@ def decline_payment(
     db.commit()
     return {"success": True, "message": "Payment declined. User notified via email."}
 
-
-# ─────────────────────────────────────────────
-# CONSULTATION MANAGEMENT
-# ─────────────────────────────────────────────
-
 @router.get("/consultations")
 def list_all_consultations(
     status_filter: Optional[str] = Query(None, alias="status"),
@@ -228,7 +203,6 @@ def list_all_consultations(
     db: Session = Depends(get_db),
     admin: User = Depends(require_super_admin),
 ):
-    """List all consultations with optional status filter and search."""
     query = db.query(ConsultationRequest)
 
     if status_filter and status_filter != "ALL":
@@ -275,18 +249,16 @@ def list_all_consultations(
 
     return {"success": True, "total": total, "data": result}
 
-
 @router.post("/consultations/{consultation_id}/schedule")
 def schedule_consultation(
     consultation_id: str,
     scheduled_date: str = Form(...),
     scheduled_time: str = Form(...),
-    meeting_mode: str = Form("PHONE"),  # PHONE, WHATSAPP, GOOGLE_MEET
+    meeting_mode: str = Form("PHONE"),
     admin_notes: Optional[str] = Form(None),
     db: Session = Depends(get_db),
     admin: User = Depends(require_super_admin),
 ):
-    """Schedule a consultation with date, time, and meeting mode."""
     if meeting_mode not in ("PHONE", "WHATSAPP", "GOOGLE_MEET"):
         raise HTTPException(status_code=400, detail="meeting_mode must be PHONE, WHATSAPP, or GOOGLE_MEET")
 
@@ -294,7 +266,6 @@ def schedule_consultation(
     if not req:
         raise HTTPException(status_code=404, detail="Consultation not found.")
 
-    # Dynamically add scheduling columns if they don't exist via setattr
     req.status = "Consultation Scheduled"
     req.updated_at = datetime.utcnow()
     try:
@@ -329,7 +300,6 @@ def schedule_consultation(
     db.commit()
     return {"success": True, "message": "Consultation scheduled. User notified via email."}
 
-
 @router.post("/consultations/{consultation_id}/complete")
 def complete_consultation(
     consultation_id: str,
@@ -337,7 +307,6 @@ def complete_consultation(
     db: Session = Depends(get_db),
     admin: User = Depends(require_super_admin),
 ):
-    """Mark a consultation as completed."""
     req = db.query(ConsultationRequest).filter(ConsultationRequest.id == consultation_id).first()
     if not req:
         raise HTTPException(status_code=404, detail="Consultation not found.")
@@ -364,17 +333,11 @@ def complete_consultation(
     db.commit()
     return {"success": True, "message": "Consultation marked as completed. User notified."}
 
-
-# ─────────────────────────────────────────────
-# ANALYTICS
-# ─────────────────────────────────────────────
-
 @router.get("/consultation-stats")
 def consultation_stats(
     db: Session = Depends(get_db),
     admin: User = Depends(require_super_admin),
 ):
-    """Real dashboard stats from the database."""
     total_users = db.query(User).count()
     total_payments = db.query(Transaction).count()
     pending_payments = db.query(Transaction).filter(Transaction.status == "pending").count()
@@ -387,11 +350,9 @@ def consultation_stats(
     scheduled = db.query(ConsultationRequest).filter(ConsultationRequest.status.ilike("%Scheduled%")).count()
     completed = db.query(ConsultationRequest).filter(ConsultationRequest.status.ilike("%Completed%")).count()
 
-    # Revenue from verified payments
     revenue_result = db.query(func.sum(Transaction.amount)).filter(Transaction.status == "verified").scalar()
     total_revenue = float(revenue_result) if revenue_result else 0.0
 
-    # Signups last 7 days
     today = datetime.utcnow().date()
     signups_chart = []
     for i in range(6, -1, -1):
@@ -418,7 +379,6 @@ def consultation_stats(
         }
     }
 
-
 @router.get("/audit-trail")
 def get_audit_trail(
     skip: int = 0,
@@ -426,7 +386,6 @@ def get_audit_trail(
     db: Session = Depends(get_db),
     admin: User = Depends(require_super_admin),
 ):
-    """Full audit trail of all admin actions."""
     logs = db.query(AuditLog).order_by(desc(AuditLog.timestamp)).offset(skip).limit(limit).all()
     return {
         "success": True,

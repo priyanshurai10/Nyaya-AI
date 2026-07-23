@@ -158,7 +158,7 @@ export default function AuthPage() {
       window.dispatchEvent(new Event('nyaya_lang_changed'));
     }
     const searchParams = new URLSearchParams(window.location.search);
-    const redirectUrl = searchParams.get('redirect') || (user.email === 'priyanshurai121111@gmail.com' ? '/admin' : '/dashboard');
+    const redirectUrl = searchParams.get('redirect') || '/dashboard';
     router.push(redirectUrl);
   };
 
@@ -345,12 +345,12 @@ export default function AuthPage() {
         <div className="flex flex-col items-center justify-center text-center space-y-2">
           <Logo size={48} animated={false} />
           <h2 className="text-xl font-black tracking-tight text-[var(--text-primary)] mt-4">
-            {isRegister ? 'Create Your Account' : 'Welcome Back'}
+            {isRegister ? 'Create Your Account' : 'Welcome to Nyaya AI'}
           </h2>
           <p className="text-xs text-[var(--text-muted)]">
             {isRegister
               ? 'Join the multilingual Indian legal operating system'
-              : 'Log in to access legal tools, cases, and notices'}
+              : "India's AI-Powered Legal Assistance Platform"}
           </p>
         </div>
 

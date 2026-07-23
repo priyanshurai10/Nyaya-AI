@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { translations, LanguageCode } from '@/lib/translations';
+import { locales, LanguageCode } from '@/locales';
 
 interface LanguageContextType {
   selectedLang: LanguageCode;
@@ -14,26 +14,24 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [selectedLang, setSelectedLang] = useState<LanguageCode>('en');
 
-  // Load language from localStorage on mount
+  // Restore saved language from localStorage on initial client mount
   useEffect(() => {
     try {
       const savedLang = localStorage.getItem('nyaya_lang') as LanguageCode;
-      if (savedLang) {
+      if (savedLang && locales[savedLang]) {
         setSelectedLang(savedLang);
       }
     } catch (e) {
-      console.warn('Failed to load language from storage', e);
+      console.warn('Failed to load language preference:', e);
     }
 
     const handleLangChange = () => {
       try {
         const updatedLang = localStorage.getItem('nyaya_lang') as LanguageCode;
-        if (updatedLang) {
+        if (updatedLang && locales[updatedLang]) {
           setSelectedLang(updatedLang);
         }
-      } catch (e) {
-        console.warn(e);
-      }
+      } catch (e) {}
     };
 
     window.addEventListener('nyaya_lang_changed', handleLangChange);
@@ -43,24 +41,35 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const changeLanguage = useCallback((lang: LanguageCode) => {
+    if (!locales[lang]) return;
     setSelectedLang(lang);
     try {
       localStorage.setItem('nyaya_lang', lang);
     } catch (e) {
-      console.warn('Failed to save language to storage', e);
+      console.warn('Failed to save language preference:', e);
     }
     window.dispatchEvent(new Event('nyaya_lang_changed'));
   }, []);
 
   const t = useCallback((key: string): string => {
-    const entry = (translations as Record<string, Record<string, string>>)[key];
-    return entry?.[selectedLang] || entry?.['en'] || key;
+    // 1. Direct translation lookup for target language
+    const currentDict = locales[selectedLang];
+    if (currentDict && currentDict[key]) {
+      return currentDict[key];
+    }
+    // 2. Graceful fallback to English dictionary
+    const fallbackDict = locales['en'];
+    if (fallbackDict && fallbackDict[key]) {
+      return fallbackDict[key];
+    }
+    // 3. Fallback to key
+    return key;
   }, [selectedLang]);
 
   const value = useMemo(() => ({
     selectedLang,
     changeLanguage,
-    t
+    t,
   }), [selectedLang, changeLanguage, t]);
 
   return (
