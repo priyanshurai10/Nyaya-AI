@@ -10,8 +10,8 @@ from app.models import (
     User, ChatSession, ChatMessage, Document, DocumentAnalysis,
     SkillInvocationLog, UserProfile, AuditLog, EvaluationLog,
     Court, SavedCase, CourtBookmark, SearchHistory, Judge, Feedback,
-    Advocate, Appointment, CaseFolder, CaseTask, LegalCalendarEvent,
-    Transaction, ConsultationRequest, PaymentSettings, LocationPincode
+    CaseFolder, CaseTask, LegalCalendarEvent,
+    Transaction, ConsultationRequest, LocationPincode
 )
 
 from app.api.v1.chat import router as chat_router
@@ -23,8 +23,6 @@ from app.api.v1.admin import router as admin_router
 from app.api.v1.advocates import router as advocates_router
 from app.api.v1.cases import router as cases_router
 from app.api.v1.calendar import router as calendar_router
-from app.api.v1.marketplace import router as marketplace_router
-from app.api.v1.discovery import router as discovery_router
 from app.api.v1.location import router as location_router
 from app.api.v1.consultation import router as consultation_router
 from app.api.v1.notifications import router as notifications_router
@@ -32,8 +30,6 @@ from app.api.v1.vault import router as vault_router
 from app.api.v1.drafts import router as drafts_router
 from app.api.v1.knowledge import router as knowledge_router
 from app.api.v1.judgments import router as judgments_router
-from app.api.v1.academy import router as academy_router
-from app.api.v1.ai_insights import router as ai_insights_router
 from app.api.v1.vault_analyze import router as vault_analyze_router
 from app.api.v1.admin_consultation import router as admin_consultation_router
 
@@ -77,8 +73,6 @@ app.include_router(admin_router, prefix=f"{settings.API_V1_STR}/admin", tags=["a
 app.include_router(advocates_router, prefix=f"{settings.API_V1_STR}/advocates", tags=["advocates"])
 app.include_router(cases_router, prefix=f"{settings.API_V1_STR}/cases", tags=["cases"])
 app.include_router(calendar_router, prefix=f"{settings.API_V1_STR}/calendar", tags=["calendar"])
-app.include_router(marketplace_router, prefix=f"{settings.API_V1_STR}/marketplace", tags=["marketplace"])
-app.include_router(discovery_router, prefix=f"{settings.API_V1_STR}/discovery", tags=["discovery"])
 app.include_router(location_router, prefix=f"{settings.API_V1_STR}/location", tags=["location"])
 app.include_router(consultation_router, prefix=f"{settings.API_V1_STR}/consultation", tags=["consultation"])
 app.include_router(notifications_router, prefix=f"{settings.API_V1_STR}/notifications", tags=["notifications"])
@@ -86,8 +80,6 @@ app.include_router(vault_router, prefix=f"{settings.API_V1_STR}/vault", tags=["v
 app.include_router(drafts_router, prefix=f"{settings.API_V1_STR}/drafts", tags=["drafts"])
 app.include_router(knowledge_router, prefix=f"{settings.API_V1_STR}/knowledge", tags=["knowledge"])
 app.include_router(judgments_router, prefix=f"{settings.API_V1_STR}/judgments", tags=["judgments"])
-app.include_router(academy_router, prefix=f"{settings.API_V1_STR}/academy", tags=["academy"])
-app.include_router(ai_insights_router, prefix=f"{settings.API_V1_STR}/ai-insights", tags=["ai-insights"])
 app.include_router(vault_analyze_router, prefix=f"{settings.API_V1_STR}/vault", tags=["vault-analyze"])
 app.include_router(admin_consultation_router, prefix=f"{settings.API_V1_STR}/admin/consultations", tags=["admin-consultations"])
 
@@ -147,5 +139,3 @@ async def global_exception_handler(request: Request, exc: Exception):
             "error": {"code": "INTERNAL_SERVER_ERROR", "detail": str(exc)}
         }
     )
-
-

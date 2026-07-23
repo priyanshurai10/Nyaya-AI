@@ -7,7 +7,6 @@ import random
 import os
 import re
 
-from supabase import create_client, Client
 from app.core.database import get_db
 from app.models import User, ConsultationRequest, Transaction, AuditLog, Notification
 from app.core.auth import get_current_user
@@ -16,8 +15,11 @@ from app.core.email_service import send_admin_new_payment_request
 
 router = APIRouter()
 
-# Initialize Supabase Client
-supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+try:
+    from supabase import create_client, Client
+    supabase: Optional[Client] = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+except Exception:
+    supabase = None
 
 def log_audit(db: Session, action_type: str, action_desc: str, user_id: Optional[str] = None):
     audit = AuditLog(

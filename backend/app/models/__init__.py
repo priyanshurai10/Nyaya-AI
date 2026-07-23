@@ -10,8 +10,6 @@ from app.models.document import Document, DocumentAnalysis
 from app.models.draft import DraftDocument
 from app.models.case import SavedCase, CaseFolder, CaseTask, SearchHistory
 from app.models.calendar import LegalCalendarEvent
-from app.models.academy import Course, Lesson, UserProgress
-from app.models.marketplace import Advocate, Appointment, PaymentSettings
 from app.models.location import Court, CourtBookmark, Judge, PoliceStation, LegalAidCentre, ConsumerForum, LocationPincode
 from app.models.system import SkillInvocationLog, AuditLog, EvaluationLog, Feedback
 
@@ -28,8 +26,6 @@ __all__ = [
     "DraftDocument",
     "SavedCase", "CaseFolder", "CaseTask", "SearchHistory",
     "LegalCalendarEvent",
-    "Course", "Lesson", "UserProgress",
-    "Advocate", "Appointment", "PaymentSettings",
     "Court", "CourtBookmark", "Judge", "PoliceStation", "LegalAidCentre", "ConsumerForum", "LocationPincode",
     "SkillInvocationLog", "AuditLog", "EvaluationLog", "Feedback"
 ]

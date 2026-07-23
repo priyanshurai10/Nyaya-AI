@@ -20,13 +20,12 @@ class CaseFolder(Base):
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     court_id = Column(String, ForeignKey("courts.id"), nullable=True)
-    advocate_id = Column(String, ForeignKey("advocates.id"), nullable=True)
+    advocate_id = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User", back_populates="case_folders")
     court = relationship("Court")
-    advocate = relationship("Advocate")
     tasks = relationship("CaseTask", back_populates="folder", cascade="all, delete-orphan")
 
 class CaseTask(Base):

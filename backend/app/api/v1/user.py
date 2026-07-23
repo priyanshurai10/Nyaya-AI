@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.models import User, SavedCase, CourtBookmark, SearchHistory, Court, Transaction, ConsultationRequest, UserProgress
+from app.models import User, SavedCase, CourtBookmark, SearchHistory, Court, Transaction, ConsultationRequest
 from app.core.auth import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter()
@@ -527,7 +527,7 @@ def get_dashboard(user: User = Depends(get_current_user), db: Session = Depends(
     consultations = db.query(ConsultationRequest).filter(ConsultationRequest.user_id == user.id).order_by(ConsultationRequest.created_at.desc()).all()
     transactions = db.query(Transaction).filter(Transaction.user_id == user.id).order_by(Transaction.created_at.desc()).all()
     bookmarks = db.query(CourtBookmark).filter(CourtBookmark.user_id == user.id).order_by(CourtBookmark.created_at.desc()).all()
-    progress = db.query(UserProgress).filter(UserProgress.user_id == user.id).order_by(UserProgress.last_accessed.desc()).all()
+    progress = []
     
     # Map snake_case to camelCase
     mapped_consultations = []
