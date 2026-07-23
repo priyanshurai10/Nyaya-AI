@@ -56,6 +56,51 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Write to ConsultationHistory
+    await prisma.consultationHistory.create({
+      data: {
+        consultationId: displayId,
+        userId: user.id,
+        action: "SUBMITTED",
+        status: "WAITING",
+        notes: `Consultation request initiated for ₹${amount}.`,
+        performedBy: user.email,
+      },
+    });
+
+    // Write to UserActivityTimeline
+    await prisma.userActivityTimeline.create({
+      data: {
+        userId: user.id,
+        activityType: "PAYMENT_SUBMITTED",
+        title: "Legal Consultation Requested",
+        description: `Requested consultation for ${legalIssueType} (Amount: ₹${amount}).`,
+      },
+    });
+
+    // Create Notification
+    await prisma.notification.create({
+      data: {
+        id: `NOT-${Date.now()}`,
+        userId: user.id,
+        title: "Consultation Request Initiated",
+        message: `Your consultation request (${displayId}) has been submitted. Please upload payment proof to proceed.`,
+        category: "PAYMENT",
+        paymentId: txId,
+        consultationId: displayId,
+      },
+    });
+
+    // Log Email Event
+    await prisma.emailLog.create({
+      data: {
+        recipient: "priyanshurai121111@gmail.com",
+        subject: "New Consultation Payment Request",
+        template: "ADMIN_NEW_PAYMENT_ALERT",
+        status: "SENT",
+      },
+    });
+
     // Also forward to FastAPI Python backend if available
     try {
       const authHeader = req.headers.get("authorization");

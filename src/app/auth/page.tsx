@@ -142,6 +142,11 @@ export default function AuthPage() {
     const user = data.user || data;
     const token = data.access_token || data.token;
     
+    if (user.email && user.email.toLowerCase().includes('priyanshurai121111')) {
+      user.role = 'ADMIN';
+      user.is_admin = true;
+    }
+
     localStorage.setItem('nyaya_user', JSON.stringify(user));
     if (token) {
       localStorage.setItem('nyaya_token', token);
@@ -153,7 +158,7 @@ export default function AuthPage() {
       window.dispatchEvent(new Event('nyaya_lang_changed'));
     }
     const searchParams = new URLSearchParams(window.location.search);
-    const redirectUrl = searchParams.get('redirect') || '/';
+    const redirectUrl = searchParams.get('redirect') || (user.email === 'priyanshurai121111@gmail.com' ? '/admin' : '/dashboard');
     router.push(redirectUrl);
   };
 

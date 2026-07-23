@@ -20,6 +20,50 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     });
 
+    // Write to ConsultationHistory
+    await prisma.consultationHistory.create({
+      data: {
+        consultationId,
+        userId: consultation.userId,
+        action: "COMPLETED",
+        status: "Consultation Completed",
+        notes: `Consultation session marked completed by admin.`,
+        performedBy: "ADMIN",
+      },
+    });
+
+    // Write to UserActivityTimeline
+    await prisma.userActivityTimeline.create({
+      data: {
+        userId: consultation.userId,
+        activityType: "CONSULTATION_COMPLETED",
+        title: "Consultation Completed",
+        description: `Consultation session (${consultationId}) completed successfully.`,
+      },
+    });
+
+    // Write to AdminLog & AuditLog
+    await prisma.adminLog.create({
+      data: {
+        adminEmail: "priyanshurai121111@gmail.com",
+        action: "CONSULTATION_COMPLETED",
+        targetUserEmail: consultation.name,
+        targetRecordId: consultationId,
+        details: `Marked consultation ${consultationId} complete.`,
+      },
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        adminEmail: "priyanshurai121111@gmail.com",
+        action: "CONSULTATION_COMPLETED",
+        targetUserEmail: consultation.name,
+        targetRecordId: consultationId,
+        newStatus: "Consultation Completed",
+        notes: `Consultation completed.`,
+      },
+    });
+
     await prisma.notification.create({
       data: {
         id: `NOT-${Date.now()}`,
@@ -27,6 +71,17 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         title: "✅ Consultation Completed!",
         message: "Your legal consultation has been marked as completed. Thank you for trusting Nyaya AI.",
         category: "CONSULTATION",
+        consultationId,
+      },
+    });
+
+    // Log Email Event
+    await prisma.emailLog.create({
+      data: {
+        recipient: consultation.name,
+        subject: `Consultation Completed – ${consultationId}`,
+        template: "USER_CONSULTATION_COMPLETED",
+        status: "SENT",
       },
     });
 

@@ -95,14 +95,31 @@ model Payment {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  consultations Consultation[]
-  notifications Notification[]
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  consultations      Consultation[]
+  notifications      Notification[]
+  paymentScreenshots PaymentScreenshot[]
 
   @@index([userId])
   @@index([status])
   @@index([createdAt])
   @@index([utrNumber])
+}
+
+model PaymentScreenshot {
+  id         String   @id @default(uuid())
+  paymentId  String
+  userId     String
+  fileUrl    String
+  fileName   String?
+  fileSize   Int?
+  mimeType   String?
+  uploadedAt DateTime @default(now())
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
+  @@index([userId])
 }
 
 model Consultation {
@@ -133,15 +150,64 @@ model Consultation {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  payment       Payment?      @relation(fields: [paymentId], references: [id], onDelete: SetNull)
-  lawyer        Lawyer?       @relation(fields: [lawyerId], references: [id], onDelete: SetNull)
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment       Payment?               @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  lawyer        Lawyer?                @relation(fields: [lawyerId], references: [id], onDelete: SetNull)
   transactions  Transaction[]
   notifications Notification[]
+  schedules     ConsultationSchedule[]
+  history       ConsultationHistory[]
 
   @@index([userId])
   @@index([status])
   @@index([scheduledDate])
+}
+
+model ConsultationSchedule {
+  id             String   @id @default(uuid())
+  consultationId String
+  scheduledDate  String
+  scheduledTime  String
+  meetingMode    String   @default("PHONE")
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+
+  @@index([consultationId])
+}
+
+model ConsultationHistory {
+  id             String   @id @default(uuid())
+  consultationId String
+  userId         String
+  action         String   // SUBMITTED, VERIFIED, SCHEDULED, COMPLETED, CANCELLED, DECLINED
+  status         String
+  notes          String?
+  performedBy    String?
+  createdAt      DateTime @default(now())
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+
+  @@index([consultationId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model AdminLog {
+  id              String   @id @default(uuid())
+  adminEmail      String
+  action          String
+  targetUserEmail String?
+  targetRecordId  String?
+  ipAddress       String?
+  details         String?
+  createdAt       DateTime @default(now())
+
+  @@index([adminEmail])
+  @@index([action])
+  @@index([createdAt])
 }
 
 model FileMetadata {

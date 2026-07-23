@@ -43,6 +43,61 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     });
 
+    // Create ConsultationSchedule entry
+    await prisma.consultationSchedule.create({
+      data: {
+        consultationId,
+        scheduledDate,
+        scheduledTime,
+        meetingMode,
+        notes: `Scheduled by admin`,
+      },
+    });
+
+    // Write to ConsultationHistory
+    await prisma.consultationHistory.create({
+      data: {
+        consultationId,
+        userId: consultation.userId,
+        action: "SCHEDULED",
+        status: "Consultation Scheduled",
+        notes: `Scheduled for ${scheduledDate} @ ${scheduledTime} (${meetingMode}).`,
+        performedBy: "ADMIN",
+      },
+    });
+
+    // Write to UserActivityTimeline
+    await prisma.userActivityTimeline.create({
+      data: {
+        userId: consultation.userId,
+        activityType: "CONSULTATION_SCHEDULED",
+        title: "Consultation Scheduled",
+        description: `Scheduled for ${scheduledDate} at ${scheduledTime} via ${meetingMode}.`,
+      },
+    });
+
+    // Write to AdminLog & AuditLog
+    await prisma.adminLog.create({
+      data: {
+        adminEmail: "priyanshurai121111@gmail.com",
+        action: "CONSULTATION_SCHEDULED",
+        targetUserEmail: consultation.name,
+        targetRecordId: consultationId,
+        details: `Scheduled date ${scheduledDate} time ${scheduledTime} mode ${meetingMode}.`,
+      },
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        adminEmail: "priyanshurai121111@gmail.com",
+        action: "CONSULTATION_SCHEDULED",
+        targetUserEmail: consultation.name,
+        targetRecordId: consultationId,
+        newStatus: "Consultation Scheduled",
+        notes: `Scheduled date ${scheduledDate} time ${scheduledTime}.`,
+      },
+    });
+
     await prisma.notification.create({
       data: {
         id: `NOT-${Date.now()}`,
@@ -50,6 +105,17 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         title: "📅 Consultation Scheduled!",
         message: `Your consultation has been scheduled for ${scheduledDate} at ${scheduledTime} via ${meetingMode.replace('_', ' ')}. Contact: +91 75418 81152`,
         category: "CONSULTATION",
+        consultationId,
+      },
+    });
+
+    // Log Email Event
+    await prisma.emailLog.create({
+      data: {
+        recipient: consultation.name,
+        subject: `Your Legal Consultation is Scheduled – ${consultationId}`,
+        template: "USER_CONSULTATION_SCHEDULED",
+        status: "SENT",
       },
     });
 

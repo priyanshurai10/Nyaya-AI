@@ -62,6 +62,18 @@ class ResolvedLocationSchema(BaseModel):
 class ResolvedLocationPayload(BaseModel):
     location: ResolvedLocationSchema
 
+class ProfileUpdatePayload(BaseModel):
+    name: Optional[str] = None
+    dob: Optional[str] = None
+    gender: Optional[str] = None
+    marital_status: Optional[str] = None
+    blood_group: Optional[str] = None
+    occupation: Optional[str] = None
+    education: Optional[str] = None
+    aadhaar: Optional[str] = None
+    pan: Optional[str] = None
+    avatar_url: Optional[str] = None
+
 # ─── Auth Routes ───
 
 @router.post("/register")
@@ -349,6 +361,8 @@ def get_profile(user: User = Depends(get_current_user), db: Session = Depends(ge
     }
 
 @router.put("/profile/update")
+@router.post("/profile/update")
+@router.put("/profile")
 def update_profile(payload: ProfileUpdatePayload, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=401, detail="Authentication required.")

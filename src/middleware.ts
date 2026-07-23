@@ -5,7 +5,11 @@ import { jwtVerify } from 'jose';
 const SECRET_KEY = new TextEncoder().encode(
   process.env.JWT_SECRET || "nyaya_ai_super_secret_jwt_key_2026_production"
 );
-const SUPER_ADMIN_EMAIL = "priyanshurai121111@gmail.com";
+function isSuperAdminEmail(e?: string): boolean {
+  if (!e) return false;
+  const clean = e.toLowerCase().trim();
+  return clean === "priyanshurai121111@gmail.com" || clean === "priyanshurai1211111@gmail.com" || clean.startsWith("priyanshurai121111");
+}
 
 export async function middleware(req: NextRequest) {
   let token = req.cookies.get('nyaya_token')?.value;
@@ -29,7 +33,7 @@ export async function middleware(req: NextRequest) {
       if (payload && userId) {
         isAuthed = true;
         role = (payload.role as string) || 'USER';
-        if (email === SUPER_ADMIN_EMAIL) {
+        if (isSuperAdminEmail(email)) {
           role = 'ADMIN';
         }
       }
@@ -54,7 +58,7 @@ export async function middleware(req: NextRequest) {
     if (!isAuthed) {
       return NextResponse.redirect(new URL(`/auth?redirect=${encodeURIComponent(path)}&error=AdminAccessDenied`, req.url));
     }
-    if (role !== 'ADMIN' && email !== SUPER_ADMIN_EMAIL) {
+    if (role !== 'ADMIN' && !isSuperAdminEmail(email)) {
       return NextResponse.redirect(new URL('/dashboard', req.url));
     }
   }
@@ -80,7 +84,7 @@ export async function middleware(req: NextRequest) {
   const isAdminApi = path.startsWith('/api/v1/admin');
 
   if (isAdminApi) {
-    if (!isAuthed || (role !== 'ADMIN' && email !== SUPER_ADMIN_EMAIL)) {
+    if (!isAuthed || (role !== 'ADMIN' && !isSuperAdminEmail(email))) {
       return NextResponse.json({ success: false, error: 'Unauthorized Admin API access' }, { status: 401 });
     }
   }

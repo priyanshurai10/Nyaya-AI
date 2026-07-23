@@ -38,6 +38,53 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     });
 
+    // Write to ConsultationHistory
+    const relatedConsult = await prisma.consultation.findFirst({ where: { paymentId } });
+    if (relatedConsult) {
+      await prisma.consultationHistory.create({
+        data: {
+          consultationId: relatedConsult.id,
+          userId: payment.userId,
+          action: "DECLINED",
+          status: "Payment Declined",
+          notes: `Payment declined by Admin (${admin.email}). Reason: ${reason}`,
+          performedBy: admin.email,
+        },
+      });
+    }
+
+    // Write to UserActivityTimeline
+    await prisma.userActivityTimeline.create({
+      data: {
+        userId: payment.userId,
+        activityType: "PAYMENT_DECLINED",
+        title: "Payment Declined",
+        description: `Payment verification failed. Reason: ${reason}`,
+      },
+    });
+
+    // Write to AdminLog & AuditLog
+    await prisma.adminLog.create({
+      data: {
+        adminEmail: admin.email,
+        action: "PAYMENT_DECLINED",
+        targetUserEmail: payment.email,
+        targetRecordId: paymentId,
+        details: `Declined payment ₹${payment.amount}. Reason: ${reason}`,
+      },
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        adminEmail: admin.email,
+        action: "PAYMENT_DECLINED",
+        targetUserEmail: payment.email,
+        targetRecordId: paymentId,
+        newStatus: "DECLINED",
+        notes: `Reason: ${reason}`,
+      },
+    });
+
     await prisma.notification.create({
       data: {
         id: `NOT-${Date.now()}`,
@@ -45,6 +92,17 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         title: "❌ Payment Declined",
         message: `Your payment of ₹${payment.amount} could not be verified. Reason: ${reason}`,
         category: "PAYMENT",
+        paymentId,
+      },
+    });
+
+    // Log Email Event
+    await prisma.emailLog.create({
+      data: {
+        recipient: payment.email,
+        subject: "Payment Could Not Be Verified – Action Required",
+        template: "USER_PAYMENT_DECLINED",
+        status: "SENT",
       },
     });
 

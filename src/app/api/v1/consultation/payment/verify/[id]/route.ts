@@ -26,6 +26,18 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     if (screenshot) {
       const saved = await vaultStorage.saveVaultFile(screenshot, "Payment_Screenshots");
       screenshotUrl = saved.publicUrl;
+
+      // Save PaymentScreenshot entry
+      await prisma.paymentScreenshot.create({
+        data: {
+          paymentId: txId,
+          userId: user.id,
+          fileUrl: screenshotUrl,
+          fileName: screenshot.name,
+          fileSize: screenshot.size,
+          mimeType: screenshot.type || "image/png",
+        },
+      });
     }
 
     // Update Prisma database
@@ -47,14 +59,50 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     });
 
+    // Write to ConsultationHistory
+    const relatedConsult = await prisma.consultation.findFirst({ where: { paymentId: txId } });
+    if (relatedConsult) {
+      await prisma.consultationHistory.create({
+        data: {
+          consultationId: relatedConsult.id,
+          userId: user.id,
+          action: "PROOF_SUBMITTED",
+          status: "WAITING",
+          notes: `Submitted UTR ${utrNumber} and payment proof screenshot.`,
+          performedBy: user.email,
+        },
+      });
+    }
+
+    // Write to UserActivityTimeline
+    await prisma.userActivityTimeline.create({
+      data: {
+        userId: user.id,
+        activityType: "PROOF_SUBMITTED",
+        title: "Payment Proof Submitted",
+        description: `Submitted UTR ${utrNumber} for verification.`,
+      },
+    });
+
     // Create Notification
     await prisma.notification.create({
       data: {
         id: `NOT-${Date.now()}`,
         userId: user.id,
-        title: "Payment Submitted",
-        message: `Your payment verification (UTR: ${utrNumber}) has been submitted and is under review.`,
+        title: "Payment Under Review",
+        message: `Your payment verification (UTR: ${utrNumber}) has been submitted and is under review by admin.`,
         category: "PAYMENT",
+        paymentId: txId,
+      },
+    });
+
+    // Log Email Event
+    await prisma.emailLog.create({
+      data: {
+        recipient: "priyanshurai121111@gmail.com",
+        subject: "New Consultation Payment Verification Submitted",
+        template: "ADMIN_VERIFY_PAYMENT_ALERT",
+        status: "SENT",
       },
     });
 

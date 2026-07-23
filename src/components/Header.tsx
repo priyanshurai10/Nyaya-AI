@@ -520,6 +520,42 @@ export default function Header({
                         {userData.email || userData.mobile}
                       </div>
                     </div>
+                    <div className="space-y-1 border-b border-[var(--border)] pb-2">
+                      <Link
+                        href="/user/profile"
+                        onClick={() => setProfileOpen(false)}
+                        className="w-full py-1.5 px-2 hover:bg-[var(--card-elevated)] text-[var(--text-primary)] rounded-lg text-xs font-semibold transition-all flex items-center gap-2"
+                      >
+                        <User size={14} className="text-[#FF9933]" />
+                        <span>My Profile</span>
+                      </Link>
+                      <Link
+                        href="/consultation"
+                        onClick={() => setProfileOpen(false)}
+                        className="w-full py-1.5 px-2 hover:bg-[var(--card-elevated)] text-[var(--text-primary)] rounded-lg text-xs font-semibold transition-all flex items-center gap-2"
+                      >
+                        <Scale size={14} className="text-emerald-500" />
+                        <span>Book Consultation</span>
+                      </Link>
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setProfileOpen(false)}
+                        className="w-full py-1.5 px-2 hover:bg-[var(--card-elevated)] text-[var(--text-primary)] rounded-lg text-xs font-semibold transition-all flex items-center gap-2"
+                      >
+                        <BookOpen size={14} className="text-blue-500" />
+                        <span>Dashboard</span>
+                      </Link>
+                      {(userData?.is_admin || userData?.role === 'ADMIN' || userData?.email?.toLowerCase().includes('priyanshurai121111')) && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setProfileOpen(false)}
+                          className="w-full py-1.5 px-2 bg-orange-500/10 text-[#FF9933] border border-orange-500/20 rounded-lg text-xs font-bold transition-all flex items-center gap-2 mt-1"
+                        >
+                          <Landmark size={14} />
+                          <span>Admin Control Center</span>
+                        </Link>
+                      )}
+                    </div>
                     <button
                       onClick={handleLogout}
                       className="w-full py-2 px-3 hover:bg-[var(--danger-subtle)] text-[var(--danger)] rounded-xl text-xs font-bold transition-all flex items-center gap-2"

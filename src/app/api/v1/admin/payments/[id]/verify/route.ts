@@ -29,6 +29,53 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     });
 
+    // Write to ConsultationHistory
+    const relatedConsult = await prisma.consultation.findFirst({ where: { paymentId } });
+    if (relatedConsult) {
+      await prisma.consultationHistory.create({
+        data: {
+          consultationId: relatedConsult.id,
+          userId: payment.userId,
+          action: "VERIFIED",
+          status: "Payment Verified – Awaiting Schedule",
+          notes: `Payment of ₹${payment.amount} verified by Admin (${admin.email}).`,
+          performedBy: admin.email,
+        },
+      });
+    }
+
+    // Write to UserActivityTimeline
+    await prisma.userActivityTimeline.create({
+      data: {
+        userId: payment.userId,
+        activityType: "PAYMENT_VERIFIED",
+        title: "Payment Verified",
+        description: `Payment of ₹${payment.amount} verified successfully.`,
+      },
+    });
+
+    // Write to AdminLog & AuditLog
+    await prisma.adminLog.create({
+      data: {
+        adminEmail: admin.email,
+        action: "PAYMENT_VERIFIED",
+        targetUserEmail: payment.email,
+        targetRecordId: paymentId,
+        details: `Verified payment ₹${payment.amount} for UTR ${payment.utrNumber || 'N/A'}.`,
+      },
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        adminEmail: admin.email,
+        action: "PAYMENT_VERIFIED",
+        targetUserEmail: payment.email,
+        targetRecordId: paymentId,
+        newStatus: "VERIFIED",
+        notes: `Payment verified by ${admin.email}.`,
+      },
+    });
+
     // Create Notification in DB
     await prisma.notification.create({
       data: {
@@ -37,6 +84,17 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         title: "✅ Payment Verified!",
         message: `Your payment of ₹${payment.amount} has been verified. Your consultation will be scheduled soon. Contact: +91 75418 81152`,
         category: "PAYMENT",
+        paymentId,
+      },
+    });
+
+    // Log Email Event
+    await prisma.emailLog.create({
+      data: {
+        recipient: payment.email,
+        subject: "Payment Verified – Your Consultation is Being Scheduled",
+        template: "USER_PAYMENT_VERIFIED",
+        status: "SENT",
       },
     });
 

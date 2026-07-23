@@ -40,30 +40,36 @@ export default function UserProfilePage() {
 
   const fetchProfile = async () => {
     setLoading(true);
+    setError("");
     try {
       const token = getToken();
-      const res = await fetch(`${BACKEND_URL}/api/v1/user/profile`, {
+      let res = await fetch("/api/v1/user/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) {
+        res = await fetch(`${BACKEND_URL}/api/v1/user/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
       const json = await res.json();
-      if (!res.ok) throw new Error(json.detail || "Failed to load profile");
+      if (!res.ok) throw new Error(json.detail || json.message || "Failed to load profile");
 
-      const p = json.data;
+      const p = json.data || json;
       setProfile(p);
       setFormData({
-        name: p.personal_information?.name || "",
-        dob: p.personal_information?.dob || "",
-        gender: p.personal_information?.gender || "",
-        marital_status: p.personal_information?.marital_status || "",
-        blood_group: p.personal_information?.blood_group || "",
-        occupation: p.personal_information?.occupation || "",
-        education: p.personal_information?.education || "",
+        name: p.personal_information?.name || p.name || "",
+        dob: p.personal_information?.dob || p.dob || "",
+        gender: p.personal_information?.gender || p.gender || "",
+        marital_status: p.personal_information?.marital_status || p.maritalStatus || "",
+        blood_group: p.personal_information?.blood_group || p.bloodGroup || "",
+        occupation: p.personal_information?.occupation || p.occupation || "",
+        education: p.personal_information?.education || p.education || "",
         aadhaar: "",
         pan: "",
-        avatar_url: p.personal_information?.avatar_url || "",
+        avatar_url: p.personal_information?.avatar_url || p.avatar_url || "",
       });
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Failed to load profile");
     } finally {
       setLoading(false);
     }
@@ -80,7 +86,7 @@ export default function UserProfilePage() {
     setSuccess("");
     try {
       const token = getToken();
-      const res = await fetch(`${BACKEND_URL}/api/v1/user/profile/update`, {
+      let res = await fetch("/api/v1/user/profile/update", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -88,14 +94,24 @@ export default function UserProfilePage() {
         },
         body: JSON.stringify(formData),
       });
+      if (!res.ok) {
+        res = await fetch(`${BACKEND_URL}/api/v1/user/profile/update`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        });
+      }
       const json = await res.json();
-      if (!res.ok) throw new Error(json.detail || "Failed to update profile");
+      if (!res.ok) throw new Error(json.detail || json.message || "Failed to update profile");
 
       setSuccess("Profile updated successfully!");
       setEditMode(false);
       fetchProfile();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Failed to update profile");
     } finally {
       setSaving(false);
     }

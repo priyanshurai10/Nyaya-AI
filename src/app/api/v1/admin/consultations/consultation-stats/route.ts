@@ -36,6 +36,24 @@ export async function GET(req: NextRequest) {
 
     const totalRevenue = revenueResult._sum.amount || 0;
 
+    // Compute actual signup count per day for past 7 days from DB
+    const now = new Date();
+    const signupsChart = [];
+    for (let i = 6; i >= 0; i--) {
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i, 0, 0, 0);
+      const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i, 23, 59, 59);
+      const count = await prisma.user.count({
+        where: {
+          createdAt: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+        },
+      });
+      const dayLabel = startOfDay.toLocaleDateString("en-US", { weekday: "short" });
+      signupsChart.push({ day: dayLabel, date: startOfDay.toISOString().split("T")[0], count });
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -45,17 +63,11 @@ export async function GET(req: NextRequest) {
         verified_payments: verifiedPayments,
         declined_payments: declinedPayments,
         total_consultations: totalConsultations,
-        waiting_consultations: totalConsultations - (scheduledConsultations + completedConsultations),
+        waiting_consultations: Math.max(0, totalConsultations - (scheduledConsultations + completedConsultations)),
         scheduled_consultations: scheduledConsultations,
         completed_consultations: completedConsultations,
         total_revenue: totalRevenue,
-        signups_chart: [
-          { day: "Mon", count: Math.max(1, Math.floor(totalUsers * 0.15)) },
-          { day: "Tue", count: Math.max(1, Math.floor(totalUsers * 0.2)) },
-          { day: "Wed", count: Math.max(1, Math.floor(totalUsers * 0.25)) },
-          { day: "Thu", count: Math.max(1, Math.floor(totalUsers * 0.1)) },
-          { day: "Fri", count: Math.max(1, Math.floor(totalUsers * 0.3)) },
-        ]
+        signups_chart: signupsChart,
       }
     });
   } catch (error: any) {
