@@ -39,7 +39,6 @@ class User(Base):
     saved_cases = relationship("SavedCase", back_populates="user", cascade="all, delete-orphan")
     bookmarks = relationship("CourtBookmark", back_populates="user", cascade="all, delete-orphan")
     searches = relationship("SearchHistory", back_populates="user", cascade="all, delete-orphan")
-    appointments = relationship("Appointment", back_populates="user", cascade="all, delete-orphan")
     case_folders = relationship("CaseFolder", back_populates="user", cascade="all, delete-orphan")
     calendar_events = relationship("LegalCalendarEvent", back_populates="user", cascade="all, delete-orphan")
     transactions = relationship("Transaction", back_populates="user", cascade="all, delete-orphan")
