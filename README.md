@@ -1,90 +1,345 @@
-# Nyaya AI (न्याय एआई) — Multilingual Legal Operating System
+# ⚖️ Nyaya AI (न्याय AI)
 
-Nyaya AI is India's first multilingual AI Legal Operating System designed to help common citizens understand legal documents, notices, FIRs, contracts, and rights in simple, native languages.
+> India's Multilingual AI Legal Assistant
 
-This is the **Day 1 MVP Foundation** built using Agentic Engineering principles with Next.js, FastAPI, SQLite, and Google Gemini API.
+Nyaya AI is an AI-powered legal assistance platform that helps users understand legal information, analyze legal documents, connect with advocates, and access legal guidance in simple language. The platform is designed to make legal services more accessible through artificial intelligence, multilingual support, and an intuitive user experience.
 
----
-
-## 🚀 Key Features (Day 1 MVP)
-
-- **Empathetic Landing Page**: Modern glassmorphic interface with interactive feature overviews.
-- **ChatGPT-Style Legal Chat**: Chat interface supporting rich legal formatting, citations, and steps.
-- **Explain to My Mother Mode**: A toggle to translate dense legal terminology into simple, comforting, jargon-free explanations.
-- **Multi-Agent Orchestration**: A 4-agent backend pipeline (Safety, Language, Memory, and Legal Chat Agents) powered by Google Gemini.
-- **Hinglish + Hindi + English Support**: Seamless processing of mixed scripts and native regional dialects.
-- **Persistent Local History**: SQLite-backed session tracking and memory summarization.
-- **Double-Safe Disclaimer System**: Initial consent modal and pinned warnings to comply with Indian legal advisory regulations.
+🌐 **Live Website:** [https://nyaya-ai-website.vercel.app/](https://nyaya-ai-website.vercel.app/)
 
 ---
 
-## 🛠️ Tech Stack
+# 📖 Overview
 
-- **Frontend**: Next.js 14 (App Router), TypeScript, TailwindCSS, Lucide Icons.
-- **Backend**: FastAPI (Python 3.12), SQLAlchemy ORM, SQLite database.
-- **AI Engine**: Google Generative AI (Gemini 1.5 Flash/Pro), Pydantic structured output validation.
-- **Deployment**: Docker, ready for Google Cloud Run deployment.
+Understanding legal documents and procedures can be difficult for many people because of complex legal terminology and lengthy documentation. Nyaya AI simplifies this process by providing AI-powered legal assistance in multiple Indian languages.
+
+Users can chat with an AI legal assistant, upload legal documents for analysis, discover advocates, manage consultations, and organize their legal information from a single platform.
+
+The platform is built with a modern full-stack architecture using Next.js, FastAPI, PostgreSQL, and Groq-powered Large Language Models (LLMs).
 
 ---
 
-## 📂 Project Structure
+# ✨ Features
 
-```
-nyaya-ai/
+## 🤖 AI Legal Assistant
+
+- AI-powered legal conversations
+- Context-aware responses
+- Follow-up conversations
+- Structured legal explanations
+- Real-time AI responses
+
+---
+
+## 📄 Legal Document Analysis
+
+Upload and analyze documents such as:
+
+- Contracts
+- Agreements
+- FIRs
+- Legal Notices
+- Court Orders
+- Property Documents
+- Government Documents
+
+The AI helps users by:
+
+- Summarizing documents
+- Explaining legal terminology
+- Highlighting important sections
+- Answering document-related questions
+
+---
+
+## 🌐 Multilingual Support
+
+Supports multiple Indian languages including:
+
+- English
+- Hindi (हिन्दी)
+- Bengali (বাংলা)
+- Tamil (தமிழ்)
+- Telugu (తెలుగు)
+- Marathi (मराठी)
+- Gujarati (ગુજરાતી)
+- Kannada (ಕನ್ನಡ)
+- Malayalam (മലയാളം)
+- Punjabi (ਪੰਜਾਬੀ)
+
+Users can change their preferred language at any time, and the application interface updates accordingly.
+
+---
+
+## 👨‍⚖️ Advocate Discovery
+
+- Search advocates
+- Filter by specialization
+- View advocate profiles
+- Book consultations
+- Contact advocates
+
+---
+
+## 📅 Consultation Management
+
+- Schedule appointments
+- View consultation history
+- Track booking status
+
+---
+
+## 👤 User Management
+
+- User Registration
+- Secure Login
+- JWT Authentication
+- Profile Management
+- Language Preferences
+- Account Settings
+
+---
+
+## 📂 Document Management
+
+- Upload Documents
+- Secure Storage
+- View Uploaded Files
+- Document History
+
+---
+
+## 🎨 Modern User Experience
+
+- Responsive Design
+- Mobile Friendly
+- Dark Mode
+- Light Mode
+- Clean Dashboard
+- Professional UI
+
+---
+
+# 🛠️ Technology Stack
+
+## Frontend
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+
+## Backend
+
+- FastAPI
+- Python
+- SQLAlchemy
+
+## Database
+
+- PostgreSQL (Supabase)
+
+## Authentication
+
+- JWT Authentication
+- Password Hashing
+
+## AI
+
+- Groq API
+- Large Language Models (LLMs)
+
+## Email Service
+
+- Brevo SMTP
+
+## Deployment
+
+- Vercel
+- Railway
+- Supabase
+
+---
+
+# 📂 Project Structure
+
+```text
+Nyaya-AI/
+│
+├── src/
+│   ├── app/
+│   ├── components/
+│   ├── context/
+│   ├── hooks/
+│   ├── locales/
+│   ├── services/
+│   └── lib/
+│
 ├── backend/
 │   ├── app/
-│   │   ├── api/v1/chat.py      # FastAPI chat endpoints
-│   │   ├── agents/             # Multi-agent implementations
-│   │   │   ├── safety.py       # Safe input/output & disclaimers
-│   │   │   ├── language.py     # Translation & Hinglish detection
-│   │   │   ├── memory.py       # Case summary compression
-│   │   │   ├── legal.py        # Statutory citation reasoning
-│   │   │   └── orchestrator.py # Choreographs agent executions
-│   │   ├── core/               # DB & config setups
-│   │   ├── models/             # SQLAlchemy schemas
-│   │   └── schemas/            # Pydantic schemas
-│   ├── requirements.txt
-│   └── Dockerfile
-├── src/
-│   ├── app/                    # Next.js app pages (Landing & Chat)
-│   ├── components/             # Tailwind UI components
-│   └── lib/                    # Language utilities & mocks
-├── AGENTS.md                   # Multi-agent system documentation
-├── README.md                   # This instruction manual
-└── run_backend.bat             # Startup script for Windows users
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── database/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routers/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   └── utils/
+│   │
+│   └── requirements.txt
+│
+├── docs/
+│   └── screenshots/
+│
+├── README.md
+└── LICENSE
 ```
 
 ---
 
-## 🚦 How to Run the Project Locally
+# 🔄 Application Workflow
 
-### 1. Prerequisite: Gemini API Key
-Get your API key from [Google AI Studio](https://aistudio.google.com/) and define it in your shell environment:
-- **Windows (CMD)**: `set GEMINI_API_KEY=your_api_key_here`
-- **Windows (PowerShell)**: `$env:GEMINI_API_KEY="your_api_key_here"`
-- **Linux/macOS**: `export GEMINI_API_KEY="your_api_key_here"`
+```text
+User
 
-*Note: If no API key is specified, Nyaya AI will run in an **Offline Mock Fallback** mode, allowing you to test landlord, arrest, and FIR scenarios locally without hitting any API rate limits.*
+↓
 
-### 2. Start the Backend
-Double-click `run_backend.bat` in the root folder, or run:
-```bash
-cd backend
-pip install -r requirements.txt --user
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+Register / Login
+
+↓
+
+Dashboard
+
+↓
+
+Choose a Service
+
+↓
+
+AI Legal Chat
+OR
+Upload Legal Document
+OR
+Book Consultation
+
+↓
+
+AI Analysis
+
+↓
+
+Legal Information & Guidance
+
+↓
+
+Save History
 ```
-Verify the backend is active by visiting: `http://localhost:8000/` (should show status: `"healthy"`).
-
-### 3. Start the Frontend
-In a separate terminal shell:
-```bash
-npm run dev
-```
-Open `http://localhost:3000` in your web browser.
 
 ---
 
-## 🛡️ Security & Compliance
-- **Safety Agent Guardrails**: Automatically blocks requests seeking help for unlawful behavior or evading justice.
-- **Local Persistence**: DB stores sessions locally; no third-party telemetry outside the Gemini processing pipelines.
-- **Attorney-Client Limitation**: The interface makes it explicit that Nyaya AI is an informational tool, not a licensed practitioner.
+# 🔒 Security
+
+Nyaya AI follows modern security practices:
+
+- JWT Authentication
+- Password Hashing
+- Secure REST APIs
+- Input Validation
+- Environment Variable Protection
+- Database Security
+- Protected Routes
+
+---
+
+# 📸 Screenshots & Feature Demonstration
+
+### 1. 🤖 AI Legal Chat Assistant ("Mother Mode™" & Legal Statutory Guidance)
+![AI Legal Chat Assistant](docs/screenshots/chat_interface.png)
+*The AI Legal Assistant provides real-time, context-aware responses citing specific Indian statutory laws (such as BNSS Section 173(4) and CrPC Section 154(3)). Features include Mother Mode™ for simplified explanations, voice input, and step-by-step action recommendation chips.*
+
+---
+
+### 2. 🌐 Built-in 10-Language Indian Multilingual System
+![Multilingual Language Switcher](docs/screenshots/multilingual_switcher.png)
+*Built-in multi-language translation engine supporting 10 major Indian languages (English, Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, and Punjabi). Users can toggle languages instantly without page reloads.*
+
+---
+
+### 3. 🏠 Citizen Legal Dashboard & Core Tools
+![Citizen Legal Dashboard](docs/screenshots/dashboard.png)
+*The centralized citizen portal providing instant access to FIR & Legal Notice Generator, AI Evidence Vault (OCR), Legal Learning Academy (14 courses), and Nyaya Path (Court Hierarchy Navigator).*
+
+---
+
+### 🗂️ 4. Full Navigation Console Drawer
+![Navigation Sidebar](docs/screenshots/navigation_sidebar.png)
+*Comprehensive navigation drawer organizing legal tools into Core Console, Legal Aid & Drafts, Case Management, and Education & Community modules.*
+
+---
+
+# 🌟 Future Enhancements
+
+- Voice-Based Legal Assistant
+- OCR for Scanned Documents
+- AI Legal Research
+- Court Case Tracking
+- Video Consultation
+- Mobile Application
+- E-Sign Documents
+- Smart Legal Search
+- Legal Calendar
+- Push Notifications
+
+---
+
+# ⚠️ Disclaimer
+
+Nyaya AI is an AI-powered legal information platform created to help users understand legal concepts and documents more easily.
+
+The information provided by the application is intended for educational and informational purposes only. It should not be considered legal advice or a substitute for consultation with a qualified legal professional.
+
+Users should consult a licensed advocate before making legal decisions or taking legal action.
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome.
+
+If you'd like to improve Nyaya AI:
+
+1. Fork the repository
+2. Create a new branch
+3. Commit your changes
+4. Push the branch
+5. Open a Pull Request
+
+---
+
+# 📜 License
+
+This project is licensed under the MIT License.
+
+---
+
+# 👨‍💻 Developer
+
+**Priyanshu Rai**
+
+B.Tech in Computer Science & Engineering
+
+GitHub: [https://github.com/priyanshurai10](https://github.com/priyanshurai10)
+
+LinkedIn: [https://linkedin.com/in/priyanshu-rai-2114722ab](https://linkedin.com/in/priyanshu-rai-2114722ab)
+
+---
+
+## ⭐ Support
+
+If you like this project, please consider giving it a ⭐ on GitHub.
+It helps others discover the project and supports future development.
+
+---
+
+© 2026 Nyaya AI. All Rights Reserved.
