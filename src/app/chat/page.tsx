@@ -224,17 +224,15 @@ export default function ChatPage() {
         };
         setMessages((prev) => [...prev, aiMsg]);
       } catch (err: any) {
-        console.warn('Backend chat failed, falling back to mock response', err);
-        // Fallback
-        const mock = getMockResponse(trimmed, motherMode);
-        const aiMsg: Message = {
+        console.error('Backend AI Chat request failed:', err);
+        const errorMessage = err?.data?.message || err?.message || 'AI Assistant service encountered an error. Please verify Groq API key configuration.';
+        const errorMsg: Message = {
           id: uid(),
           role: 'ai',
-          content: mock.response,
+          content: `⚠️ **Legal AI Service Exception**\n\n${errorMessage}\n\n*All responses must originate from the real LLM engine. Please check backend server status.*`,
           timestamp: new Date(),
-          nextSteps: mock.nextSteps || [],
         };
-        setMessages((prev) => [...prev, aiMsg]);
+        setMessages((prev) => [...prev, errorMsg]);
       } finally {
         setIsTyping(false);
       }
