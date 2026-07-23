@@ -361,6 +361,8 @@ model Transaction {
   status         String  @default("PENDING") // PENDING, APPROVED, REJECTED, REFUNDED
   paymentMethod  String  @default("UPI")
   remarks        String?
+  admin_notes    String?
+  adminNotes     String?
 
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
