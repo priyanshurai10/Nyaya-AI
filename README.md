@@ -260,19 +260,43 @@ Nyaya AI follows modern security practices:
 
 ---
 
-### 2. 🌐 Built-in 10-Language Indian Multilingual System
+### 2. 🏠 Personalized Citizen Dashboard & Welcome Banner
+![Personalized Citizen Dashboard](docs/screenshots/welcome_dashboard.png)
+*Centralized citizen portal welcoming authenticated users by name ("Welcome, Priyanshu Rai 👋") with quick actions (Talk to Specialist, AI Risk Scan) and Core Legal Superpowers (AI Chat, Specialist Call, Risk Analyzer, Strategy Builder).*
+
+---
+
+### 3. 🌐 Built-in 10-Language Indian Multilingual System
 ![Multilingual Language Switcher](docs/screenshots/multilingual_switcher.png)
 *Built-in multi-language translation engine supporting 10 major Indian languages (English, Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, and Punjabi). Users can toggle languages instantly without page reloads.*
 
 ---
 
-### 3. 🏠 Citizen Legal Dashboard & Core Tools
-![Citizen Legal Dashboard](docs/screenshots/dashboard.png)
-*The centralized citizen portal providing instant access to FIR & Legal Notice Generator, AI Evidence Vault (OCR), Legal Learning Academy (14 courses), and Nyaya Path (Court Hierarchy Navigator).*
+### 4. 👤 Authenticated User Profile & Permanent Details Storage
+![User Profile Details](docs/screenshots/profile_details.png)
+*Connected user profile permanently storing personal information in PostgreSQL (Date of Birth, Gender, Marital Status, Blood Group, Occupation, Education, Address, District, State, Pincode, and Preferred Language).*
 
 ---
 
-### 🗂️ 4. Full Navigation Console Drawer
+### 5. 🎓 Legal Learning Academy (BNS, BNSS & BSA 2023 Modules)
+![Legal Learning Academy](docs/screenshots/legal_academy.png)
+*Interactive learning academy offering 14 structured modules covering new Indian criminal laws (Bharatiya Nyaya Sanhita 2023, Bharatiya Nagarik Suraksha Sanhita 2023, Bharatiya Sakshya Adhiniyam 2023 Electronic Evidence), Consumer Protection, and POSH Act with quizzes.*
+
+---
+
+### 6. 🗺️ Nyaya Path - Legal Guides & Action Pathways
+![Legal Guides & Pathways](docs/screenshots/legal_pathways.png)
+*Step-by-step procedure navigator showing dispute resolution timelines, required documents, first-instance authorities, and jurisdictional guidance for Property Law, Employment Law, Family Law, Civil, and Criminal Cases.*
+
+---
+
+### 7. 🛠️ Citizen Legal Tools & Feature Hub
+![Citizen Legal Tools](docs/screenshots/dashboard.png)
+*Quick-access cards for FIR & Legal Notice Generator, AI Evidence Vault (OCR), Legal Learning Academy, and Nyaya Path Court Hierarchy Navigator.*
+
+---
+
+### 🗂️ 8. Full Navigation Console Drawer
 ![Navigation Sidebar](docs/screenshots/navigation_sidebar.png)
 *Comprehensive navigation drawer organizing legal tools into Core Console, Legal Aid & Drafts, Case Management, and Education & Community modules.*
 
