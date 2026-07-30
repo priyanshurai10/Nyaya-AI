@@ -9,10 +9,8 @@
 -- 1. Authenticated users can only read, insert, update, or delete their own data.
 -- 2. Anonymous users have ZERO access to sensitive user data, chats, payments, or documents.
 -- 3. Super Admin (priyanshurai121111@gmail.com) has full administrative visibility & management.
--- 4. Public lookup tables (courts, judges, guides, laws) are read-only for public access.
+-- 4. Public lookup tables (courts, judges, guides, laws, courses, lessons) are read-only for public access.
 -- ==============================================================================
-
-BEGIN;
 
 -- ------------------------------------------------------------------------------
 -- STEP 1: DYNAMICALLY ENABLE RLS ON ALL TABLES IN THE PUBLIC SCHEMA
@@ -52,7 +50,6 @@ END $$;
 -- STEP 3: CREATE SECURE POLICIES FOR USER MANAGEMENT & AUTHENTICATION
 -- ------------------------------------------------------------------------------
 
--- Table: public.users (and legacy public."User")
 DO $$ 
 BEGIN
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'users') THEN
@@ -102,7 +99,6 @@ END $$;
 -- STEP 4: CREATE SECURE POLICIES FOR AI LEGAL CHAT & CONVERSATIONS
 -- ------------------------------------------------------------------------------
 
--- Table: public.chat_sessions
 DO $$ 
 BEGIN
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'chat_sessions') THEN
@@ -119,7 +115,6 @@ BEGIN
             USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
     END IF;
 
-    -- Table: public.chat_messages
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'chat_messages') THEN
         CREATE POLICY "chat_messages_select_own_or_admin" ON public.chat_messages FOR SELECT TO authenticated
             USING (
@@ -157,7 +152,6 @@ END $$;
 
 DO $$ 
 BEGIN
-    -- Table: public.documents & public."Document"
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'documents') THEN
         CREATE POLICY "documents_select_own_or_admin" ON public.documents FOR SELECT TO authenticated
             USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
@@ -225,7 +219,6 @@ END $$;
 
 DO $$ 
 BEGIN
-    -- Table: public.transactions & public."Transaction"
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'transactions') THEN
         CREATE POLICY "transactions_select_own_or_admin" ON public.transactions FOR SELECT TO authenticated
             USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
@@ -250,7 +243,6 @@ BEGIN
             WITH CHECK ((auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
     END IF;
 
-    -- Table: public."Payment"
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'Payment') THEN
         CREATE POLICY "Payment_select_own_or_admin" ON public."Payment" FOR SELECT TO authenticated
             USING ("userId"::text = auth.uid()::text OR email = auth.jwt() ->> 'email' OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
@@ -263,7 +255,6 @@ BEGIN
             WITH CHECK ((auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
     END IF;
 
-    -- Table: public."PaymentScreenshot"
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'PaymentScreenshot') THEN
         CREATE POLICY "PaymentScreenshot_select_own_or_admin" ON public."PaymentScreenshot" FOR SELECT TO authenticated
             USING ("userId"::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
@@ -280,7 +271,6 @@ END $$;
 
 DO $$ 
 BEGIN
-    -- Table: public.consultation_requests
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'consultation_requests') THEN
         CREATE POLICY "consultations_select_own_or_admin" ON public.consultation_requests FOR SELECT TO authenticated
             USING (user_id::text = auth.uid()::text OR email = auth.jwt() ->> 'email' OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
@@ -292,7 +282,6 @@ BEGIN
             USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
     END IF;
 
-    -- Table: public."Consultation"
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'Consultation') THEN
         CREATE POLICY "Consultation_select_own_or_admin" ON public."Consultation" FOR SELECT TO authenticated
             USING ("userId"::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
@@ -304,7 +293,6 @@ BEGIN
             USING ("userId"::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
     END IF;
 
-    -- Table: public."ConsultationSchedule" & public."ConsultationHistory"
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'ConsultationSchedule') THEN
         CREATE POLICY "ConsultationSchedule_select_own_or_admin" ON public."ConsultationSchedule" FOR SELECT TO authenticated
             USING (
@@ -326,11 +314,22 @@ BEGIN
         CREATE POLICY "ConsultationHistory_admin_manage" ON public."ConsultationHistory" FOR ALL TO authenticated
             USING ((auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
     END IF;
+
+    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'appointments') THEN
+        CREATE POLICY "appointments_select_own_or_admin" ON public.appointments FOR SELECT TO authenticated
+            USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
+            
+        CREATE POLICY "appointments_insert_own" ON public.appointments FOR INSERT TO authenticated, service_role
+            WITH CHECK (user_id::text = auth.uid()::text OR auth.role() = 'service_role');
+            
+        CREATE POLICY "appointments_update_own_or_admin" ON public.appointments FOR UPDATE TO authenticated
+            USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
+    END IF;
 END $$;
 
 
 -- ------------------------------------------------------------------------------
--- STEP 8: CREATE SECURE POLICIES FOR USER NOTIFICATIONS & ACTIVITY HISTORY
+-- STEP 8: CREATE SECURE POLICIES FOR NOTIFICATIONS, ACTIVITY & PROGRESS
 -- ------------------------------------------------------------------------------
 
 DO $$ 
@@ -357,141 +356,137 @@ BEGIN
             USING ("userId"::text = auth.uid()::text);
     END IF;
 
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'UserActivityTimeline') THEN
-        CREATE POLICY "UserActivityTimeline_select_own" ON public."UserActivityTimeline" FOR SELECT TO authenticated
-            USING ("userId"::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
-    END IF;
-
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'UserProgress') THEN
         CREATE POLICY "UserProgress_all_own" ON public."UserProgress" FOR ALL TO authenticated
             USING ("userId"::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com')
             WITH CHECK ("userId"::text = auth.uid()::text);
     END IF;
 
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'Bookmark') THEN
-        CREATE POLICY "Bookmark_all_own" ON public."Bookmark" FOR ALL TO authenticated
-            USING ("userId"::text = auth.uid()::text)
-            WITH CHECK ("userId"::text = auth.uid()::text);
-    END IF;
-
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'court_bookmarks') THEN
-        CREATE POLICY "court_bookmarks_all_own" ON public.court_bookmarks FOR ALL TO authenticated
-            USING (user_id::text = auth.uid()::text)
+    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'user_progress') THEN
+        CREATE POLICY "user_progress_all_own" ON public.user_progress FOR ALL TO authenticated
+            USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com')
             WITH CHECK (user_id::text = auth.uid()::text);
     END IF;
+END $$;
 
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'search_histories') THEN
-        CREATE POLICY "search_histories_all_own" ON public.search_histories FOR ALL TO authenticated
-            USING (user_id::text = auth.uid()::text)
-            WITH CHECK (user_id::text = auth.uid()::text);
-    END IF;
 
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'ReadingHistory') THEN
-        CREATE POLICY "ReadingHistory_all_own" ON public."ReadingHistory" FOR ALL TO authenticated
-            USING ("userId"::text = auth.uid()::text)
-            WITH CHECK ("userId"::text = auth.uid()::text);
-    END IF;
+-- ------------------------------------------------------------------------------
+-- STEP 9: DYNAMIC CATCH-ALL FOR 100% TABLE SECURITY COVERAGE
+-- ------------------------------------------------------------------------------
+-- Automatically attaches secure RLS policies to ANY remaining table in public schema
+-- so that ZERO tables remain with "RLS ENABLED WITHOUT POLICIES".
 
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'saved_cases') THEN
-        CREATE POLICY "saved_cases_all_own" ON public.saved_cases FOR ALL TO authenticated
-            USING (user_id::text = auth.uid()::text)
-            WITH CHECK (user_id::text = auth.uid()::text);
-    END IF;
+DO $$
+DECLARE
+    tbl RECORD;
+    has_user_id BOOLEAN;
+    has_userId BOOLEAN;
+    has_email BOOLEAN;
+    is_public_ref BOOLEAN;
+    pol_count INT;
+BEGIN
+    FOR tbl IN (
+        SELECT tablename 
+        FROM pg_tables 
+        WHERE schemaname = 'public'
+    ) LOOP
+        -- Count active policies on this table
+        SELECT COUNT(*) INTO pol_count 
+        FROM pg_policies 
+        WHERE schemaname = 'public' AND tablename = tbl.tablename;
 
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'case_folders') THEN
-        CREATE POLICY "case_folders_all_own" ON public.case_folders FOR ALL TO authenticated
-            USING (user_id::text = auth.uid()::text)
-            WITH CHECK (user_id::text = auth.uid()::text);
-    END IF;
-
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'case_tasks') THEN
-        CREATE POLICY "case_tasks_all_own" ON public.case_tasks FOR ALL TO authenticated
-            USING (
-                EXISTS (
-                    SELECT 1 FROM public.case_folders f 
-                    WHERE f.id = case_tasks.folder_id 
-                    AND f.user_id::text = auth.uid()::text
-                )
+        -- If zero policies exist for this table, dynamically add policies!
+        IF pol_count = 0 THEN
+            -- Check if it is a public reference table
+            is_public_ref := tbl.tablename IN (
+                'courses', 'lessons', 'knowledge_articles', 'landmark_judgments', 
+                'courts', 'judges', 'police_stations', 'legal_aid_centres', 
+                'consumer_forums', 'location_pincodes', 'Lawyer', 'lawyers', 'advocates'
             );
-    END IF;
 
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'legal_calendar_events') THEN
-        CREATE POLICY "legal_calendar_events_all_own" ON public.legal_calendar_events FOR ALL TO authenticated
-            USING (user_id::text = auth.uid()::text)
-            WITH CHECK (user_id::text = auth.uid()::text);
-    END IF;
-END $$;
-
-
--- ------------------------------------------------------------------------------
--- STEP 9: PUBLIC REFERENCE TABLES (READ-ONLY FOR PUBLIC, WRITE FOR ADMIN)
--- ------------------------------------------------------------------------------
-
-DO $$ 
-DECLARE
-    ref_table TEXT;
-    ref_tables TEXT[] := ARRAY[
-        'courts', 'judges', 'police_stations', 'legal_aid_centres', 
-        'consumer_forums', 'location_pincodes', 'knowledge_articles', 
-        'landmark_judgments', 'Lawyer', 'lawyers', 'advocates'
-    ];
-BEGIN
-    FOREACH ref_table IN ARRAY ref_tables LOOP
-        IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = ref_table) THEN
-            EXECUTE format('
-                CREATE POLICY "%I_public_select" ON public.%I FOR SELECT TO anon, authenticated
-                    USING (true);
-                CREATE POLICY "%I_admin_modify" ON public.%I FOR ALL TO authenticated, service_role
+            IF is_public_ref THEN
+                -- Public READ policy for anon and authenticated
+                EXECUTE format('
+                    CREATE POLICY %I ON public.%I FOR SELECT TO anon, authenticated USING (true);
+                ', tbl.tablename || '_public_select', tbl.tablename);
+                
+                -- Admin ALL policy
+                EXECUTE format('
+                    CREATE POLICY %I ON public.%I FOR ALL TO authenticated, service_role 
                     USING ((auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'' OR auth.role() = ''service_role'')
                     WITH CHECK ((auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'' OR auth.role() = ''service_role'');
-            ', ref_table, ref_table, ref_table, ref_table);
+                ', tbl.tablename || '_admin_all', tbl.tablename);
+            ELSE
+                -- Inspect column structure
+                SELECT EXISTS (
+                    SELECT 1 FROM information_schema.columns 
+                    WHERE table_schema = 'public' AND table_name = tbl.tablename AND column_name = 'user_id'
+                ) INTO has_user_id;
+
+                SELECT EXISTS (
+                    SELECT 1 FROM information_schema.columns 
+                    WHERE table_schema = 'public' AND table_name = tbl.tablename AND column_name = 'userId'
+                ) INTO has_userId;
+
+                SELECT EXISTS (
+                    SELECT 1 FROM information_schema.columns 
+                    WHERE table_schema = 'public' AND table_name = tbl.tablename AND column_name = 'email'
+                ) INTO has_email;
+
+                IF has_user_id THEN
+                    EXECUTE format('
+                        CREATE POLICY %I ON public.%I FOR SELECT TO authenticated 
+                        USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'');
+                        CREATE POLICY %I ON public.%I FOR INSERT TO authenticated, service_role 
+                        WITH CHECK (user_id::text = auth.uid()::text OR auth.role() = ''service_role'');
+                        CREATE POLICY %I ON public.%I FOR UPDATE TO authenticated 
+                        USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'');
+                        CREATE POLICY %I ON public.%I FOR DELETE TO authenticated 
+                        USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'');
+                    ', 
+                    tbl.tablename || '_select_own', tbl.tablename,
+                    tbl.tablename || '_insert_own', tbl.tablename,
+                    tbl.tablename || '_update_own', tbl.tablename,
+                    tbl.tablename || '_delete_own', tbl.tablename);
+                ELSIF has_userId THEN
+                    EXECUTE format('
+                        CREATE POLICY %I ON public.%I FOR SELECT TO authenticated 
+                        USING ("userId"::text = auth.uid()::text OR (auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'');
+                        CREATE POLICY %I ON public.%I FOR INSERT TO authenticated, service_role 
+                        WITH CHECK ("userId"::text = auth.uid()::text OR auth.role() = ''service_role'');
+                        CREATE POLICY %I ON public.%I FOR UPDATE TO authenticated 
+                        USING ("userId"::text = auth.uid()::text OR (auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'');
+                        CREATE POLICY %I ON public.%I FOR DELETE TO authenticated 
+                        USING ("userId"::text = auth.uid()::text OR (auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'');
+                    ', 
+                    tbl.tablename || '_select_own', tbl.tablename,
+                    tbl.tablename || '_insert_own', tbl.tablename,
+                    tbl.tablename || '_update_own', tbl.tablename,
+                    tbl.tablename || '_delete_own', tbl.tablename);
+                ELSIF has_email THEN
+                    EXECUTE format('
+                        CREATE POLICY %I ON public.%I FOR SELECT TO authenticated 
+                        USING (email = auth.jwt() ->> ''email'' OR (auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'');
+                        CREATE POLICY %I ON public.%I FOR INSERT TO authenticated, service_role 
+                        WITH CHECK (email = auth.jwt() ->> ''email'' OR auth.role() = ''service_role'');
+                        CREATE POLICY %I ON public.%I FOR UPDATE TO authenticated 
+                        USING (email = auth.jwt() ->> ''email'' OR (auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'');
+                        CREATE POLICY %I ON public.%I FOR DELETE TO authenticated 
+                        USING (email = auth.jwt() ->> ''email'' OR (auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'');
+                    ', 
+                    tbl.tablename || '_select_own', tbl.tablename,
+                    tbl.tablename || '_insert_own', tbl.tablename,
+                    tbl.tablename || '_update_own', tbl.tablename,
+                    tbl.tablename || '_delete_own', tbl.tablename);
+                ELSE
+                    -- Default fallback: Admin & Service Role access only
+                    EXECUTE format('
+                        CREATE POLICY %I ON public.%I FOR ALL TO authenticated, service_role 
+                        USING ((auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'' OR auth.role() = ''service_role'')
+                        WITH CHECK ((auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'' OR auth.role() = ''service_role'');
+                    ', tbl.tablename || '_admin_fallback', tbl.tablename);
+                END IF;
+            END IF;
         END IF;
     END LOOP;
 END $$;
-
-
--- ------------------------------------------------------------------------------
--- STEP 10: ADMIN AUDIT & DIAGNOSTIC LOGS (ADMIN ONLY)
--- ------------------------------------------------------------------------------
-
-DO $$ 
-DECLARE
-    log_table TEXT;
-    log_tables TEXT[] := ARRAY[
-        'audit_logs', 'AuditLog', 'AdminLog', 'evaluation_logs', 
-        'skill_invocation_logs', 'SystemErrorLog', 'EmailLog', 'BackupLog'
-    ];
-BEGIN
-    FOREACH log_table IN ARRAY log_tables LOOP
-        IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = log_table) THEN
-            EXECUTE format('
-                CREATE POLICY "%I_admin_only_access" ON public.%I FOR ALL TO authenticated, service_role
-                    USING ((auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'' OR auth.role() = ''service_role'')
-                    WITH CHECK ((auth.jwt() ->> ''email'') = ''priyanshurai121111@gmail.com'' OR auth.role() = ''service_role'');
-            ', log_table, log_table);
-        END IF;
-    END LOOP;
-END $$;
-
-
--- Feedback table: Authenticated users can insert feedback, Admin can select all
-DO $$ 
-BEGIN
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'feedbacks') THEN
-        CREATE POLICY "feedbacks_insert_own" ON public.feedbacks FOR INSERT TO authenticated
-            WITH CHECK (user_id::text = auth.uid()::text OR user_id IS NULL);
-            
-        CREATE POLICY "feedbacks_select_admin" ON public.feedbacks FOR SELECT TO authenticated
-            USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
-    END IF;
-
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'feedback') THEN
-        CREATE POLICY "feedback_insert_own" ON public.feedback FOR INSERT TO authenticated
-            WITH CHECK (user_id::text = auth.uid()::text OR user_id IS NULL);
-            
-        CREATE POLICY "feedback_select_admin" ON public.feedback FOR SELECT TO authenticated
-            USING (user_id::text = auth.uid()::text OR (auth.jwt() ->> 'email') = 'priyanshurai121111@gmail.com');
-    END IF;
-END $$;
-
-COMMIT;
