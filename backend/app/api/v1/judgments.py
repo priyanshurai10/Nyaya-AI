@@ -25,6 +25,39 @@ def get_judgments(
         
     judgments = query.order_by(LandmarkJudgment.date.desc()).limit(50).all()
     
+    if not judgments:
+        return {
+            "success": True,
+            "data": [
+                {
+                    "id": "mock-1",
+                    "case_name": "Kesavananda Bharati v. State of Kerala",
+                    "court": "Supreme Court of India",
+                    "bench": "13-Judge Bench",
+                    "citation": "AIR 1973 SC 1461",
+                    "date": "1973-04-24",
+                    "legal_issue": "Can the Parliament amend the basic structure of the Constitution?",
+                    "decision": "Parliament cannot alter the 'Basic Structure' of the Constitution.",
+                    "impact": "Saved Indian democracy from absolute parliamentary power.",
+                    "related_laws": ["Article 368"],
+                    "related_judgments": []
+                },
+                {
+                    "id": "mock-2",
+                    "case_name": "Justice K. S. Puttaswamy (Retd.) and Anr. vs Union Of India",
+                    "court": "Supreme Court of India",
+                    "bench": "9-Judge Bench",
+                    "citation": "(2017) 10 SCC 1",
+                    "date": "2017-08-24",
+                    "legal_issue": "Is the Right to Privacy a fundamental right?",
+                    "decision": "Right to Privacy is recognized as a fundamental right under Article 21.",
+                    "impact": "Revolutionized data privacy and shaped the DPDP Act.",
+                    "related_laws": ["Article 21"],
+                    "related_judgments": []
+                }
+            ]
+        }
+
     return {
         "success": True,
         "data": [
