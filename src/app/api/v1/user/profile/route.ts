@@ -187,7 +187,20 @@ export async function GET(request: Request) {
   } catch (error: any) {
     console.error("[Profile API Error]:", error);
     return NextResponse.json(
-      { success: false, message: "Internal server error.", error: error.message },
+      { 
+        success: false, 
+        message: "Internal server error.", 
+        error: error.message,
+        error_name: error.name,
+        error_code: error.code,
+        error_meta: error.meta,
+        env_diagnostics: {
+          has_database_url: !!process.env.DATABASE_URL,
+          has_direct_url: !!process.env.DIRECT_URL,
+          node_env: process.env.NODE_ENV,
+          has_jwt_secret: !!process.env.JWT_SECRET
+        }
+      },
       { status: 500 }
     );
   }
