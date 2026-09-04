@@ -35,7 +35,7 @@ export default function ActiveCasesPage() {
   const fetchCases = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/v1/cases");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/cases`);
       const data = await res.json();
       if (data.success && data.data) {
         setCases(data.data.map((c: any) => ({
@@ -65,7 +65,7 @@ export default function ActiveCasesPage() {
     }
     setIsAdding(true);
     try {
-      const res = await fetch("/api/v1/cases", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/cases`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

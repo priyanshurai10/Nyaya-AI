@@ -81,7 +81,7 @@ export default function LitigationCalendarPage() {
   const fetchEvents = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/v1/calendar");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/calendar`);
       const data = await res.json();
       if (data.success && data.data) {
         setEvents(data.data);
@@ -101,7 +101,7 @@ export default function LitigationCalendarPage() {
     }
     setIsAdding(true);
     try {
-      const res = await fetch("/api/v1/calendar", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/calendar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(addForm)
@@ -135,7 +135,7 @@ export default function LitigationCalendarPage() {
 
   const handleDeleteEvent = async (id: string) => {
     try {
-      await fetch(`/api/v1/calendar/${id}`, { method: "DELETE" });
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/calendar/${id}`, { method: "DELETE" });
       setEvents(prev => prev.filter(e => e.id !== id));
       setNotificationMsg("Event removed from calendar.");
       setTimeout(() => setNotificationMsg(null), 3000);

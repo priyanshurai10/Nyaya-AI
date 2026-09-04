@@ -51,10 +51,15 @@ def startup_event():
     # Run data retention cleanup in a background thread on startup
     threading.Thread(target=run_data_retention_cleanup, daemon=True).start()
 
-# Setup CORS - For MVP, allow all origins to ease local testing
+# Setup CORS - Strict origins to allow credentials
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://nyayaa-ai-website.vercel.app",
+        "https://nyaya-ai-website.vercel.app",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

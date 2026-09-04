@@ -41,7 +41,7 @@ export default function RiskPage() {
     setError("");
     setInsights(null);
     try {
-      const res = await fetch("/api/v1/ai-insights", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/ai-insights`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ situation }),

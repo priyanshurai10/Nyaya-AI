@@ -27,7 +27,7 @@ export default function DocumentAnalyzerPage() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/v1/documents/upload", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/documents/upload`, {
         method: "POST",
         body: formData
       });

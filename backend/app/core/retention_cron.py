@@ -50,7 +50,7 @@ def run_data_retention_cleanup():
                 cleaned_schedules += 1
 
         # 3. Delete notifications older than 60 days
-        deleted_notifications = db.query(Notification).filter(Notification.created_at < cutoff_date).delete(synchronize_session=false)
+        deleted_notifications = db.query(Notification).filter(Notification.created_at < cutoff_date).delete(synchronize_session=False)
 
         db.commit()
 

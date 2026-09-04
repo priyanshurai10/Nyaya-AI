@@ -86,7 +86,7 @@ export default function EvidenceVaultPage() {
   const fetchFiles = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/v1/vault");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/vault`);
       const data = await res.json();
       if (data.success && data.data) {
         setFiles(data.data);
@@ -116,7 +116,7 @@ export default function EvidenceVaultPage() {
     formData.append("vault_category", uploadCategory);
 
     try {
-      const res = await fetch("/api/v1/vault/upload", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/vault/upload`, {
         method: "POST",
         body: formData,
       });
@@ -137,7 +137,7 @@ export default function EvidenceVaultPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      await fetch(`/api/v1/vault/${id}`, { method: "DELETE" });
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/vault/${id}`, { method: "DELETE" });
       setFiles(prev => prev.filter(f => f.id !== id));
       setDeleteConfirmId(null);
       if (openAnalysisId === id) setOpenAnalysisId(null);
@@ -157,7 +157,7 @@ export default function EvidenceVaultPage() {
     setAnalysisError(null);
 
     try {
-      const res = await fetch(`/api/v1/vault/analyze/${file.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/vault/analyze/${file.id}`, {
         method: "POST",
       });
       const data = await res.json();

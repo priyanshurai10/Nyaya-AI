@@ -172,7 +172,8 @@ export default function AuthPage() {
     setLoading(true);
     const cleanEmail = email.trim();
     const cleanMobile = mobile.replace(/\D/g, '');
-    const url = isRegister ? '/api/v1/user/register' : '/api/v1/user/login';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    const url = isRegister ? `${baseUrl}/api/v1/user/register` : `${baseUrl}/api/v1/user/login`;
     const payload = isRegister
       ? {
           name: name.trim(),
@@ -270,7 +271,7 @@ export default function AuthPage() {
     }
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/user/forgot-password', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/user/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: forgotEmail })
@@ -304,7 +305,7 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/user/reset-password', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/user/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

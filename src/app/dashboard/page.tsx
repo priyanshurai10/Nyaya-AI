@@ -36,7 +36,7 @@ export default function UserDashboardPage() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/v1/user/logout', { method: 'POST' });
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/user/logout`, { method: 'POST' });
     } catch (e) {
       console.warn('Logout API error:', e);
     }
