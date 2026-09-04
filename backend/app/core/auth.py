@@ -39,6 +39,8 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    if isinstance(encoded_jwt, bytes):
+        return encoded_jwt.decode('utf-8')
     return encoded_jwt
 
 def decode_access_token(token: str) -> Optional[Dict[str, Any]]:
