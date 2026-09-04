@@ -88,7 +88,7 @@ export default function CaseBuilderPage() {
     setIsLoading(true);
     try {
       // 1. Create case in backend store
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/cases`, {
+      await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/cases`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -100,7 +100,7 @@ export default function CaseBuilderPage() {
       });
 
       // 2. Fetch AI strategy analysis
-      const aiRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/ai-insights`, {
+      const aiRes = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/ai-insights`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ situation: `[Category: ${formData.type}] Title: ${formData.title}. Description: ${formData.description}` }),

@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://nyaya-ai-backend-tyy5.onrender.com";
+const BACKEND_URL = "https://nyaya-ai-backend-tyy5.onrender.com";
 
 function getToken(): string {
   if (typeof window === "undefined") return "";
@@ -50,7 +50,9 @@ export default function UserProfilePage() {
 
     try {
       const token = getToken();
-      let res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/user/profile`, {
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "https://nyaya-ai-backend-tyy5.onrender.com/api/v1").replace(/\/api\/v1$/, "");
+      
+      let res = await fetch(`${baseUrl}/api/v1/user/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -112,22 +114,25 @@ export default function UserProfilePage() {
 
     try {
       const token = getToken();
-      let res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/user/profile/update`, {
-        method: "PUT",
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "https://nyaya-ai-backend-tyy5.onrender.com/api/v1").replace(/\/api\/v1$/, "");
+      const payload = formData;
+
+      let res = await fetch(`${baseUrl}/api/v1/user/profile/update`, {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload)
       });
       if (!res.ok) {
         res = await fetch(`${BACKEND_URL}/api/v1/user/profile/update`, {
-          method: "PUT",
+          method: 'PUT',
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload)
         });
       }
 

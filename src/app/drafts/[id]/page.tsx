@@ -36,7 +36,7 @@ export default function DraftEditorPage() {
 
   const fetchDraft = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/drafts/${id}`);
+      const res = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/drafts/${id}`);
       const data = await res.json();
       if (data.success && data.data) {
         setDraft(data.data);
@@ -136,7 +136,7 @@ export default function DraftEditorPage() {
     const currentType = draft?.template_type || (id.includes('police') ? 'police_complaint' : id.includes('rti') ? 'rti' : id.includes('consumer') ? 'consumer_complaint' : 'legal_notice');
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/drafts/${id}/generate`, {
+      const res = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/drafts/${id}/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -166,7 +166,7 @@ export default function DraftEditorPage() {
   const handleSaveText = async () => {
     setIsSaving(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/drafts/${id}`, {
+      const res = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/drafts/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -73,7 +73,7 @@ export default function TalkToSeniorSpecialistPage() {
       submitData.append("legal_issue_type", formData.category);
       submitData.append("description", formData.summary);
 
-      const submitRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/consultation/payment/submit`, {
+      const submitRes = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/consultation/payment/submit`, {
         method: "POST",
         body: submitData
       });
@@ -96,7 +96,7 @@ export default function TalkToSeniorSpecialistPage() {
       verifyData.append("utr_number", formData.utr);
       verifyData.append("screenshot", screenshot);
 
-      const verifyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/consultation/payment/verify/${txId}`, {
+      const verifyRes = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/consultation/payment/verify/${txId}`, {
         method: "POST",
         body: verifyData
       });

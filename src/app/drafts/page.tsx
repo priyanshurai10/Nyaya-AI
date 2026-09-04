@@ -57,7 +57,7 @@ function DraftsContent() {
     setIsCreating(true);
     const targetType = templateType || "custom";
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/drafts`, {
+      const res = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/drafts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -82,7 +82,7 @@ function DraftsContent() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this draft?")) return;
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/drafts/${id}`, { method: "DELETE" });
+      await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/drafts/${id}`, { method: "DELETE" });
       setDrafts((prev) => prev.filter((d) => d.id !== id));
     } catch (e) {
       console.error(e);

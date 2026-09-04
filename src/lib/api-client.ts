@@ -5,7 +5,7 @@
 
 const API_VERSION = "v1";
 // Resolve base URL: If NEXT_PUBLIC_API_URL is provided, use it. Otherwise, use relative path to trigger Next.js proxy rewrite.
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com/api/v1';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://nyaya-ai-backend-tyy5.onrender.com/api/v1";
 const DEFAULT_TIMEOUT_MS = 30000;
 
 export class ApiError extends Error {

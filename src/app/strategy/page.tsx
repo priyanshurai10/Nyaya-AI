@@ -47,7 +47,7 @@ export default function StrategyPage() {
     const fullSituation = `[Case Type: ${caseType}] [Position: ${position}] [Desired Outcome: ${desiredOutcome || "Fair resolution"}] Details: ${description}`;
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/ai-insights`, {
+      const res = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/ai-insights`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ situation: fullSituation }),
@@ -69,7 +69,7 @@ export default function StrategyPage() {
     setSaveSuccessMsg("");
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/cases`, {
+      const res = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/cases`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

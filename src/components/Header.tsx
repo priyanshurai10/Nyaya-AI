@@ -111,7 +111,7 @@ export default function Header({
       if (searchQuery.trim().length >= 2) {
         setIsSearching(true);
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/search?q=${encodeURIComponent(searchQuery)}`);
+          const res = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/search?q=${encodeURIComponent(searchQuery)}`);
           if (res.ok) {
             const data = await res.json();
             setSearchResults(data);
@@ -223,7 +223,7 @@ export default function Header({
 
   const handleLogout = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/user/logout`, { method: 'POST' });
+      await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/user/logout`, { method: 'POST' });
     } catch (e) {
       console.warn('Logout API error:', e);
     }

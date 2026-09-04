@@ -27,7 +27,7 @@ export default function DocumentAnalyzerPage() {
     formData.append("file", file);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/documents/upload`, {
+      const res = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/documents/upload`, {
         method: "POST",
         body: formData
       });
