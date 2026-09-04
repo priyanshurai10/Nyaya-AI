@@ -19,7 +19,7 @@ export default function LandmarkJudgmentsPage() {
   useEffect(() => {
     setIsLoading(true);
     setError(null);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/judgments`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/judgments`)
       .then(res => {
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);

@@ -54,7 +54,7 @@ function LitigationJourneyContent() {
       setSelectedStep(null);
       
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/guides?category=${activeCategory}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/guides?category=${activeCategory}`);
         if (!res.ok) throw new Error('Failed to load guide data');
         const json = await res.json();
         

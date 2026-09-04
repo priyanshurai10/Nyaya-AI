@@ -35,9 +35,15 @@ export class ApiClient {
   private buildUrl(endpoint: string, params?: Record<string, any>): string {
     let finalPath = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
     
-    // Prevent duplicate /api/v1 if BASE_URL already contains /api/v1
-    const base = BASE_URL.endsWith("/") ? BASE_URL.slice(0, -1) : BASE_URL;
-    if ((base === "/api/v1" || base.endsWith("/api/v1")) && finalPath.startsWith("/api/v1")) {
+    let base = BASE_URL.endsWith("/") ? BASE_URL.slice(0, -1) : BASE_URL;
+    
+    // Ensure base always ends with /api/v1 if it's a backend URL
+    if (!base.endsWith("/api/v1")) {
+      base = `${base}/api/v1`;
+    }
+
+    // Prevent duplicate /api/v1 if finalPath also has it
+    if (finalPath.startsWith("/api/v1")) {
       finalPath = finalPath.slice(7); // Remove leading /api/v1
     }
 

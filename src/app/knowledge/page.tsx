@@ -43,7 +43,7 @@ export default function LegalKnowledgeCenterPage() {
     });
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/bookmarks`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/bookmarks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ articleId: id })

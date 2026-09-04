@@ -50,7 +50,7 @@ export default function UserProfilePage() {
 
     try {
       const token = getToken();
-      let res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/user/profile`, {
+      let res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/user/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -106,7 +106,7 @@ export default function UserProfilePage() {
 
     try {
       const token = getToken();
-      let res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/user/profile/update`, {
+      let res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com'}/api/v1/user/profile/update`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
