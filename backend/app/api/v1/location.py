@@ -108,24 +108,6 @@ def search_pincode(payload: PincodeSearchRequest, db: Session = Depends(get_db))
     # Derive the most useful city name: prefer non-empty fields in order
     city = best.city or best.town or best.district or best.office_name or ""
 
-@router.post("/seed")
-def seed_pincodes_endpoint(db: Session = Depends(get_db)):
-    # Quick endpoint to seed pincodes on production
-    import os
-    # We will just run the import_pincodes script
-    script_path = os.path.join(os.path.dirname(__file__), "../../../import_pincodes.py")
-    if not os.path.exists(script_path):
-        return {"success": False, "error": "Script not found"}
-    
-    # We run it in a background thread to not block the request
-    import threading
-    def run_seed():
-        import subprocess
-        subprocess.run(["python", script_path])
-        
-    threading.Thread(target=run_seed, daemon=True).start()
-    return {"success": True, "message": "Seeding started in background"}
-
     location = LocationData(
         pincode=best.pincode,
         office_name=best.office_name,
@@ -192,3 +174,18 @@ def location_health(db: Session = Depends(get_db)):
         "pincode_records": count,
         "seeded": count > 0
     }
+
+@router.post("/seed")
+def seed_pincodes_endpoint(db: Session = Depends(get_db)):
+    import os
+    script_path = os.path.join(os.path.dirname(__file__), "../../../import_pincodes.py")
+    if not os.path.exists(script_path):
+        return {"success": False, "error": "Script not found"}
+    
+    import threading
+    def run_seed():
+        import subprocess
+        subprocess.run(["python", script_path])
+        
+    threading.Thread(target=run_seed, daemon=True).start()
+    return {"success": True, "message": "Seeding started in background"}
