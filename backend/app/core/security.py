@@ -217,3 +217,11 @@ def log_audit_event(
         db.commit()
     except Exception as e:
         print(f"Failed to log audit event: {e}")
+
+def mask_aadhaar(aadhaar: str) -> str:
+    if not aadhaar or len(str(aadhaar)) < 4: return ''
+    return 'XXXX-XXXX-' + str(aadhaar)[-4:]
+
+def mask_pan(pan: str) -> str:
+    if not pan or len(str(pan)) < 4: return ''
+    return 'XXXXX' + str(pan)[-4:]
