@@ -14,7 +14,7 @@ def call_llm(prompt: str, json_mode: bool = False, response_schema = None) -> st
     
     if groq_key:
         url = "https://api.groq.com/openai/v1/chat/completions"
-        model_name = "llama-3.3-70b-versatile"
+        model_name = "llama-3.1-70b-versatile"
         headers = {
             "Authorization": f"Bearer {groq_key}",
             "Content-Type": "application/json"

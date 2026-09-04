@@ -85,7 +85,7 @@ async def analyze_vault_document(doc_id: str, user: User = Depends(get_current_u
     }
     
     body = {
-        "model": "llama-3.3-70b-versatile",
+        "model": "llama-3.1-70b-versatile",
         "messages": [
             {"role": "system", "content": ANALYSIS_SYSTEM_PROMPT},
             {"role": "user", "content": f"Analyze this legal document:\n\n{text_content[:8000]}"}
