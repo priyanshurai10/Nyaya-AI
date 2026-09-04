@@ -32,6 +32,7 @@ from app.api.v1.knowledge import router as knowledge_router
 from app.api.v1.judgments import router as judgments_router
 from app.api.v1.vault_analyze import router as vault_analyze_router
 from app.api.v1.admin_consultation import router as admin_consultation_router
+from app.api.v1.ai_insights import router as ai_insights_router
 
 # Ensure upload directory exists
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
@@ -87,6 +88,7 @@ app.include_router(knowledge_router, prefix=f"{settings.API_V1_STR}/knowledge", 
 app.include_router(judgments_router, prefix=f"{settings.API_V1_STR}/judgments", tags=["judgments"])
 app.include_router(vault_analyze_router, prefix=f"{settings.API_V1_STR}/vault", tags=["vault-analyze"])
 app.include_router(admin_consultation_router, prefix=f"{settings.API_V1_STR}/admin/consultations", tags=["admin-consultations"])
+app.include_router(ai_insights_router, prefix=f"{settings.API_V1_STR}/ai-insights", tags=["ai-insights"])
 
 @app.get("/")
 def health_check():
