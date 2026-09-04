@@ -26,7 +26,7 @@ export default function CourtHierarchyPage() {
         setLoading(true);
         setError(null);
         // Attempt to fetch from backend API
-        const response = await apiClient.get<any[]>('/hierarchy/courts');
+        const response = await apiClient.get<any[]>('/navigation/hierarchy/courts');
         if (response && response.length > 0) {
           setData(response);
         } else {

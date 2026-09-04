@@ -59,6 +59,12 @@ export default function UserProfilePage() {
         });
       }
       const json = await res.json();
+      if (res.status === 401) {
+        localStorage.removeItem("nyaya_token");
+        localStorage.removeItem("nyaya_user");
+        window.location.href = "/auth?expired=true";
+        return;
+      }
       if (res.ok && (json.data || json.user)) {
         const p = json.data || json;
         const u = json.user || p.personal_information || {};
