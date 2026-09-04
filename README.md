@@ -156,7 +156,7 @@ Users can change their preferred language at any time, and the application inter
 ## Deployment
 
 - Vercel
-- Railway
+- Render
 - Supabase
 
 ---

@@ -4,7 +4,7 @@ import { getUserFromRequest } from "@/lib/auth";
 import { vaultStorage } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://nyaya-ai-production-04ba.up.railway.app";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://nyaya-ai-backend-tyy5.onrender.com";
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {

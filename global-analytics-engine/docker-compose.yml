@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  global-analytics-engine:
+    build: .
+    container_name: gae_analytics_app
+    ports:
+      - "8501:8501"
+    environment:
+      - STORAGE_MODE=LOCAL_MOCK
+      - DUCKDB_MEMORY_LIMIT=4GB
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
