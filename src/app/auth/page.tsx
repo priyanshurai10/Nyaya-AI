@@ -202,11 +202,22 @@ export default function AuthPage() {
         }
         
         const { data, error } = await supabase.auth.signInWithPassword({
-          email: cleanEmail,
-          password,
-        });
-        
-        if (error) throw error;
+            email: cleanEmail,
+            password,
+          });
+          
+          if (error) throw error;
+          
+          if (data?.session) {
+            localStorage.setItem('nyaya_token', data.session.access_token);
+            localStorage.setItem('nyaya_user', JSON.stringify({
+              id: data.user.id,
+              email: data.user.email,
+              name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'User',
+              role: "CITIZEN"
+            }));
+            document.cookie = `nyaya_token=${data.session.access_token}; path=/; max-age=86400`;
+          }
         
         if (rememberMe) {
           localStorage.setItem('nyaya_remembered_user', cleanEmail);
