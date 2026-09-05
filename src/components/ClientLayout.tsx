@@ -6,6 +6,7 @@ import { LocationProvider } from '@/context/LocationContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
+import NyayaShield from '@/components/NyayaShield';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -22,6 +23,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return (
       <LanguageProvider>
         {children}
+      <NyayaShield />
       </LanguageProvider>
     );
   }
