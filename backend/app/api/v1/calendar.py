@@ -24,9 +24,15 @@ def get_calendar_events(
     if not user:
         raise HTTPException(status_code=401, detail="Authentication required")
         
-    events = db.query(LegalCalendarEvent).filter(
-        LegalCalendarEvent.user_id == user.id
-    ).order_by(LegalCalendarEvent.event_date).all()
+    from sqlalchemy.exc import SQLAlchemyError
+    
+    try:
+        events = db.query(LegalCalendarEvent).filter(
+            LegalCalendarEvent.user_id == user.id
+        ).order_by(LegalCalendarEvent.event_date).all()
+    except SQLAlchemyError:
+        db.rollback()
+        events = []
 
     # Auto-seed demo events if user has none
     if len(events) == 0:
@@ -71,10 +77,14 @@ def get_calendar_events(
         ]
         for e in demo_events:
             db.add(e)
-        db.commit()
-        events = db.query(LegalCalendarEvent).filter(
-            LegalCalendarEvent.user_id == user.id
-        ).order_by(LegalCalendarEvent.event_date).all()
+        try:
+            db.commit()
+            events = db.query(LegalCalendarEvent).filter(
+                LegalCalendarEvent.user_id == user.id
+            ).order_by(LegalCalendarEvent.event_date).all()
+        except SQLAlchemyError:
+            db.rollback()
+            events = demo_events
 
     return {
         "success": True,

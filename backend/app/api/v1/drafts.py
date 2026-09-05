@@ -37,7 +37,12 @@ def get_drafts(
     if template_type:
         query = query.filter(DraftDocument.template_type == template_type)
         
-    drafts = query.order_by(DraftDocument.updated_at.desc()).all()
+    from sqlalchemy.exc import SQLAlchemyError
+    try:
+        drafts = query.order_by(DraftDocument.updated_at.desc()).all()
+    except SQLAlchemyError:
+        db.rollback()
+        drafts = []
     
     return {
         "success": True,

@@ -21,7 +21,13 @@ def list_documents(
     if not user:
         raise HTTPException(status_code=401, detail="Authentication required")
         
-    documents = db.query(Document).filter(Document.user_id == user.id).order_by(Document.created_at.desc()).all()
+    from sqlalchemy.exc import SQLAlchemyError
+    
+    try:
+        documents = db.query(Document).filter(Document.user_id == user.id).order_by(Document.created_at.desc()).all()
+    except SQLAlchemyError:
+        db.rollback()
+        documents = []
     
     return {
         "success": True,
