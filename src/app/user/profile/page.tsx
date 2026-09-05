@@ -142,11 +142,12 @@ export default function UserProfilePage() {
       await fetchProfile(); // Re-fetch clean database state
     } catch (err: any) {
       setError(err.message || "Failed to update profile.");
-    } finally {
+        } finally {
       setSaving(false);
     }
   };
 
+  if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220] flex items-center justify-center p-6">
         <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400 font-medium">
