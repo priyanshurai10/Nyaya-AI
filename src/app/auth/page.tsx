@@ -172,7 +172,8 @@ export default function AuthPage() {
     setLoading(true);
     const cleanEmail = email.trim();
     const cleanMobile = mobile.replace(/\D/g, '');
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com/api/v1';
+    const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com/api/v1';
+    const baseUrl = rawBaseUrl.endsWith('/api/v1') ? rawBaseUrl : `${rawBaseUrl.replace(/\/$/, '')}/api/v1`;
     const url = isRegister ? `${baseUrl}/user/register` : `${baseUrl}/user/login`;
     const payload = isRegister
       ? {
