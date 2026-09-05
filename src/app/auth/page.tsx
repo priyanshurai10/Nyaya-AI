@@ -578,7 +578,7 @@ export default function AuthPage() {
             ) : forgotSent ? (
               <form onSubmit={handleResetPasswordVerify} className="space-y-4">
                 <div className="p-3 bg-[var(--primary-subtle)]0/10 border border-indigo-500/20 text-[var(--primary)] dark:text-[var(--primary)] rounded-xl text-xs leading-relaxed font-semibold">
-                  📧 Simulated recovery code sent! Check your notifications and enter code <strong>123456</strong> below.
+                  📧 Recovery code sent! Please check your email inbox (and spam folder) and enter the 6-digit code below.
                 </div>
 
                 {forgotError && (
@@ -588,13 +588,13 @@ export default function AuthPage() {
                 )}
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase">Simulated OTP Code</label>
+                  <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase">Recovery OTP Code</label>
                   <input
                     type="text"
                     required
                     value={forgotCode}
                     onChange={(e) => setForgotCode(e.target.value.trim())}
-                    placeholder="Enter code 123456"
+                    placeholder="Enter 6-digit code"
                     className="w-full h-11 px-4 bg-slate-50 dark:bg-[var(--card)] border border-[var(--border)] rounded-xl text-xs focus:outline-none text-[var(--text-primary)] font-semibold"
                   />
                 </div>

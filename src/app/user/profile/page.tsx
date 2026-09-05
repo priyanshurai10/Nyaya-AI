@@ -52,62 +52,53 @@ export default function UserProfilePage() {
     setError("");
 
     try {
-      const token = await getToken();
-      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "https://nyaya-ai-backend-tyy5.onrender.com/api/v1").replace(/\/api\/v1$/, "");
+      const { createClient } = await import('@/utils/supabase/client');
+      const supabase = createClient();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
       
-      let res = await fetch(`${baseUrl}/api/v1/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
-        res = await fetch(`${BACKEND_URL}/api/v1/user/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      }
-      const json = await res.json();
-      if (res.status === 401) {
-        localStorage.removeItem("nyaya_token");
-        localStorage.removeItem("nyaya_user");
+      if (authError || !user) {
         window.location.href = "/auth?expired=true";
         return;
       }
-      if (res.ok && (json.data || json.user)) {
-        const p = json.data || json;
-        const u = json.user || p.personal_information || {};
-        const pInfo = p.personal_information || {};
 
-        setProfile(p);
-        setFormData({
-          name: pInfo.name || u.name || "",
-          email: pInfo.email || u.email || "",
-          phone: pInfo.phone || u.phone || "",
-          dob: pInfo.dob || "",
-          gender: pInfo.gender || "",
-          marital_status: pInfo.marital_status || "",
-          blood_group: pInfo.blood_group || "",
-          occupation: pInfo.occupation || "",
-          education: pInfo.education || "",
-          address: pInfo.address || "",
-          state: pInfo.state || "",
-          district: pInfo.district || "",
-          pincode: pInfo.pincode || "",
-          preferred_language: pInfo.preferred_language || "en",
-          avatar_url: pInfo.avatar_url || "",
-          aadhaar: "",
-          pan: "",
-        });
-      } else {
-        setError(json.message || "Failed to load profile from database.");
+      const { data: p, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+        
+      if (error && error.code !== 'PGRST116') {
+        throw error;
       }
+
+      setProfile(p || {});
+      setFormData({
+        name: p?.name || user.user_metadata?.name || "",
+        email: p?.email || user.email || "",
+        phone: p?.phone || user.phone || "",
+        dob: p?.dob || "",
+        gender: p?.gender || "",
+        marital_status: p?.marital_status || "",
+        blood_group: p?.blood_group || "",
+        occupation: p?.occupation || "",
+        education: p?.education || "",
+        address: p?.location_town || "",
+        state: p?.location_state || "",
+        district: p?.location_district || "",
+        pincode: p?.location_pincode || "",
+        preferred_language: p?.language_preference || "en",
+        avatar_url: p?.avatar_url || "",
+        aadhaar: "",
+        pan: "",
+      });
     } catch (err: any) {
-      setError(err.message || "Network error loading database profile.");
+      console.error(err);
+      setError(err.message || "Failed to load profile from database.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,7 +113,8 @@ export default function UserProfilePage() {
 
       if (!user) throw new Error("Unauthorized");
 
-      const { error } = await supabase.from('profiles').update({
+      const updates = {
+        id: user.id,
         name: formData.name,
         phone: formData.phone,
         dob: formData.dob,
@@ -131,13 +123,15 @@ export default function UserProfilePage() {
         blood_group: formData.blood_group,
         occupation: formData.occupation,
         education: formData.education,
-        address: formData.address,
-        state: formData.state,
-        district: formData.district,
-        pincode: formData.pincode,
-        preferred_language: formData.preferred_language,
-        avatar_url: formData.avatar_url,
-      }).eq('id', user.id);
+        location_town: formData.address,
+        location_state: formData.state,
+        location_district: formData.district,
+        location_pincode: formData.pincode,
+        language_preference: formData.preferred_language,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase.from('profiles').upsert(updates);
 
       if (error) {
         throw error;
@@ -153,7 +147,6 @@ export default function UserProfilePage() {
     }
   };
 
-  if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220] flex items-center justify-center p-6">
         <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400 font-medium">
