@@ -99,6 +99,9 @@ export default function UserProfilePage() {
     }
   };
 
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
