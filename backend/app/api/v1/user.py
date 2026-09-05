@@ -247,13 +247,44 @@ def get_profile(user: User = Depends(get_current_user), db: Session = Depends(ge
     from app.models import Notification, Document, ChatSession, AuditLog
     from app.core.security import encrypt_data, decrypt_data, mask_aadhaar, mask_pan
 
-    # Fetch real relations from PostgreSQL
-    consultations = db.query(ConsultationRequest).filter(ConsultationRequest.user_id == user.id).order_by(ConsultationRequest.created_at.desc()).all()
-    transactions = db.query(Transaction).filter(Transaction.user_id == user.id).order_by(Transaction.created_at.desc()).all()
-    notifications = db.query(Notification).filter(Notification.user_id == user.id).order_by(Notification.created_at.desc()).all()
-    documents = db.query(Document).filter(Document.user_id == user.id).order_by(Document.created_at.desc()).all()
-    chats = db.query(ChatSession).filter(ChatSession.user_id == user.id).order_by(ChatSession.created_at.desc()).all()
-    activities = db.query(AuditLog).filter(AuditLog.user_id == user.id).order_by(AuditLog.timestamp.desc()).limit(50).all()
+    # Fetch real relations from PostgreSQL with fallback to empty lists if tables don't exist
+    from sqlalchemy.exc import SQLAlchemyError
+    
+    try:
+        consultations = db.query(ConsultationRequest).filter(ConsultationRequest.user_id == user.id).order_by(ConsultationRequest.created_at.desc()).all()
+    except SQLAlchemyError:
+        db.rollback()
+        consultations = []
+        
+    try:
+        transactions = db.query(Transaction).filter(Transaction.user_id == user.id).order_by(Transaction.created_at.desc()).all()
+    except SQLAlchemyError:
+        db.rollback()
+        transactions = []
+        
+    try:
+        notifications = db.query(Notification).filter(Notification.user_id == user.id).order_by(Notification.created_at.desc()).all()
+    except SQLAlchemyError:
+        db.rollback()
+        notifications = []
+        
+    try:
+        documents = db.query(Document).filter(Document.user_id == user.id).order_by(Document.created_at.desc()).all()
+    except SQLAlchemyError:
+        db.rollback()
+        documents = []
+        
+    try:
+        chats = db.query(ChatSession).filter(ChatSession.user_id == user.id).order_by(ChatSession.created_at.desc()).all()
+    except SQLAlchemyError:
+        db.rollback()
+        chats = []
+        
+    try:
+        activities = db.query(AuditLog).filter(AuditLog.user_id == user.id).order_by(AuditLog.timestamp.desc()).limit(50).all()
+    except SQLAlchemyError:
+        db.rollback()
+        activities = []
 
     # Decrypt & mask Aadhaar / PAN
     aadhaar_raw = decrypt_data(user.aadhaar_enc) if user.aadhaar_enc else None
