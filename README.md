@@ -18,7 +18,25 @@ The platform is built with a modern full-stack architecture using Next.js, FastA
 
 ---
 
-# ✨ Features
+
+# ✨ Core Features
+
+## 🛡️ Nyaya Shield (न्याय कवच) - Your Instant Legal Guardian
+
+Ever been pulled over by the traffic police and felt unsure of what they can actually do? Or found yourself in a sudden emergency where you needed to know your rights *right now*? 
+
+We built **Nyaya Shield** exactly for these moments. It's a quick-access, floating SOS button that sits quietly at the bottom right of your screen on every page. 
+
+**With just one tap (no typing required), it gives you instant, panic-free access to:**
+- 🚨 **Police Arrest Rights:** (e.g., *Women cannot be arrested after sunset without a female officer.*)
+- 🚦 **Traffic Stop Rights:** (e.g., *Traffic police CANNOT physically take your car keys.*)
+- ⚖️ **Domestic Violence Protections:** (e.g., *Your right to reside in the shared household.*)
+- 📞 **One-Tap Helplines:** (Direct access to National Emergency 112, Women Helpline 1091, Cyber Crime 1930, etc.)
+
+We believe true justice means knowing your rights exactly when you need them most. Nyaya Shield is our way of ensuring you're never caught off-guard.
+
+---
+
 
 ## 🤖 AI Legal Assistant
 
