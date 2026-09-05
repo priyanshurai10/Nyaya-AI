@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import {
+  Sparkles,
   User as UserIcon, Shield, Lock, CreditCard, Calendar, Edit3, Save, Eye,
   EyeOff, MapPin, CheckCircle2, AlertCircle, RefreshCw, ChevronRight, Phone, Mail, Globe
 } from "lucide-react";
@@ -160,7 +161,7 @@ export default function UserProfilePage() {
     );
   }
 
-  const pInfo = profile?.personal_information || {};
+  const pInfo = profile || {};
   const sIdent = profile?.sensitive_identity || {};
   const payments = profile?.payment_history || [];
   const consultations = profile?.consultation_history || [];
@@ -319,6 +320,37 @@ export default function UserProfilePage() {
 
         {/* Display Grid */}
         <div className="max-w-3xl mx-auto">
+          
+          {(() => {
+            const fields = ['name', 'phone', 'dob', 'gender', 'marital_status', 'blood_group', 'occupation', 'education', 'address', 'state', 'district', 'pincode', 'preferred_language'];
+            const filledCount = fields.filter(f => pInfo[f] && String(pInfo[f]).trim() !== "").length;
+            const progressPct = Math.round((filledCount / fields.length) * 100);
+            
+            return (
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-sm">
+                    <Sparkles className="w-4 h-4 text-[#FF9933]" /> Profile Completion
+                  </h3>
+                  <span className="text-sm font-bold text-[#FF9933]">
+                    {progressPct}%
+                  </span>
+                </div>
+                <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5">
+                  <div 
+                    className="bg-[#FF9933] h-2.5 rounded-full transition-all duration-500 ease-in-out" 
+                    style={{ width: `${progressPct}%` }}
+                  ></div>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                  {progressPct === 100 
+                    ? "Awesome! Your profile is complete." 
+                    : "Complete your profile to get more accurate legal advice and faster case assistance."}
+                </p>
+              </div>
+            );
+          })()}
+
           {/* Personal Details Card */}
           <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 space-y-4 shadow-sm">
             <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-lg">
