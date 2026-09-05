@@ -9,9 +9,12 @@ import Link from "next/link";
 
 const BACKEND_URL = "https://nyaya-ai-backend-tyy5.onrender.com";
 
-function getToken(): string {
+async function getToken(): Promise<string> {
   if (typeof window === "undefined") return "";
-  return localStorage.getItem("nyaya_token") || "";
+  const { createClient } = await import('@/utils/supabase/client');
+  const supabase = createClient();
+  const { data } = await supabase.auth.getSession();
+  return data?.session?.access_token || "";
 }
 
 export default function UserProfilePage() {
@@ -49,7 +52,7 @@ export default function UserProfilePage() {
     setError("");
 
     try {
-      const token = getToken();
+      const token = await getToken();
       const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "https://nyaya-ai-backend-tyy5.onrender.com/api/v1").replace(/\/api\/v1$/, "");
       
       let res = await fetch(`${baseUrl}/api/v1/user/profile`, {
@@ -113,37 +116,36 @@ export default function UserProfilePage() {
     setSuccess("");
 
     try {
-      const token = getToken();
-      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "https://nyaya-ai-backend-tyy5.onrender.com/api/v1").replace(/\/api\/v1$/, "");
-      const payload = formData;
+      const { createClient } = await import('@/utils/supabase/client');
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
 
-      let res = await fetch(`${baseUrl}/api/v1/user/profile/update`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        res = await fetch(`${BACKEND_URL}/api/v1/user/profile/update`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify(payload)
-        });
+      if (!user) throw new Error("Unauthorized");
+
+      const { error } = await supabase.from('profiles').update({
+        name: formData.name,
+        phone: formData.phone,
+        dob: formData.dob,
+        gender: formData.gender,
+        marital_status: formData.marital_status,
+        blood_group: formData.blood_group,
+        occupation: formData.occupation,
+        education: formData.education,
+        address: formData.address,
+        state: formData.state,
+        district: formData.district,
+        pincode: formData.pincode,
+        preferred_language: formData.preferred_language,
+        avatar_url: formData.avatar_url,
+      }).eq('id', user.id);
+
+      if (error) {
+        throw error;
       }
 
-      const json = await res.json();
-      if (res.ok && json.success) {
-        setSuccess("Profile updated and saved to database successfully!");
-        setEditMode(false);
-        await fetchProfile(); // Re-fetch clean database state
-      } else {
-        setError(json.message || "Failed to save profile updates.");
-      }
+      setSuccess("Profile updated and saved to database successfully!");
+      setEditMode(false);
+      await fetchProfile(); // Re-fetch clean database state
     } catch (err: any) {
       setError(err.message || "Failed to update profile.");
     } finally {

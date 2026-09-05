@@ -66,7 +66,7 @@ export class ApiClient {
     return url.toString();
   }
 
-  private getHeaders(options: ApiRequestOptions, isFormData = false): Headers {
+  private async getHeaders(options: ApiRequestOptions, isFormData = false): Promise<Headers> {
     const headers = new Headers(options.headers || {});
     
     // Accept-Language
@@ -91,9 +91,13 @@ export class ApiClient {
     
     // Authentication (Default true unless explicitly false)
     if (options.requireAuth !== false) {
-      const token = localStorage.getItem("nyaya_token");
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
+      if (typeof window !== "undefined") {
+        const { createClient } = await import('@/utils/supabase/client');
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          headers.set("Authorization", `Bearer ${session.access_token}`);
+        }
       }
     }
     return headers;
@@ -116,7 +120,7 @@ export class ApiClient {
     const { timeout = DEFAULT_TIMEOUT_MS, params, ...fetchOptions } = options;
     const url = this.buildUrl(endpoint, params);
     const isFormData = fetchOptions.body instanceof FormData;
-    const headers = this.getHeaders(options, isFormData);
+    const headers = await this.getHeaders(options, isFormData);
     const controller = new AbortController();
     
     const id = setTimeout(() => controller.abort(), timeout);
@@ -240,7 +244,7 @@ export class ApiClient {
    */
   async download(endpoint: string, filename: string, options?: ApiRequestOptions & { body?: any; method?: string }): Promise<void> {
     const url = this.buildUrl(endpoint, options?.params);
-    const headers = this.getHeaders(options || {}, false);
+    const headers = await this.getHeaders(options || {}, false);
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), options?.timeout || DEFAULT_TIMEOUT_MS);
     try {

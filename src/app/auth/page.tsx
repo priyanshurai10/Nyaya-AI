@@ -172,51 +172,56 @@ export default function AuthPage() {
     setLoading(true);
     const cleanEmail = email.trim();
     const cleanMobile = mobile.replace(/\D/g, '');
-    const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://nyaya-ai-backend-tyy5.onrender.com/api/v1';
-    const baseUrl = rawBaseUrl.endsWith('/api/v1') ? rawBaseUrl : `${rawBaseUrl.replace(/\/$/, '')}/api/v1`;
-    const url = isRegister ? `${baseUrl}/user/register` : `${baseUrl}/user/login`;
-    const payload = isRegister
-      ? {
-          name: name.trim(),
-          email: useMobile ? null : cleanEmail,
-          mobile: useMobile ? cleanMobile : null,
-          password,
-        }
-      : {
-          username: useMobile ? cleanMobile : cleanEmail,
-          password,
-        };
-
+    
     try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
+      const { createClient } = await import('@/utils/supabase/client');
+      const supabase = createClient();
       
-      if (!res.ok) {
-        throw new Error(data.detail || data.message || 'Authentication failed');
-      }
-      
-      if (rememberMe) {
-        localStorage.setItem('nyaya_remembered_user', useMobile ? cleanMobile : cleanEmail);
-        localStorage.setItem('nyaya_remembered_type', useMobile ? 'mobile' : 'email');
+      if (isRegister) {
+        if (useMobile) {
+          throw new Error('Mobile registration is not configured for Supabase. Please use email.');
+        }
+        
+        const { data, error } = await supabase.auth.signUp({
+          email: cleanEmail,
+          password,
+          options: {
+            data: {
+              name: name.trim()
+            }
+          }
+        });
+        
+        if (error) throw error;
+        
+        setSuccessMessage('Registration successful! Please login.');
+        setTimeout(() => setIsRegister(false), 2000);
       } else {
-        localStorage.removeItem('nyaya_remembered_user');
-        localStorage.removeItem('nyaya_remembered_type');
-      }
-
-      if (isRegister && useMobile) {
-        // Simulated OTP flow for mobile registrations
-        setSuccessMessage('Simulated Verification OTP code "123456" sent to your mobile.');
-        setShowOtpScreen(true);
-        setOtpCountdown(30);
-      } else {
-        saveSession(data.data || data);
+        if (useMobile) {
+          throw new Error('Mobile login is not configured yet. Please use email.');
+        }
+        
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password,
+        });
+        
+        if (error) throw error;
+        
+        if (rememberMe) {
+          localStorage.setItem('nyaya_remembered_user', cleanEmail);
+          localStorage.setItem('nyaya_remembered_type', 'email');
+        } else {
+          localStorage.removeItem('nyaya_remembered_user');
+          localStorage.removeItem('nyaya_remembered_type');
+        }
+        
+        const searchParams = new URLSearchParams(window.location.search);
+        const redirectUrl = searchParams.get('redirect') || '/dashboard';
+        window.location.href = redirectUrl;
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Server connection failed.');
+      setErrorMessage(err.message || 'Authentication failed.');
     } finally {
       setLoading(false);
     }
@@ -267,23 +272,20 @@ export default function AuthPage() {
     setForgotSuccess(false);
 
     if (!forgotEmail.trim()) {
-      setForgotError('Please enter a username, email, or mobile.');
+      setForgotError('Please enter an email address.');
       return;
     }
     setLoading(true);
     try {
-      const res = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/user/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: forgotEmail })
+      const { createClient } = await import('@/utils/supabase/client');
+      const supabase = createClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
+        redirectTo: window.location.origin + '/auth/update-password',
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message || 'Verification request failed.');
-      }
-      setForgotToken(data.recovery_token);
+      if (error) throw error;
+      
       setForgotSent(true);
-      setForgotError('Simulated recovery OTP code "123456" sent successfully.');
+      setForgotError('Password recovery link sent to your email successfully.');
     } catch (err: any) {
       setForgotError(err.message || 'Connection failed.');
     } finally {
@@ -293,47 +295,7 @@ export default function AuthPage() {
 
   const handleResetPasswordVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    setForgotError('');
-
-    if (forgotCode !== '123456') {
-      setForgotError('Invalid verification code. Enter code 123456.');
-      return;
-    }
-    if (forgotNewPassword.length < 6) {
-      setForgotError('Password must be at least 6 characters.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const res = await fetch(`https://nyaya-ai-backend-tyy5.onrender.com/api/v1/user/reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          token: forgotToken,
-          code: forgotCode,
-          password: forgotNewPassword
-        })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message || 'Reset password failed.');
-      }
-      setForgotSuccess(true);
-      setTimeout(() => {
-        setForgotOpen(false);
-        setForgotSent(false);
-        setForgotSuccess(false);
-        setForgotEmail('');
-        setForgotCode('');
-        setForgotNewPassword('');
-        setForgotToken('');
-      }, 1500);
-    } catch (err: any) {
-      setForgotError(err.message || 'Connection failed.');
-    } finally {
-      setLoading(false);
-    }
+    setForgotError('Please click the recovery link sent to your email to update your password.');
   };
 
   return (
