@@ -6,7 +6,7 @@
 const API_VERSION = "v1";
 // Resolve base URL: If NEXT_PUBLIC_API_URL is provided, use it. Otherwise, use relative path to trigger Next.js proxy rewrite.
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://nyaya-ai-backend-tyy5.onrender.com/api/v1";
-const DEFAULT_TIMEOUT_MS = 30000;
+const DEFAULT_TIMEOUT_MS = 120000;
 
 export class ApiError extends Error {
   status: number;
@@ -174,7 +174,7 @@ export class ApiClient {
       clearTimeout(id);
       if (error.name === "AbortError") {
         if (isDev) console.error(`[API TIMEOUT] ${url}`);
-        throw new ApiError(408, "Request timed out. Please check your internet connection.");
+        throw new ApiError(408, "Request timed out. The backend server might be waking up from sleep. Please try again in a few seconds.");
       }
       if (error instanceof ApiError) {
         throw error;
