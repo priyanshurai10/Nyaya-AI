@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { updateSession } from './utils/supabase/middleware';
-import { createServerClient } from '@supabase/ssr';
 
 function isSuperAdminEmail(e?: string): boolean {
   if (!e) return false;
@@ -9,30 +8,12 @@ function isSuperAdminEmail(e?: string): boolean {
 }
 
 export async function middleware(req: NextRequest) {
-  // Update Supabase session
-  let response = await updateSession(req);
-  
-  // Create a supabase client strictly for middleware checks
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return req.cookies.get(name)?.value;
-        },
-      },
-    }
-  );
-
-  const { data: { user } } = await supabase.auth.getUser();
   const path = req.nextUrl.pathname;
-  const isAuthed = !!user;
-  const email = user?.email || '';
 
-  // Completely redirect removed UI routes (/admin, /notifications) to /dashboard
+  // Completely redirect removed UI routes (/admin, /notifications) to /dashboard or /auth
   if (path.startsWith('/admin') || path.startsWith('/notifications')) {
-    return NextResponse.redirect(new URL(isAuthed ? '/dashboard' : '/auth', req.url));
+    const hasAuthCookie = req.cookies.getAll().some(c => c.name.startsWith('sb-') && c.name.includes('-auth-token'));
+    return NextResponse.redirect(new URL(hasAuthCookie ? '/dashboard' : '/auth', req.url));
   }
 
   // Define protected routes
@@ -42,11 +23,6 @@ export async function middleware(req: NextRequest) {
     path.startsWith('/evidence-vault') ||
     path.startsWith('/payments') ||
     path.startsWith('/user/profile');
-
-  // Protect general UI
-  if (isProtectedUI && !isAuthed) {
-    return NextResponse.redirect(new URL(`/auth?redirect=${encodeURIComponent(path)}`, req.url));
-  }
 
   // Define API routes
   const isProtectedApi = 
@@ -61,6 +37,23 @@ export async function middleware(req: NextRequest) {
     path.startsWith('/api/v1/consultation');
 
   const isAdminApi = path.startsWith('/api/v1/admin');
+
+  // Fast path: If it's a completely public page (e.g. /, /auth, /academy, etc.)
+  // and the visitor has no Supabase auth cookies, return immediately without any network roundtrip!
+  const hasAuthCookie = req.cookies.getAll().some(c => c.name.startsWith('sb-') && c.name.includes('-auth-token'));
+  if (!isProtectedUI && !isProtectedApi && !isAdminApi && !hasAuthCookie) {
+    return NextResponse.next();
+  }
+
+  // Update Supabase session and fetch user in ONE single, timeout-safe call
+  const { response, user } = await updateSession(req);
+  const isAuthed = !!user;
+  const email = user?.email || '';
+
+  // Protect general UI
+  if (isProtectedUI && !isAuthed) {
+    return NextResponse.redirect(new URL(`/auth?redirect=${encodeURIComponent(path)}`, req.url));
+  }
 
   if (isAdminApi) {
     if (!isAuthed || !isSuperAdminEmail(email)) {
