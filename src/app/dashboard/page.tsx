@@ -5,7 +5,8 @@ import {
   User, CheckCircle2, BookOpen, Sparkles, Shield, Scale, FileText, ArrowRight, 
   Zap, Landmark, Search, ShieldAlert, Award, PhoneCall, ChevronRight, Gavel, 
   FolderOpen, Compass, FileSignature, MessageSquare, Star, Send, MessageCircle,
-  Instagram, Linkedin, Github, MapPin, Bookmark, Users, Clock, Lightbulb, Rocket, Heart, BrainCircuit
+  Instagram, Linkedin, Github, MapPin, Bookmark, Users, Clock, Lightbulb, Rocket, Heart, BrainCircuit,
+  Calculator
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -63,6 +64,7 @@ export default function UserDashboardPage() {
     { id: "consultation", title: "Talk to Senior Specialist", desc: "Schedule a 1-on-1 confidential consultation with a senior legal specialist", icon: PhoneCall, href: "/consultation", color: "from-emerald-600 to-teal-700", tag: "Specialist Call" },
     { id: "risk", title: "AI Risk Analyzer", desc: "Scan legal documents & disputes to identify risk levels and vulnerabilities", icon: ShieldAlert, href: "/risk", color: "from-amber-500 to-orange-600", tag: "Risk Engine" },
     { id: "strategy", title: "Legal Strategy Builder", desc: "Generate step-by-step legal action plans and litigation roadmaps", icon: Compass, href: "/strategy", color: "from-[#FF9933] to-amber-600", tag: "Strategy" },
+    { id: "calculator", title: "Nyaya Legal Calculator", desc: "Instant statutory calculations for Traffic Fines, Cheque Bounce, RERA Delay & Gratuity", icon: Calculator, href: "/calculator", color: "from-cyan-600 to-blue-700", tag: "New Feature" },
     { id: "generator", title: "FIR & Legal Notice Generator", desc: "Draft complaints, RTI applications & legal notices in seconds", icon: FileSignature, href: "/document-generator", color: "from-blue-600 to-indigo-600", tag: "Drafting" },
     { id: "vault", title: "AI Evidence Vault", desc: "Upload and run OCR analysis on contracts, deeds, and legal receipts", icon: FolderOpen, href: "/evidence-vault", color: "from-purple-600 to-indigo-700", tag: "OCR Analysis" },
     { id: "academy", title: "Legal Learning Academy", desc: "Structured lessons on Constitution, BNS, BNSS, BSA & Consumer Rights", icon: BookOpen, href: "/academy", color: "from-sky-500 to-blue-600", tag: "14 Courses" },

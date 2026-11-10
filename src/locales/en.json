@@ -111,5 +111,6 @@
   "uploadDropzone": "Drag & drop legal document (PDF, PNG, JPG, TXT)",
   "riskScore": "Legal Vulnerability Score",
   "keyPoints": "Extracted Key Clauses",
-  "recommendedSteps": "Actionable Next Steps"
+  "recommendedSteps": "Actionable Next Steps",
+  "navCalculator": "Nyaya Legal Calculator"
 }

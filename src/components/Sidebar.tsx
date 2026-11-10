@@ -30,6 +30,7 @@ import {
   X,
   ChevronDown,
   Gavel,
+  Calculator,
   type LucideIcon,
 } from 'lucide-react';
 import { translations } from '@/lib/translations';
@@ -125,6 +126,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       title: t('catAid') || 'Legal Aid & Drafts',
       items: [
+        { path: '/calculator', label: t('navCalculator') || 'Nyaya Legal Calculator', icon: Calculator, badge: 'NEW', badgeType: 'success' },
         { path: '/knowledge', label: t('navKnowledge') || 'Knowledge Center', icon: Scale },
         { path: '/journey', label: t('navJourney') || 'Legal Rights Guide', icon: Shield },
         { path: '/strategy', label: t('navStrategy') || 'Strategy Engine', icon: ShieldCheck },

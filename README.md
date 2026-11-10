@@ -38,6 +38,27 @@ We believe true justice means knowing your rights exactly when you need them mos
 ---
 
 
+## 🧮 Nyaya Legal Calculator (न्याय कैलकुलेटर) - Real-time Statutory Computation Suite
+
+Legal fines, statutory deadlines, and compensation amounts shouldn't be a guessing game or hidden behind expensive legal consultations. 
+
+We built the **Nyaya Legal Calculator** (`/calculator`) as an interactive, zero-jargon legal computation suite that calculates exact statutory figures, penal liabilities, and mandatory countdowns backed directly by Indian Acts:
+
+- 🚦 **Motor Vehicle Challan & Penalty Calculator (MVA 2019):**
+  Check any combination of traffic violations (Helmet, Red Light, DUI, Expired PUC, Over-speeding, Minor Driving) to get exact compounding fines, court summons flags, and on-the-spot citizen rights (e.g., Rule 139A DigiLocker validity, prohibition on physical key snatching).
+- 💸 **Cheque Dishonour & Recovery Calculator (Section 138 NI Act):**
+  Enter the cheque amount and return memo date to automatically calculate the mandatory **15-day cure window**, the **30-day court filing deadline**, double (2x) penal exposure, and Section 143A interim compensation deposits (up to 20%).
+- 🏢 **Builder Possession Delay Compensation (Section 18 RERA Act):**
+  Calculate statutory monthly interest and total accumulated delay compensation owed by real estate developers based on SBI MCLR + 2% per annum guidelines.
+- 💼 **Statutory Gratuity Payout Estimator (Payment of Gratuity Act 1972):**
+  Computes exact qualifying service years, applies the statutory formula `((15 × Basic × Years) ÷ 26)`, checks 5-year eligibility, and highlights Section 10(10) tax exemptions.
+- ⚖️ **Maintenance & Alimony Legal Benchmark (Section 144 BNSS / Section 125 CrPC):**
+  Generates judicial benchmark estimates based on landmark Supreme Court precedent (*Kalyan Dey Chowdhury v. Rita Dey Chowdhury* - 25% net income rule plus dependent child allowances).
+- 📋 **One-Click Legal Summary Copy & Print:**
+  Instantly copy or print a cleanly formatted statutory report citing all relevant Indian legal sections to share with your advocate or keep for your records.
+
+---
+
 ## 🤖 AI Legal Assistant
 
 - AI-powered legal conversations
